@@ -24,8 +24,12 @@ export interface Fundi extends Omit<User, "photo"> {
   verified: boolean;
   rating: number;
   reviewCount: number;
-  photo?: string; // Re-add to allow it, or use `image`
-  image?: string; // Add image property
+  photo?: string;
+  image?: string;
+  joinedDate?: string;
+  subscriptionActive?: boolean;
+  promoted?: boolean;
+  isPromoted?: boolean;
 }
 
 export interface Shop {
@@ -45,6 +49,9 @@ export interface Shop {
   ward?: string;
   categories?: string[];
   shopName?: string; // Keep for now for compatibility, but prefer `name`
+  subscriptionActive?: boolean;
+  promoted?: boolean;
+  isPromoted?: boolean;
 }
 
 export interface Message {

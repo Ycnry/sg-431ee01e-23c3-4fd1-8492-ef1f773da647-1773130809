@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { Header } from "@/components/Header";
@@ -9,8 +8,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Star, MessageSquare, Phone, MapPin, CheckCircle2, Briefcase } from "lucide-react";
+import { Star, MessageSquare, Phone, MapPin, CheckCircle2, Briefcase, ShieldCheck, ShieldX } from "lucide-react";
 import { mockFundis } from "@/lib/mockData";
+import { subscriptionDb } from "@/lib/subscriptionDb";
+import { Fundi } from "@/types";
 
 export default function FundiProfile() {
   const router = useRouter();
@@ -18,12 +19,20 @@ export default function FundiProfile() {
   const { t, language } = useLanguage();
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
+  const [fundi, setFundi] = useState<Fundi | null>(null);
+  const [isPromoted, setIsPromoted] = useState(false);
+  const [subscriptionActive, setSubscriptionActive] = useState(false);
 
-  const fundi = mockFundis.find((f) => f.id === id);
-
-  if (!fundi) {
-    return <div>Loading...</div>;
-  }
+  useEffect(() => {
+    if (id) {
+      const foundFundi = mockFundis.find((f) => f.id === id);
+      setFundi(foundFundi || null);
+      if (foundFundi) {
+        setIsPromoted(subscriptionDb.isUserPromoted(foundFundi.id));
+        setSubscriptionActive(subscriptionDb.isUserActiveAndValid(foundFundi.id));
+      }
+    }
+  }, [id]);
 
   const handleSubmitReview = () => {
     if (rating > 0 && review.trim()) {
@@ -34,8 +43,8 @@ export default function FundiProfile() {
   };
 
   const metaTitle = language === "en" 
-    ? `${fundi.name} - ${fundi.specialty} in ${fundi.city} | Smart Fundi`
-    : `${fundi.name} - ${fundi.specialty} ${fundi.city} | Smart Fundi`;
+    ? `${fundi?.name} - ${fundi?.specialty} in ${fundi?.city} | Smart Fundi`
+    : `${fundi?.name} - ${fundi?.specialty} ${fundi?.city} | Smart Fundi`;
 
   return (
     <>
@@ -48,60 +57,57 @@ export default function FundiProfile() {
         <Header />
         
         <main className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-8">
               <Card>
                 <CardContent className="p-6">
-                  <div className="flex items-start gap-6 mb-6">
-                    <Avatar className="h-24 w-24 border-4 border-blue-100">
-                      <AvatarImage src={fundi.photo} alt={fundi.name} />
-                      <AvatarFallback className="bg-blue-100 text-blue-700 text-2xl font-bold">
-                        {fundi.name.charAt(0)}
-                      </AvatarFallback>
+                  <div className="flex flex-col sm:flex-row items-start gap-6">
+                    <Avatar className="h-32 w-32 border-4 border-white shadow-lg">
+                      <AvatarImage src={fundi?.image || fundi?.photo} alt={fundi?.name} />
+                      <AvatarFallback className="text-4xl">{fundi?.name?.charAt(0)}</AvatarFallback>
                     </Avatar>
-                    
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h1 className="text-3xl font-bold">{fundi.name}</h1>
-                        {fundi.verified && (
-                          <CheckCircle2 className="h-6 w-6 text-blue-600" />
+                      <div className="flex flex-wrap items-center gap-4 mb-2">
+                        <h1 className="text-3xl font-bold">{fundi?.name}</h1>
+                        {fundi?.verified && (
+                          <Badge variant="default" className="bg-blue-600 hover:bg-blue-700 gap-1.5 pl-2 pr-3">
+                            <CheckCircle2 className="h-4 w-4" />
+                            {t("common.verified")}
+                          </Badge>
+                        )}
+                        {isPromoted && (
+                          <Badge variant="secondary" className="bg-orange-100 text-orange-700">
+                            {t("common.featured")}
+                          </Badge>
                         )}
                       </div>
-                      
-                      <div className="flex items-center gap-4 mb-3">
+                      <p className="text-lg text-muted-foreground">{fundi?.specialty}</p>
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground mt-2">
+                        <MapPin className="h-4 w-4" />
+                        <span>{fundi?.city}</span>
+                      </div>
+                      <div className="flex items-center gap-2 mt-3">
                         <div className="flex items-center gap-1">
                           <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                          <span className="font-semibold text-lg">{fundi.rating.toFixed(1)}</span>
-                          <span className="text-muted-foreground">({fundi.reviewCount} {t("common.reviews")})</span>
+                          <span className="font-bold text-lg">{fundi?.rating?.toFixed(1)}</span>
                         </div>
+                        <span className="text-sm text-muted-foreground">
+                          ({fundi?.reviewCount} {t("common.reviews")})
+                        </span>
                       </div>
-
-                      <div className="flex flex-wrap gap-3 text-sm">
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <Briefcase className="h-4 w-4" />
-                          <span>{fundi.specialty}</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <MapPin className="h-4 w-4" />
-                          <span>{fundi.city}</span>
-                        </div>
+                       <div className="mt-2 text-sm text-muted-foreground">
+                        {subscriptionActive ? (
+                          <span className="flex items-center gap-2 text-green-600">
+                            <ShieldCheck className="h-4 w-4" /> Active Subscription
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-2 text-red-600">
+                            <ShieldX className="h-4 w-4" /> Inactive Subscription
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
-
-                  <div className="mb-6">
-                    <h2 className="text-xl font-semibold mb-3">About</h2>
-                    <p className="text-muted-foreground leading-relaxed">{fundi.bio}</p>
-                  </div>
-
-                  {fundi.subscriptionActive && (
-                    <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-950 rounded-lg">
-                      <CheckCircle2 className="h-5 w-5 text-green-600" />
-                      <span className="text-sm font-medium text-green-700 dark:text-green-400">
-                        Active subscription - Verified professional
-                      </span>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
 
@@ -112,50 +118,23 @@ export default function FundiProfile() {
                   </h2>
                   
                   <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-2">
-                        {language === "en" ? "Your Rating" : "Ukadiriaji Wako"}
-                      </label>
-                      <div className="flex gap-2">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <button
-                            key={star}
-                            onClick={() => setRating(star)}
-                            className="transition-colors"
-                          >
-                            <Star
-                              className={`h-8 w-8 ${
-                                star <= rating
-                                  ? "fill-yellow-400 text-yellow-400"
-                                  : "text-gray-300"
-                              }`}
-                            />
-                          </button>
-                        ))}
+                    <div className="flex items-center gap-4">
+                      <Button className="flex-1 gap-2 py-6 text-lg" variant="default">
+                        <MessageSquare className="h-5 w-5" />
+                        {t("action.message")}
+                      </Button>
+                      {fundi?.whatsapp && (
+                        <Button className="flex-1 gap-2 py-6 text-lg" variant="outline">
+                          <Phone className="h-5 w-5" />
+                          {t("action.call")}
+                        </Button>
+                      )}
+                    </div>
+                    {isPromoted && (
+                      <div className="text-center text-sm text-orange-600">
+                        This provider is featured! Contact them for priority service.
                       </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium mb-2">
-                        {language === "en" ? "Your Review" : "Maoni Yako"}
-                      </label>
-                      <Textarea
-                        value={review}
-                        onChange={(e) => setReview(e.target.value)}
-                        placeholder={language === "en" 
-                          ? "Share your experience with this fundi..." 
-                          : "Shiriki uzoefu wako na fundi huyu..."}
-                        rows={4}
-                      />
-                    </div>
-
-                    <Button 
-                      onClick={handleSubmitReview}
-                      disabled={rating === 0 || !review.trim()}
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
-                      {language === "en" ? "Submit Review" : "Wasilisha Maoni"}
-                    </Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -172,7 +151,7 @@ export default function FundiProfile() {
                       {t("action.message")}
                     </Button>
                     
-                    {fundi.whatsapp && (
+                    {fundi?.whatsapp && (
                       <>
                         <Button variant="outline" className="w-full gap-2" size="lg">
                           <Phone className="h-5 w-5" />
@@ -191,7 +170,7 @@ export default function FundiProfile() {
                 </CardContent>
               </Card>
 
-              {fundi.promoted && (
+              {isPromoted && (
                 <Card className="border-orange-500 border-2">
                   <CardContent className="p-6">
                     <Badge className="mb-3 bg-orange-500">Featured Listing</Badge>

@@ -5,6 +5,9 @@ export const mockFundis: Fundi[] = [
   {
     id: "1",
     name: "John Kamau",
+    type: "fundi",
+    email: "john.kamau@example.com",
+    createdAt: "2023-01-10T10:00:00Z",
     specialty: "Electrician",
     city: "Dar es Salaam",
     rating: 4.8,
@@ -19,6 +22,9 @@ export const mockFundis: Fundi[] = [
   {
     id: "2",
     name: "Amina Hassan",
+    type: "fundi",
+    email: "amina.hassan@example.com",
+    createdAt: "2023-03-15T11:00:00Z",
     specialty: "Plumber",
     city: "Arusha",
     rating: 4.9,
@@ -33,6 +39,9 @@ export const mockFundis: Fundi[] = [
   {
     id: "3",
     name: "David Mwangi",
+    type: "fundi",
+    email: "david.mwangi@example.com",
+    createdAt: "2022-11-01T09:00:00Z",
     specialty: "Carpenter",
     city: "Mwanza",
     rating: 4.7,
