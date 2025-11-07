@@ -1,10 +1,10 @@
-
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { ThemeSwitch } from "@/components/ThemeSwitch";
 import { Button } from "@/components/ui/button";
 import { Menu, Wrench } from "lucide-react";
 import { useState } from "react";
+import Link from "next/link";
 
 export function Header() {
   const { t } = useLanguage();
@@ -37,6 +37,21 @@ export function Header() {
               {t("nav.events")}
             </a>
           </nav>
+
+          <div className="hidden md:flex items-center space-x-6">
+            <Link href="/search" className="text-sm font-medium hover:text-blue-600 transition-colors">
+              {language === "en" ? "Search" : "Tafuta"}
+            </Link>
+            <Link href="/events" className="text-sm font-medium hover:text-blue-600 transition-colors">
+              {language === "en" ? "Events" : "Matukio"}
+            </Link>
+            <Link href="/messages" className="text-sm font-medium hover:text-blue-600 transition-colors">
+              {language === "en" ? "Messages" : "Ujumbe"}
+            </Link>
+            <Link href="/profile" className="text-sm font-medium hover:text-blue-600 transition-colors">
+              {language === "en" ? "Profile" : "Wasifu"}
+            </Link>
+          </div>
 
           <div className="flex items-center gap-2">
             <LanguageToggle />
