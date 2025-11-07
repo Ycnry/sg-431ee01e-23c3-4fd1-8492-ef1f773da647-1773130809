@@ -1,192 +1,202 @@
 
-import { useLanguage } from "@/contexts/LanguageContext";
-import { LanguageToggle } from "@/components/LanguageToggle";
-import { ThemeSwitch } from "@/components/ThemeSwitch";
-import { Button } from "@/components/ui/button";
-import { Menu, Wrench, X } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { Menu, Search, Wrench, Store, Calendar } from "lucide-react";
+import { LanguageToggle } from "@/components/LanguageToggle";
+import { ThemeSwitch } from "@/components/ThemeSwitch";
 
 export function Header() {
   const { t, language } = useLanguage();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const router = useRouter();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  const [isSignedIn] = useState(false);
 
-  const scrollToSection = (sectionId: string) => {
-    if (router.pathname !== "/") {
-      router.push(`/#${sectionId}`);
-    } else {
-      const element = document.getElementById(sectionId);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
-      }
+  const navLinks = [
+    { href: "/search", label: language === "en" ? "Find Fundi" : "Tafuta Fundi", icon: Search },
+    { href: "/search?type=shop", label: language === "en" ? "Shops" : "Maduka", icon: Store },
+    { href: "/events", label: language === "en" ? "Events" : "Matukio", icon: Calendar },
+  ];
+
+  const authenticatedLinks = [
+    { href: "/messages", label: language === "en" ? "Messages" : "Ujumbe", icon: Wrench },
+    { href: "/profile", label: language === "en" ? "Profile" : "Wasifu", icon: Store },
+  ];
+
+  const isActive = (href: string) => {
+    if (href === "/search?type=shop") {
+      return router.pathname === "/search" && router.query.type === "shop";
     }
-    setMobileMenuOpen(false);
+    return router.pathname === href;
   };
 
-  const isActive = (path: string) => router.pathname === path;
-
   return (
-    <header className="sticky top-0 z-30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <Wrench className="h-6 w-6 text-blue-600" />
-            <span className="text-xl font-bold">
-              SMART<span className="text-orange-500"> FUNDI</span>
-            </span>
+          <Link href="/" className="flex items-center space-x-2">
+            <div className="flex items-center gap-2">
+              <div className="bg-blue-600 p-2 rounded-lg">
+                <Wrench className="h-5 w-5 text-white" />
+              </div>
+              <span className="font-bold text-xl">
+                <span className="text-blue-600">SMART</span>{" "}
+                <span className="text-orange-500">FUNDI</span>
+              </span>
+            </div>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-6">
-            <Link 
-              href="/" 
-              className={`text-sm font-medium hover:text-blue-600 transition-colors ${isActive("/") ? "text-blue-600" : ""}`}
-            >
-              {t("nav.home")}
-            </Link>
-            <button 
-              onClick={() => scrollToSection("fundis")} 
-              className="text-sm font-medium hover:text-blue-600 transition-colors"
-            >
-              {t("nav.fundis")}
-            </button>
-            <button 
-              onClick={() => scrollToSection("shops")} 
-              className="text-sm font-medium hover:text-blue-600 transition-colors"
-            >
-              {t("nav.shops")}
-            </button>
-            <button 
-              onClick={() => scrollToSection("events")} 
-              className="text-sm font-medium hover:text-blue-600 transition-colors"
-            >
-              {t("nav.events")}
-            </button>
-          </nav>
+          <nav className="hidden md:flex items-center gap-1">
+            {navLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <Link key={link.href} href={link.href}>
+                  <Button
+                    variant={isActive(link.href) ? "default" : "ghost"}
+                    className="gap-2"
+                  >
+                    <Icon className="h-4 w-4" />
+                    {link.label}
+                  </Button>
+                </Link>
+              );
+            })}
 
-          <div className="hidden md:flex items-center space-x-6">
-            <Link 
-              href="/search" 
-              className={`text-sm font-medium hover:text-blue-600 transition-colors ${isActive("/search") ? "text-blue-600" : ""}`}
-            >
-              {language === "en" ? "Search" : "Tafuta"}
-            </Link>
-            <Link 
-              href="/events" 
-              className={`text-sm font-medium hover:text-blue-600 transition-colors ${isActive("/events") ? "text-blue-600" : ""}`}
-            >
-              {language === "en" ? "Events" : "Matukio"}
-            </Link>
-            <Link 
-              href="/messages" 
-              className={`text-sm font-medium hover:text-blue-600 transition-colors ${isActive("/messages") ? "text-blue-600" : ""}`}
-            >
-              {language === "en" ? "Messages" : "Ujumbe"}
-            </Link>
-            <Link 
-              href="/profile" 
-              className={`text-sm font-medium hover:text-blue-600 transition-colors ${isActive("/profile") ? "text-blue-600" : ""}`}
-            >
-              {language === "en" ? "Profile" : "Wasifu"}
-            </Link>
-          </div>
+            {isSignedIn && authenticatedLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <Link key={link.href} href={link.href}>
+                  <Button
+                    variant={isActive(link.href) ? "default" : "ghost"}
+                    className="gap-2"
+                  >
+                    <Icon className="h-4 w-4" />
+                    {link.label}
+                  </Button>
+                </Link>
+              );
+            })}
+          </nav>
 
           <div className="flex items-center gap-2">
             <LanguageToggle />
             <ThemeSwitch />
-            <Link href="/auth/signin">
-              <Button variant="ghost" size="sm" className="hidden md:inline-flex">
-                {t("nav.signin")}
-              </Button>
-            </Link>
-            <Link href="/auth/signup">
-              <Button size="sm" className="hidden md:inline-flex bg-blue-600 hover:bg-blue-700">
-                {t("nav.signup")}
-              </Button>
-            </Link>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>
-          </div>
-        </div>
 
-        {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t animate-in slide-in-from-top-2">
-            <nav className="flex flex-col gap-3">
-              <Link 
-                href="/" 
-                className={`text-sm font-medium hover:text-blue-600 transition-colors ${isActive("/") ? "text-blue-600" : ""}`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {t("nav.home")}
-              </Link>
-              <button 
-                onClick={() => scrollToSection("fundis")} 
-                className="text-sm font-medium hover:text-blue-600 transition-colors text-left"
-              >
-                {t("nav.fundis")}
-              </button>
-              <button 
-                onClick={() => scrollToSection("shops")} 
-                className="text-sm font-medium hover:text-blue-600 transition-colors text-left"
-              >
-                {t("nav.shops")}
-              </button>
-              <button 
-                onClick={() => scrollToSection("events")} 
-                className="text-sm font-medium hover:text-blue-600 transition-colors text-left"
-              >
-                {t("nav.events")}
-              </button>
-              <Link 
-                href="/search" 
-                className={`text-sm font-medium hover:text-blue-600 transition-colors ${isActive("/search") ? "text-blue-600" : ""}`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {language === "en" ? "Search" : "Tafuta"}
-              </Link>
-              <Link 
-                href="/events" 
-                className={`text-sm font-medium hover:text-blue-600 transition-colors ${isActive("/events") ? "text-blue-600" : ""}`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {language === "en" ? "Events" : "Matukio"}
-              </Link>
-              <Link 
-                href="/messages" 
-                className={`text-sm font-medium hover:text-blue-600 transition-colors ${isActive("/messages") ? "text-blue-600" : ""}`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {language === "en" ? "Messages" : "Ujumbe"}
-              </Link>
-              <Link 
-                href="/profile" 
-                className={`text-sm font-medium hover:text-blue-600 transition-colors ${isActive("/profile") ? "text-blue-600" : ""}`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {language === "en" ? "Profile" : "Wasifu"}
-              </Link>
-              <div className="flex gap-2 pt-2">
-                <Link href="/auth/signin" className="flex-1">
-                  <Button variant="outline" size="sm" className="w-full" onClick={() => setMobileMenuOpen(false)}>
-                    {t("nav.signin")}
+            {!isSignedIn && (
+              <div className="hidden md:flex items-center gap-2">
+                <Link href="/auth/signin">
+                  <Button variant="ghost">
+                    {language === "en" ? "Sign In" : "Ingia"}
                   </Button>
                 </Link>
-                <Link href="/auth/signup" className="flex-1">
-                  <Button size="sm" className="w-full bg-blue-600 hover:bg-blue-700" onClick={() => setMobileMenuOpen(false)}>
-                    {t("nav.signup")}
+                <Link href="/auth/signup">
+                  <Button>
+                    {language === "en" ? "Sign Up" : "Jisajili"}
                   </Button>
                 </Link>
               </div>
-            </nav>
+            )}
+
+            {isSignedIn && (
+              <div className="hidden md:flex items-center gap-2">
+                <Link href="/profile">
+                  <Button variant="ghost">
+                    {language === "en" ? "Profile" : "Wasifu"}
+                  </Button>
+                </Link>
+              </div>
+            )}
+
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild className="md:hidden">
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Toggle menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                <nav className="flex flex-col gap-4 mt-8">
+                  {navLinks.map((link) => {
+                    const Icon = link.icon;
+                    return (
+                      <Link key={link.href} href={link.href}>
+                        <Button
+                          variant={isActive(link.href) ? "default" : "ghost"}
+                          className="w-full justify-start gap-2"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <Icon className="h-4 w-4" />
+                          {link.label}
+                        </Button>
+                      </Link>
+                    );
+                  })}
+
+                  {isSignedIn && (
+                    <>
+                      <div className="border-t my-2"></div>
+                      {authenticatedLinks.map((link) => {
+                        const Icon = link.icon;
+                        return (
+                          <Link key={link.href} href={link.href}>
+                            <Button
+                              variant={isActive(link.href) ? "default" : "ghost"}
+                              className="w-full justify-start gap-2"
+                              onClick={() => setMobileMenuOpen(false)}
+                            >
+                              <Icon className="h-4 w-4" />
+                              {link.label}
+                            </Button>
+                          </Link>
+                        );
+                      })}
+                    </>
+                  )}
+
+                  <div className="border-t my-2"></div>
+
+                  {!isSignedIn && (
+                    <>
+                      <Link href="/auth/signin">
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-start"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          {language === "en" ? "Sign In" : "Ingia"}
+                        </Button>
+                      </Link>
+                      <Link href="/auth/signup">
+                        <Button
+                          className="w-full justify-start"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          {language === "en" ? "Sign Up" : "Jisajili"}
+                        </Button>
+                      </Link>
+                    </>
+                  )}
+
+                  {isSignedIn && (
+                    <Link href="/profile">
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {language === "en" ? "Profile" : "Wasifu"}
+                      </Button>
+                    </Link>
+                  )}
+                </nav>
+              </SheetContent>
+            </Sheet>
           </div>
-        )}
+        </div>
       </div>
     </header>
   );
