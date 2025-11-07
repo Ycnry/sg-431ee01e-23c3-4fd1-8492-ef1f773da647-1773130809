@@ -84,18 +84,20 @@ export default function Home() {
                 {language === "en" ? "Trusted by 10,000+ Customers" : "Waaminifu 10,000+ Wateja"}
               </Badge>
               <h1 className="text-4xl md:text-6xl font-bold mb-6">
-                {t("hero.title")}
+                {language === "en" ? "Welcome to Smart Fundi" : "Karibu Smart Fundi"}
               </h1>
               <p className="text-xl md:text-2xl mb-8 text-blue-100">
-                {t("hero.subtitle")}
+                {language === "en" 
+                  ? "Connect with verified technicians and hardware stores across Tanzania" 
+                  : "Wasiliana na mafundi na maduka ya vifaa halali kote Tanzania"}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg" className="bg-orange-500 hover:bg-orange-600 text-white">
                   <Search className="mr-2 h-5 w-5" />
-                  {t("hero.findFundi")}
+                  {language === "en" ? "Find Fundi" : "Pata Fundi"}
                 </Button>
                 <Button size="lg" variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
-                  {t("hero.becomeProvider")}
+                  {language === "en" ? "Become Provider" : "Kuwa Mtoa Huduma"}
                 </Button>
               </div>
             </div>
