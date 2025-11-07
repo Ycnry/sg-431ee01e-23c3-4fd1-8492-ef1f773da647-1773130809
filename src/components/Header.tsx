@@ -7,7 +7,7 @@ import { useState } from "react";
 import Link from "next/link";
 
 export function Header() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (

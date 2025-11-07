@@ -80,12 +80,13 @@ export interface Review {
 
 export interface Event {
   id: string;
-  title: Translation;
-  description: Translation;
-  organizerName: string;
-  location: string;
+  title: string;
+  organizer: string;
   date: string;
-  imageUrl?: string;
-  sponsored: boolean;
-  createdAt: string;
+  time: string;
+  location: string;
+  description: string;
+  imageUrl: string;
+  isSponsored: boolean;
+  expectedAttendees: number;
 }
