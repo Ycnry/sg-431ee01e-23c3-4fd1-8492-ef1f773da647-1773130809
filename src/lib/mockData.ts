@@ -1,5 +1,5 @@
 
-import { Fundi, Shop, Event } from "@/types";
+import { Fundi, Shop, Event, Translation } from "@/types";
 
 export const mockFundis: Fundi[] = [
   {
@@ -167,11 +167,13 @@ export const mockEvents: Event[] = [
       en: "Annual exhibition showcasing the latest construction tools, materials, and techniques for professionals across Tanzania.",
       sw: "Maonyesho ya kila mwaka yanayoonyesha zana za hivi karibuni za ujenzi, vifaa, na mbinu kwa wataalamu nchini Tanzania.",
     },
-    organizerName: "Tanzania Builders Association",
+    organizer: "Tanzania Builders Association",
     location: "Diamond Jubilee Hall, Dar es Salaam",
     date: new Date(Date.now() + 15 * 86400000).toISOString(),
-    sponsored: true,
-    createdAt: new Date().toISOString(),
+    time: "9:00 AM - 5:00 PM",
+    isSponsored: true,
+    imageUrl: `https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2053&auto=format&fit=crop`,
+    expectedAttendees: 500,
   },
   {
     id: "e2",
@@ -183,11 +185,13 @@ export const mockEvents: Event[] = [
       en: "Free training workshop on electrical safety standards and best practices for electricians and apprentices.",
       sw: "Warsha ya bure ya mafunzo kuhusu viwango vya usalama wa umeme na mbinu bora kwa wafundi umeme na wanafunzi.",
     },
-    organizerName: "Tanzania Electrical Institute",
+    organizer: "Tanzania Electrical Institute",
     location: "Vocational Training Center, Arusha",
     date: new Date(Date.now() + 8 * 86400000).toISOString(),
-    sponsored: false,
-    createdAt: new Date().toISOString(),
+    time: "10:00 AM - 1:00 PM",
+    isSponsored: false,
+    imageUrl: `https://images.unsplash.com/photo-1581092921462-6849a6e3a453?q=80&w=2070&auto=format&fit=crop`,
+    expectedAttendees: 50,
   },
   {
     id: "e3",
@@ -199,10 +203,12 @@ export const mockEvents: Event[] = [
       en: "Meet industry experts, learn new techniques, and discover the latest automotive tools and diagnostic equipment.",
       sw: "Kutana na wataalamu wa sekta, jifunze mbinu mpya, na gundua zana za hivi karibuni za magari na vifaa vya uchunguzi.",
     },
-    organizerName: "Tanzania Automotive Association",
+    organizer: "Tanzania Automotive Association",
     location: "Mlimani City Conference Center, Dar es Salaam",
     date: new Date(Date.now() + 22 * 86400000).toISOString(),
-    sponsored: true,
-    createdAt: new Date().toISOString(),
+    time: "8:30 AM - 6:00 PM",
+    isSponsored: true,
+    imageUrl: `https://images.unsplash.com/photo-1553775282-20af807797d2?q=80&w=2070&auto=format&fit=crop`,
+    expectedAttendees: 300,
   },
 ];

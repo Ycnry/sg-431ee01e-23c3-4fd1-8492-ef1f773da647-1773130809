@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin, Building } from "lucide-react";
@@ -14,11 +13,9 @@ export function EventCard({ event }: EventCardProps) {
 
   return (
     <Card className="overflow-hidden transition-all hover:shadow-lg">
-      <div className="aspect-video bg-gradient-to-br from-blue-100 to-orange-100 relative">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <Calendar className="h-16 w-16 text-blue-600 opacity-50" />
-        </div>
-        {event.sponsored && (
+      <div className="aspect-video bg-gray-100 dark:bg-gray-800 relative">
+        <img src={event.imageUrl} alt={event.title[language]} className="w-full h-full object-cover" />
+        {event.isSponsored && (
           <Badge className="absolute top-3 right-3 bg-orange-500">
             Sponsored
           </Badge>
@@ -37,7 +34,7 @@ export function EventCard({ event }: EventCardProps) {
         <div className="space-y-2 text-sm">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Building className="h-4 w-4" />
-            <span>{event.organizerName}</span>
+            <span>{event.organizer}</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
             <MapPin className="h-4 w-4" />
@@ -45,7 +42,7 @@ export function EventCard({ event }: EventCardProps) {
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
             <Calendar className="h-4 w-4" />
-            <span>{new Date(event.date).toLocaleDateString()}</span>
+            <span>{new Date(event.date).toLocaleDateString(language === "sw" ? "sw-TZ" : "en-US", { year: "numeric", month: "long", day: "numeric"})}</span>
           </div>
         </div>
       </div>
