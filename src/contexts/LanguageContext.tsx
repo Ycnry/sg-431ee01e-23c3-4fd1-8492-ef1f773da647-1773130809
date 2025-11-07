@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 type Language = "en" | "sw";
@@ -19,6 +18,7 @@ const translations: Record<string, Record<Language, string>> = {
   "nav.events": { en: "Events", sw: "Matukio" },
   "nav.signin": { en: "Sign In", sw: "Ingia" },
   "nav.signup": { en: "Sign Up", sw: "Jisajili" },
+  "nav.messages": { en: "Messages", sw: "Ujumbe" },
   
   // Splash & Welcome
   "splash.tagline": { en: "Connecting You to Skilled Technicians", sw: "Kukuunganisha na Mafundi Hodari" },
@@ -62,6 +62,34 @@ const translations: Record<string, Record<Language, string>> = {
   "specialty.carpenter": { en: "Carpenter", sw: "Seremala" },
   "specialty.mechanic": { en: "Mechanic", sw: "Fundi Gari" },
   "specialty.welder": { en: "Welder", sw: "Mwuweledi" },
+  
+  // Auth
+  "auth.signin.title": { en: "Sign In", sw: "Ingia" },
+  "auth.signin.subtitle": { en: "Enter your credentials to access your account", sw: "Weka maelezo yako kuingia kwenye akaunti" },
+  "auth.signin.button": { en: "Sign In", sw: "Ingia" },
+  "auth.signin.link": { en: "Sign In", sw: "Ingia" },
+  "auth.signup.title": { en: "Create Account", sw: "Fungua Akaunti" },
+  "auth.signup.subtitle": { en: "Choose your account type and get started", sw: "Chagua aina ya akaunti na anza" },
+  "auth.signup.button": { en: "Create Account", sw: "Fungua Akaunti" },
+  "auth.signup.link": { en: "Sign Up", sw: "Jisajili" },
+  "auth.email": { en: "Email", sw: "Barua pepe" },
+  "auth.password": { en: "Password", sw: "Nenosiri" },
+  "auth.confirmPassword": { en: "Confirm Password", sw: "Thibitisha Nenosiri" },
+  "auth.name": { en: "Full Name", sw: "Jina Kamili" },
+  "auth.phone": { en: "Phone Number", sw: "Namba ya Simu" },
+  "auth.forgotPassword": { en: "Forgot password?", sw: "Umesahau nenosiri?" },
+  "auth.noAccount": { en: "Don't have an account?", sw: "Hauna akaunti?" },
+  "auth.hasAccount": { en: "Already have an account?", sw: "Una akaunti tayari?" },
+  "auth.accountType": { en: "I am a", sw: "Mimi ni" },
+  "auth.customer": { en: "Customer (looking for services)", sw: "Mteja (unatafuta huduma)" },
+  "auth.fundi": { en: "Fundi (technician)", sw: "Fundi (mtaalamu)" },
+  "auth.shop": { en: "Shop Owner", sw: "Mmiliki wa Duka" },
+  
+  // Messaging
+  "messaging.inbox": { en: "Messages", sw: "Ujumbe" },
+  "messaging.noMessages": { en: "No messages yet", sw: "Hakuna ujumbe bado" },
+  "messaging.selectChat": { en: "Select a conversation to start messaging", sw: "Chagua mazungumzo kuanza kutuma ujumbe" },
+  "messaging.typePlaceholder": { en: "Type a message...", sw: "Andika ujumbe..." },
 };
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
