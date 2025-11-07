@@ -13,15 +13,21 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Search as SearchIcon, Filter, MapPin } from "lucide-react";
 import { mockFundis, mockShops } from "@/lib/mockData";
 import { subscriptionDb } from "@/lib/subscriptionDb";
+import { Fundi, Shop } from "@/types";
 
 export default function SearchPage() {
   const { language } = useLanguage();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("fundis");
   const [searchType, setSearchType] = useState<"fundi" | "shop">("fundi");
   const [selectedCity, setSelectedCity] = useState("all");
   const [selectedSpecialty, setSelectedSpecialty] = useState("all");
   const [providers, setProviders] = useState<(Fundi | Shop)[]>([]);
   const [loading, setLoading] = useState(false);
   const [filteredCount, setFilteredCount] = useState(0);
+
+  const cities = [...new Set([...mockFundis.map(f => f.city), ...mockShops.map(s => s.city)])];
+  const specialties = [...new Set(mockFundis.map(f => f.specialty))];
 
   useEffect(() => {
     fetchProviders();
@@ -72,6 +78,12 @@ export default function SearchPage() {
               <Card>
                 <CardContent className="p-6">
                   <div className="space-y-4">
+                    <Tabs value={searchType} onValueChange={(value) => setSearchType(value as "fundi" | "shop")}>
+                      <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="fundi">Fundis</TabsTrigger>
+                        <TabsTrigger value="shop">Shops</TabsTrigger>
+                      </TabsList>
+                    </Tabs>
                     <div className="relative">
                       <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                       <Input
@@ -104,7 +116,7 @@ export default function SearchPage() {
                         </Select>
                       </div>
 
-                      {activeTab === "fundis" && (
+                      {searchType === "fundi" && (
                         <div>
                           <label className="text-sm font-medium mb-2 block">
                             {language === "en" ? "Specialty" : "Ujuzi"}

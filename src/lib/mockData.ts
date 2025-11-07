@@ -50,6 +50,7 @@ export const mockShops: Shop[] = [
   {
     id: "shop1",
     name: "Dar Hardware Supplies",
+    shopName: "Dar Hardware Supplies",
     city: "Dar es Salaam",
     rating: 4.6,
     reviewCount: 234,
@@ -64,6 +65,7 @@ export const mockShops: Shop[] = [
   {
     id: "shop2",
     name: "Arusha Tool Center",
+    shopName: "Arusha Tool Center",
     city: "Arusha",
     rating: 4.8,
     reviewCount: 189,

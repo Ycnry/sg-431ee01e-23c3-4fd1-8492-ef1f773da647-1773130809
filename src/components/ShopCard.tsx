@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,15 +19,15 @@ export function ShopCard({ shop, featured }: ShopCardProps) {
       <div className="p-6">
         <div className="flex items-start gap-4 mb-4">
           <Avatar className="h-16 w-16 border-2 border-blue-100 rounded-lg">
-            <AvatarImage src={shop.logo} alt={shop.shopName} />
+            <AvatarImage src={shop.image || shop.logo} alt={shop.shopName || shop.name} />
             <AvatarFallback className="bg-blue-100 text-blue-700 font-semibold rounded-lg">
-              {shop.shopName.charAt(0)}
+              {(shop.shopName || shop.name).charAt(0)}
             </AvatarFallback>
           </Avatar>
           
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <h3 className="font-semibold text-lg truncate">{shop.shopName}</h3>
+              <h3 className="font-semibold text-lg truncate">{shop.shopName || shop.name}</h3>
               {shop.verified && (
                 <CheckCircle2 className="h-4 w-4 text-blue-600 flex-shrink-0" />
               )}
@@ -45,7 +44,7 @@ export function ShopCard({ shop, featured }: ShopCardProps) {
         </div>
 
         <div className="flex flex-wrap gap-1 mb-4">
-          {shop.categories.slice(0, 3).map((category) => (
+          {shop.categories?.slice(0, 3).map((category) => (
             <Badge key={category} variant="secondary" className="text-xs">
               {category}
             </Badge>

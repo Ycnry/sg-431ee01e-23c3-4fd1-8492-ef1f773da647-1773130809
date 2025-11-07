@@ -1,7 +1,7 @@
-
 import type { NextApiRequest, NextApiResponse } from "next";
 import { subscriptionDb } from "@/lib/subscriptionDb";
 import { mockFundis, mockShops } from "@/lib/mockData";
+import { Fundi, Shop } from "@/types";
 
 export default async function handler(
   req: NextApiRequest,
@@ -14,38 +14,32 @@ export default async function handler(
   try {
     const { type, city, specialty } = req.query;
 
-    let providers = type === "shop" ? [...mockShops] : [...mockFundis];
+    let providers: (Fundi | Shop)[] = type === "shop" ? [...mockShops] : [...mockFundis];
 
     if (city && city !== "all") {
       providers = providers.filter(p => p.city === city);
     }
 
-    if (specialty && specialty !== "all" && type === "fundi") {
-      providers = providers.filter(p => "specialty" in p && p.specialty === specialty);
+    if (type === "fundi" && specialty && specialty !== "all") {
+      providers = (providers as Fundi[]).filter(p => p.specialty === specialty);
     }
 
     const verifiedProviders = providers.filter(provider => {
       const isActive = subscriptionDb.isUserActiveAndValid(provider.id);
-      const hasValidSubscription = isActive;
-
-      if (!hasValidSubscription) {
+      if (!isActive) {
         console.log(`Filtering out provider ${provider.id}: subscription inactive or expired`);
-        return false;
       }
-
-      return true;
+      return isActive;
     });
 
-    const sortedProviders = verifiedProviders.map(provider => {
-      const isPromoted = subscriptionDb.isUserPromoted(provider.id);
-      return {
-        ...provider,
-        isPromoted
-      };
-    }).sort((a, b) => {
+    const sortedProviders = verifiedProviders.map(provider => ({
+      ...provider,
+      isPromoted: subscriptionDb.isUserPromoted(provider.id),
+    })).sort((a, b) => {
       if (a.isPromoted && !b.isPromoted) return -1;
       if (!a.isPromoted && b.isPromoted) return 1;
-      return b.rating - a.rating;
+      // Use optional chaining for rating in case it's not present on all types
+      return (b.rating ?? 0) - (a.rating ?? 0);
     });
 
     return res.status(200).json({

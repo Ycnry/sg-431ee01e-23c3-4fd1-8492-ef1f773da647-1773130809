@@ -8,7 +8,6 @@ export type Language = "en" | "sw";
 
 export interface User {
   id: string;
-  type: "customer" | "fundi" | "shop" | "admin";
   name: string;
   email: string;
   phone?: string;
@@ -16,7 +15,7 @@ export interface User {
   createdAt: string;
 }
 
-export interface Fundi extends User {
+export interface Fundi extends Omit<User, "photo"> {
   type: "fundi";
   specialty: string;
   city: string;
@@ -25,28 +24,27 @@ export interface Fundi extends User {
   verified: boolean;
   rating: number;
   reviewCount: number;
-  subscriptionActive: boolean;
-  subscriptionExpiry?: string;
-  promoted?: boolean;
-  promotedUntil?: string;
+  photo?: string; // Re-add to allow it, or use `image`
+  image?: string; // Add image property
 }
 
-export interface Shop extends User {
-  type: "shop";
-  shopName: string;
-  logo?: string;
+export interface Shop {
+  id: string;
+  name: string; // Shops have `name`, not `shopName` to be consistent with fundi
   city: string;
-  ward: string;
-  categories: string[];
-  openingHours: string;
-  whatsapp?: string;
-  verified: boolean;
   rating: number;
   reviewCount: number;
-  subscriptionActive: boolean;
-  subscriptionExpiry?: string;
-  promoted?: boolean;
-  promotedUntil?: string;
+  image?: string; // Use `image` consistently
+  logo?: string;
+  category: string;
+  openingHours: string;
+  phone?: string;
+  whatsapp?: string;
+  description: string;
+  verified: boolean;
+  ward?: string;
+  categories?: string[];
+  shopName?: string; // Keep for now for compatibility, but prefer `name`
 }
 
 export interface Message {

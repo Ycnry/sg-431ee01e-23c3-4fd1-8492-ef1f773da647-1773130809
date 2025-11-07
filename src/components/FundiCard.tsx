@@ -20,7 +20,7 @@ export function FundiCard({ fundi, featured }: FundiCardProps) {
       <div className="p-6">
         <div className="flex items-start gap-4 mb-4">
           <Avatar className="h-16 w-16 border-2 border-blue-100">
-            <AvatarImage src={fundi.photo} alt={fundi.name} />
+            <AvatarImage src={fundi.image || fundi.photo} alt={fundi.name} />
             <AvatarFallback className="bg-blue-100 text-blue-700 font-semibold">
               {fundi.name.charAt(0)}
             </AvatarFallback>
