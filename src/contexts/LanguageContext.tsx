@@ -35,6 +35,29 @@ const translations: Record<string, Record<Language, string>> = {
   "home.verified.title": { en: "Verified Technicians", sw: "Mafundi Wastahilifu" },
   "home.shops.title": { en: "Fundi Supply Stores", sw: "Maduka ya Vifaa" },
   "home.events.title": { en: "Upcoming Trade Events", sw: "Matukio Yanayokuja" },
+
+  // Homepage Section Descriptions
+  "sections.featured": { en: "Featured Providers", sw: "Watoaji Huduma Maarufu" },
+  "sections.featuredDescription": { en: "Premium verified professionals across Tanzania", sw: "Wataalamu wastahilifu bora Tanzania nzima" },
+  "sections.verified": { en: "Verified Technicians", sw: "Mafundi Wastahilifu" },
+  "sections.verifiedDescription": { en: "Trusted fundis in your area", sw: "Mafundi waaminifu katika eneo lako" },
+  "sections.shops": { en: "Hardware & Tool Suppliers", sw: "Wauzaji wa Vifaa na Zana" },
+  "sections.shopsDescription": { en: "Quality materials and equipment providers", sw: "Watoaji wa vifaa na zana za ubora" },
+  "sections.events": { en: "Trade Events & Workshops", sw: "Matukio ya Biashara na Warsha" },
+  "sections.eventsDescription": { en: "Upcoming industry events and training", sw: "Matukio na mafunzo yanayokuja" },
+
+  // Features Section - Specific Tanzania Content
+  "features.verified.title": { en: "Best Fundis in Major Cities", sw: "Mafundi Bora Miji Mikubwa" },
+  "features.verified.description": { en: "Connect with top-rated electricians, plumbers, and carpenters in Dar es Salaam, Arusha, Mwanza, and Dodoma", sw: "Unganisha na wafundi bora wa umeme, mabomba, na useremala Dar, Arusha, Mwanza, na Dodoma" },
+  
+  "features.messaging.title": { en: "Private & Secure Messaging", sw: "Ujumbe wa Faragha na Salama" },
+  "features.messaging.description": { en: "Chat directly with fundis and shops without sharing your phone number. Safe communication guaranteed", sw: "Zungumza moja kwa moja na mafundi na maduka bila kushiriki namba yako ya simu. Mawasiliano salama yanahakikishwa" },
+  
+  "features.reviews.title": { en: "Quality Hardware Stores", sw: "Maduka ya Vifaa Bora" },
+  "features.reviews.description": { en: "Find the best tool shops and building material suppliers in Dar es Salaam, Arusha, and across Tanzania", sw: "Pata maduka bora ya zana na vifaa vya ujenzi Dar es Salaam, Arusha, na Tanzania nzima" },
+  
+  "features.local.title": { en: "Biggest Trade Events in Tanzania", sw: "Matukio Makubwa Tanzania" },
+  "features.local.description": { en: "Attend construction expos, tool fairs, and skills workshops happening in major cities across the country", sw: "Hudhuria maonyesho ya ujenzi, maonyesho ya zana, na warsha za ujuzi zinazofanyika miji mikubwa nchini" },
   
   // Profile Actions
   "action.message": { en: "Message", sw: "Tuma Ujumbe" },
