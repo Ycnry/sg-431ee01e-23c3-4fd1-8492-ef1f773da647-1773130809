@@ -118,7 +118,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
               }}
             >
               <motion.img
-                src="/F (1).svg"
+                src="/F.png"
                 alt="Smart Fundi Logo"
                 className="w-32 h-32 object-contain"
                 animate={{
