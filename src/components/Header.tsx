@@ -4,17 +4,26 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Menu, Search, Wrench, Store, Calendar } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Menu, Search, Wrench, Store, Calendar, MessageSquare, User, LogOut } from "lucide-react";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { ThemeSwitch } from "@/components/ThemeSwitch";
 
 export function Header() {
   const { t, language } = useLanguage();
+  const { user, isAuthenticated, signOut } = useAuth();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
-  const [isSignedIn] = useState(false);
 
   const navLinks = [
     { href: "/search", label: language === "en" ? "Find Fundi" : "Tafuta Fundi", icon: Search },
@@ -23,8 +32,8 @@ export function Header() {
   ];
 
   const authenticatedLinks = [
-    { href: "/messages", label: language === "en" ? "Messages" : "Ujumbe", icon: Wrench },
-    { href: "/profile", label: language === "en" ? "Profile" : "Wasifu", icon: Store },
+    { href: "/messages", label: language === "en" ? "Messages" : "Ujumbe", icon: MessageSquare },
+    { href: "/profile", label: language === "en" ? "Profile" : "Wasifu", icon: User },
   ];
 
   const isActive = (href: string) => {
@@ -32,6 +41,10 @@ export function Header() {
       return router.pathname === "/search" && router.query.type === "shop";
     }
     return router.pathname === href;
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
   };
 
   return (
@@ -66,7 +79,7 @@ export function Header() {
               );
             })}
 
-            {isSignedIn && authenticatedLinks.map((link) => {
+            {isAuthenticated && authenticatedLinks.map((link) => {
               const Icon = link.icon;
               return (
                 <Link key={link.href} href={link.href}>
@@ -86,7 +99,7 @@ export function Header() {
             <LanguageToggle />
             <ThemeSwitch />
 
-            {!isSignedIn && (
+            {!isAuthenticated ? (
               <div className="hidden md:flex items-center gap-2">
                 <Link href="/auth/signin">
                   <Button variant="ghost">
@@ -99,15 +112,48 @@ export function Header() {
                   </Button>
                 </Link>
               </div>
-            )}
-
-            {isSignedIn && (
+            ) : (
               <div className="hidden md:flex items-center gap-2">
-                <Link href="/profile">
-                  <Button variant="ghost">
-                    {language === "en" ? "Profile" : "Wasifu"}
-                  </Button>
-                </Link>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={user?.photo} alt={user?.name} />
+                        <AvatarFallback className="bg-blue-100 text-blue-700">
+                          {user?.name?.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">{user?.name}</p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user?.email}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/profile" className="cursor-pointer">
+                        <User className="mr-2 h-4 w-4" />
+                        <span>{language === "en" ? "Profile" : "Wasifu"}</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/messages" className="cursor-pointer">
+                        <MessageSquare className="mr-2 h-4 w-4" />
+                        <span>{language === "en" ? "Messages" : "Ujumbe"}</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>{language === "en" ? "Sign Out" : "Toka"}</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             )}
 
@@ -136,7 +182,7 @@ export function Header() {
                     );
                   })}
 
-                  {isSignedIn && (
+                  {isAuthenticated && (
                     <>
                       <div className="border-t my-2"></div>
                       {authenticatedLinks.map((link) => {
@@ -159,7 +205,7 @@ export function Header() {
 
                   <div className="border-t my-2"></div>
 
-                  {!isSignedIn && (
+                  {!isAuthenticated ? (
                     <>
                       <Link href="/auth/signin">
                         <Button
@@ -179,18 +225,24 @@ export function Header() {
                         </Button>
                       </Link>
                     </>
-                  )}
-
-                  {isSignedIn && (
-                    <Link href="/profile">
+                  ) : (
+                    <>
+                      <div className="px-4 py-2">
+                        <p className="text-sm font-medium">{user?.name}</p>
+                        <p className="text-xs text-muted-foreground">{user?.email}</p>
+                      </div>
                       <Button
                         variant="ghost"
-                        className="w-full justify-start"
-                        onClick={() => setMobileMenuOpen(false)}
+                        className="w-full justify-start gap-2 text-red-600"
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          handleSignOut();
+                        }}
                       >
-                        {language === "en" ? "Profile" : "Wasifu"}
+                        <LogOut className="h-4 w-4" />
+                        {language === "en" ? "Sign Out" : "Toka"}
                       </Button>
-                    </Link>
+                    </>
                   )}
                 </nav>
               </SheetContent>
