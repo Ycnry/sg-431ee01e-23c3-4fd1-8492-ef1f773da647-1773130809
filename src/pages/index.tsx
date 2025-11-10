@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Head from "next/head";
 import { SplashScreen } from "@/components/SplashScreen";
@@ -13,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Search, Star, Shield, MessageSquare, TrendingUp, Users } from "lucide-react";
 import { mockFundis, mockShops, mockEvents } from "@/lib/mockData";
+import Link from "next/link";
 
 export default function Home() {
   const { t, language } = useLanguage();
@@ -92,13 +92,17 @@ export default function Home() {
                   : "Wasiliana na mafundi na maduka ya vifaa halali kote Tanzania"}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="bg-orange-500 hover:bg-orange-600 text-white">
-                  <Search className="mr-2 h-5 w-5" />
-                  {language === "en" ? "Find Fundi" : "Pata Fundi"}
-                </Button>
-                <Button size="lg" variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
-                  {language === "en" ? "Become Provider" : "Kuwa Mtoa Huduma"}
-                </Button>
+                <Link href="/search">
+                  <Button size="lg" className="bg-orange-500 hover:bg-orange-600 text-white">
+                    <Search className="mr-2 h-5 w-5" />
+                    {language === "en" ? "Find Fundi" : "Pata Fundi"}
+                  </Button>
+                </Link>
+                <Link href="/auth/signup">
+                  <Button size="lg" variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+                    {language === "en" ? "Become Provider" : "Kuwa Mtoa Huduma"}
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
@@ -219,12 +223,16 @@ export default function Home() {
                 : "Je, wewe ni fundi mwenye ujuzi au mmiliki wa duka la vifaa? Orodhesha huduma zako na fikia maelfu ya wateja."}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-orange-500 hover:bg-orange-600">
-                {language === "en" ? "Register as Fundi" : "Jisajili kama Fundi"}
-              </Button>
-              <Button size="lg" variant="outline" className="bg-white/10 border-white/20 hover:bg-white/20">
-                {language === "en" ? "Register Your Shop" : "Sajili Duka Lako"}
-              </Button>
+              <Link href="/auth/signup?type=fundi">
+                <Button size="lg" className="bg-orange-500 hover:bg-orange-600">
+                  {language === "en" ? "Register as Fundi" : "Jisajili kama Fundi"}
+                </Button>
+              </Link>
+              <Link href="/auth/signup?type=shop">
+                <Button size="lg" variant="outline" className="bg-white/10 border-white/20 hover:bg-white/20">
+                  {language === "en" ? "Register Your Shop" : "Sajili Duka Lako"}
+                </Button>
+              </Link>
             </div>
           </div>
         </section>
