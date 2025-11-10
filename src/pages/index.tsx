@@ -16,18 +16,13 @@ import Link from "next/link";
 
 export default function Home() {
   const { t, language } = useLanguage();
-  const [showSplash, setShowSplash] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
   const [showWelcome, setShowWelcome] = useState(false);
   const [showContent, setShowContent] = useState(false);
 
   useEffect(() => {
-    const hasSeenAnimation = localStorage.getItem("smartFundiAnimationSeen");
-    
-    if (!hasSeenAnimation) {
-      setShowSplash(true);
-    } else {
-      setShowContent(true);
-    }
+    // Always show splash screen on app load
+    setShowSplash(true);
   }, []);
 
   const handleSplashComplete = () => {
@@ -38,7 +33,7 @@ export default function Home() {
   const handleWelcomeComplete = () => {
     setShowWelcome(false);
     setShowContent(true);
-    localStorage.setItem("smartFundiAnimationSeen", "true");
+    // Removed localStorage.setItem - animations will play every time
   };
 
   const featuredFundis = mockFundis.filter(f => f.promoted);
