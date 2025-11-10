@@ -1,3 +1,4 @@
+"use client";
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,8 +9,11 @@ interface SplashScreenProps {
 
 export function SplashScreen({ onComplete }: SplashScreenProps) {
   const [progress, setProgress] = useState(0);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
+
     const progressInterval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
@@ -44,8 +48,8 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         {/* Radial gradient overlay */}
         <div className="absolute inset-0 bg-gradient-radial from-blue-600/20 via-transparent to-transparent" />
 
-        {/* Floating particles */}
-        {[...Array(20)].map((_, i) => (
+        {/* Floating particles - render only on client */}
+        {isClient && [...Array(20)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-1 h-1 bg-orange-400 rounded-full"
@@ -218,7 +222,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         </div>
 
         {/* Corner sparkles */}
-        {[
+        {isClient && [
           { top: "10%", left: "10%" },
           { top: "10%", right: "10%" },
           { bottom: "10%", left: "10%" },
