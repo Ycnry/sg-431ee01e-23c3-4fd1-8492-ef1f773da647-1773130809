@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Head from "next/head";
 import { SplashScreen } from "@/components/SplashScreen";
@@ -7,10 +8,11 @@ import { FundiCard } from "@/components/FundiCard";
 import { ShopCard } from "@/components/ShopCard";
 import { EventCard } from "@/components/EventCard";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Search, Star, Shield, MessageSquare, TrendingUp, Users } from "lucide-react";
+import { Search, Star, Shield, MessageSquare, TrendingUp, Users, MapPin, Wrench, Store } from "lucide-react";
 import { mockFundis, mockShops, mockEvents } from "@/lib/mockData";
 import Link from "next/link";
 
@@ -19,9 +21,9 @@ export default function Home() {
   const [showSplash, setShowSplash] = useState(true);
   const [showWelcome, setShowWelcome] = useState(false);
   const [showContent, setShowContent] = useState(false);
+  const [selectedCity, setSelectedCity] = useState("Dar es Salaam");
 
   useEffect(() => {
-    // Always show splash screen on app load
     setShowSplash(true);
   }, []);
 
@@ -33,11 +35,21 @@ export default function Home() {
   const handleWelcomeComplete = () => {
     setShowWelcome(false);
     setShowContent(true);
-    // Removed localStorage.setItem - animations will play every time
   };
 
-  const featuredFundis = mockFundis.filter(f => f.promoted);
-  const featuredShops = mockShops.filter(s => s.promoted);
+  const cities = ["Dar es Salaam", "Arusha", "Mwanza"];
+  
+  const fundisByCity = cities.reduce((acc, city) => {
+    acc[city] = mockFundis.filter(f => f.city === city).slice(0, 3);
+    return acc;
+  }, {} as Record<string, typeof mockFundis>);
+
+  const shopsByCity = cities.reduce((acc, city) => {
+    acc[city] = mockShops.filter(s => s.city === city).slice(0, 3);
+    return acc;
+  }, {} as Record<string, typeof mockShops>);
+
+  const sponsoredEvents = mockEvents.filter(e => e.isSponsored);
   const upcomingEvents = mockEvents.slice(0, 3);
 
   const metaTitle = language === "en" 
@@ -129,7 +141,7 @@ export default function Home() {
               <Card className="text-center hover:shadow-lg transition-shadow">
                 <CardContent className="pt-6">
                   <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Star className="h-6 w-6 text-green-600" />
+                    <Store className="h-6 w-6 text-green-600" />
                   </div>
                   <h3 className="font-semibold mb-2">{t("features.reviews.title")}</h3>
                   <p className="text-sm text-muted-foreground">{t("features.reviews.description")}</p>
@@ -151,38 +163,118 @@ export default function Home() {
 
         <section id="fundis" className="py-16">
           <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h2 className="text-3xl font-bold mb-2">{t("sections.featured")}</h2>
-                <p className="text-muted-foreground">{t("sections.featuredDescription")}</p>
+            <div className="mb-8">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="bg-blue-600 p-2 rounded-lg">
+                  <Wrench className="h-6 w-6 text-white" />
+                </div>
+                <h2 className="text-3xl font-bold">
+                  {language === "en" ? "Best Fundis in Major Cities" : "Mafundi Bora Miji Mikubwa"}
+                </h2>
               </div>
-              <Button variant="outline">
-                {language === "en" ? "View All" : "Ona Zote"}
-              </Button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredFundis.map((fundi) => (
-                <FundiCard key={fundi.id} fundi={fundi} />
-              ))}
+              <p className="text-muted-foreground mb-6">
+                {language === "en" 
+                  ? "Top-rated technicians across Tanzania's biggest cities" 
+                  : "Mafundi bora zaidi miji mikubwa ya Tanzania"}
+              </p>
+              
+              <Tabs value={selectedCity} onValueChange={setSelectedCity} className="w-full">
+                <TabsList className="w-full justify-start mb-6">
+                  {cities.map((city) => (
+                    <TabsTrigger key={city} value={city} className="gap-2">
+                      <MapPin className="h-4 w-4" />
+                      {city}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+
+                {cities.map((city) => (
+                  <TabsContent key={city} value={city}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {fundisByCity[city]?.length > 0 ? (
+                        fundisByCity[city].map((fundi) => (
+                          <FundiCard key={fundi.id} fundi={fundi} featured={fundi.promoted} />
+                        ))
+                      ) : (
+                        <div className="col-span-full text-center py-12">
+                          <p className="text-muted-foreground">
+                            {language === "en" 
+                              ? `No fundis available in ${city} yet` 
+                              : `Hakuna mafundi ${city} bado`}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </TabsContent>
+                ))}
+              </Tabs>
+
+              <div className="mt-6 text-center">
+                <Link href="/search">
+                  <Button variant="outline" size="lg">
+                    {language === "en" ? "View All Fundis" : "Ona Mafundi Wote"}
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </section>
 
         <section id="shops" className="py-16 bg-muted/50">
           <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h2 className="text-3xl font-bold mb-2">{t("sections.shops")}</h2>
-                <p className="text-muted-foreground">{t("sections.shopsDescription")}</p>
+            <div className="mb-8">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="bg-green-600 p-2 rounded-lg">
+                  <Store className="h-6 w-6 text-white" />
+                </div>
+                <h2 className="text-3xl font-bold">
+                  {language === "en" ? "Best Hardware Stores by City" : "Maduka Bora ya Vifaa kwa Jiji"}
+                </h2>
               </div>
-              <Button variant="outline">
-                {language === "en" ? "View All Shops" : "Ona Maduka Yote"}
-              </Button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredShops.map((shop) => (
-                <ShopCard key={shop.id} shop={shop} />
-              ))}
+              <p className="text-muted-foreground mb-6">
+                {language === "en" 
+                  ? "Quality tool shops and building material suppliers" 
+                  : "Maduka ya ubora ya zana na vifaa vya ujenzi"}
+              </p>
+
+              <Tabs value={selectedCity} onValueChange={setSelectedCity} className="w-full">
+                <TabsList className="w-full justify-start mb-6">
+                  {cities.map((city) => (
+                    <TabsTrigger key={city} value={city} className="gap-2">
+                      <MapPin className="h-4 w-4" />
+                      {city}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+
+                {cities.map((city) => (
+                  <TabsContent key={city} value={city}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {shopsByCity[city]?.length > 0 ? (
+                        shopsByCity[city].map((shop) => (
+                          <ShopCard key={shop.id} shop={shop} featured={shop.promoted} />
+                        ))
+                      ) : (
+                        <div className="col-span-full text-center py-12">
+                          <p className="text-muted-foreground">
+                            {language === "en" 
+                              ? `No shops available in ${city} yet` 
+                              : `Hakuna maduka ${city} bado`}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </TabsContent>
+                ))}
+              </Tabs>
+
+              <div className="mt-6 text-center">
+                <Link href="/search?type=shop">
+                  <Button variant="outline" size="lg">
+                    {language === "en" ? "View All Shops" : "Ona Maduka Yote"}
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </section>
@@ -191,17 +283,51 @@ export default function Home() {
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h2 className="text-3xl font-bold mb-2">{t("sections.events")}</h2>
-                <p className="text-muted-foreground">{t("sections.eventsDescription")}</p>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="bg-purple-600 p-2 rounded-lg">
+                    <TrendingUp className="h-6 w-6 text-white" />
+                  </div>
+                  <h2 className="text-3xl font-bold">
+                    {language === "en" ? "Biggest Events in Tanzania" : "Matukio Makubwa Tanzania"}
+                  </h2>
+                </div>
+                <p className="text-muted-foreground">
+                  {language === "en" 
+                    ? "Construction expos, tool fairs, and skills workshops" 
+                    : "Maonyesho ya ujenzi, maonyesho ya zana, na warsha za ujuzi"}
+                </p>
               </div>
-              <Button variant="outline">
-                {language === "en" ? "View All Events" : "Ona Matukio Yote"}
-              </Button>
+              <Link href="/events">
+                <Button variant="outline">
+                  {language === "en" ? "View All Events" : "Ona Matukio Yote"}
+                </Button>
+              </Link>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {upcomingEvents.map((event) => (
-                <EventCard key={event.id} event={event} />
-              ))}
+
+            {sponsoredEvents.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                  <Badge className="bg-orange-500">
+                    {language === "en" ? "Sponsored Events" : "Matukio Yaliyodhaminiwa"}
+                  </Badge>
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {sponsoredEvents.map((event) => (
+                    <EventCard key={event.id} event={event} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div>
+              <h3 className="text-xl font-semibold mb-4">
+                {language === "en" ? "Upcoming Events" : "Matukio Yanayokuja"}
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {upcomingEvents.map((event) => (
+                  <EventCard key={event.id} event={event} />
+                ))}
+              </div>
             </div>
           </div>
         </section>
