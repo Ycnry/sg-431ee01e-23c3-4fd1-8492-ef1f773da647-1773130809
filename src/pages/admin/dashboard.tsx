@@ -592,7 +592,7 @@ export default function AdminDashboardPage() {
                           <Alert className="mb-4 border-yellow-200 bg-yellow-50 dark:bg-yellow-950">
                             <AlertTriangle className="h-4 w-4 text-yellow-600" />
                             <AlertDescription className="text-yellow-800 dark:text-yellow-200 text-sm">
-                              <strong>Action Required:</strong> This fundi provided an alternative government-issued document instead of a National ID Number. Please verify the document authenticity before approving.
+                              <strong>Action Required:</strong> This fundi provided an alternative government-issued document (Passport, Driver's License, Voter's Card, NIDA Application Receipt, School Documentation, or Birth Certificate) instead of a National ID Number. Please verify the document authenticity before approving.
                             </AlertDescription>
                           </Alert>
 

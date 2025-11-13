@@ -376,8 +376,8 @@ export default function SignUpPage() {
                             <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                             <p className="text-sm text-muted-foreground mb-2">
                               {language === "en" 
-                                ? "Passport, Driver's License, Voter's Card, or NIDA Application Receipt"
-                                : "Pasipoti, Leseni ya Kuendesha, Kadi ya Kupiga Kura, au Risiti ya Maombi ya NIDA"}
+                                ? "Passport, Driver's License, Voter's Card, NIDA Application Receipt, School Documentation, or Birth Certificate"
+                                : "Pasipoti, Leseni ya Kuendesha, Kadi ya Kupiga Kura, Risiti ya Maombi ya NIDA, Hati za Shule, au Cheti cha Kuzaliwa"}
                             </p>
                             <Input
                               type="file"
