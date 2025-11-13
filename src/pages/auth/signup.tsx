@@ -26,6 +26,10 @@ export default function SignUpPage() {
     userType: "customer" as "customer" | "fundi" | "shop",
     nationalIdNumber: "",
     idDocument: null as File | null,
+    businessRegistrationNumber: "",
+    physicalAddress: "",
+    storefrontPhoto: null as File | null,
+    businessLicense: null as File | null,
   });
   const [magicEmail, setMagicEmail] = useState("");
   const [magicUserType, setMagicUserType] = useState<"customer" | "fundi" | "shop">("customer");
@@ -409,6 +413,122 @@ export default function SignUpPage() {
                             {language === "en"
                               ? "Providing a National ID Number ensures faster verification. Alternative documents require manual review."
                               : "Kutoa Nambari ya Kitambulisho cha Taifa kunahakikisha uthibitisho wa haraka. Hati mbadala zinahitaji ukaguzi wa mkono."}
+                          </AlertDescription>
+                        </Alert>
+                      </div>
+                    )}
+
+                    {formData.userType === "shop" && (
+                      <div className="space-y-4 p-4 border-2 border-green-200 dark:border-green-800 rounded-lg bg-green-50 dark:bg-green-950">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Store className="h-5 w-5 text-green-600" />
+                          <h3 className="font-semibold text-green-900 dark:text-green-100">
+                            {language === "en" ? "Shop Verification Requirements" : "Mahitaji ya Uthibitisho wa Duka"}
+                          </h3>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="business-registration">
+                            {language === "en" ? "Business Registration Number (BRELA)" : "Nambari ya Usajili wa Biashara (BRELA)"}
+                          </Label>
+                          <Input
+                            id="business-registration"
+                            type="text"
+                            placeholder={language === "en" ? "Enter BRELA number" : "Weka nambari ya BRELA"}
+                            value={formData.businessRegistrationNumber || ""}
+                            onChange={(e) => setFormData({ ...formData, businessRegistrationNumber: e.target.value })}
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            {language === "en" 
+                              ? "BRELA registration helps prevent duplicate shops and ensures business authenticity"
+                              : "Usajili wa BRELA husaidia kuzuia maduka ya kujirudia na kuhakikisha uhalisi wa biashara"}
+                          </p>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="physical-address">
+                            {language === "en" ? "Physical Address" : "Anwani ya Kimwili"}
+                          </Label>
+                          <Input
+                            id="physical-address"
+                            type="text"
+                            placeholder={language === "en" ? "e.g., Nyerere Rd, Kinondoni, Dar es Salaam" : "mfano, Barabara ya Nyerere, Kinondoni, Dar es Salaam"}
+                            value={formData.physicalAddress || ""}
+                            onChange={(e) => setFormData({ ...formData, physicalAddress: e.target.value })}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>{language === "en" ? "Storefront Photo (Required)" : "Picha ya Duka (Inahitajika)"}</Label>
+                          <div className="border-2 border-dashed rounded-lg p-4 text-center">
+                            <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                            <p className="text-sm text-muted-foreground mb-2">
+                              {language === "en" 
+                                ? "Upload a clear photo of your shop with visible signage"
+                                : "Pakia picha wazi ya duka lako lenye alama inayoonekana"}
+                            </p>
+                            <Input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleFileUpload}
+                              className="hidden"
+                              id="storefront-photo-upload"
+                            />
+                            <Label htmlFor="storefront-photo-upload" className="cursor-pointer">
+                              <Button type="button" variant="outline" size="sm" asChild>
+                                <span>
+                                  {formData.storefrontPhoto 
+                                    ? (language === "en" ? `Photo: ${formData.storefrontPhoto.name}` : `Picha: ${formData.storefrontPhoto.name}`)
+                                    : (language === "en" ? "Choose Photo (Max 5MB)" : "Chagua Picha (Max 5MB)")}
+                                </span>
+                              </Button>
+                            </Label>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>{language === "en" ? "Business License or TIN Certificate (Optional)" : "Leseni ya Biashara au Cheti cha TIN (Si lazima)"}</Label>
+                          <div className="border-2 border-dashed rounded-lg p-4 text-center">
+                            <FileText className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                            <p className="text-sm text-muted-foreground mb-2">
+                              {language === "en" 
+                                ? "Upload business license or TIN certificate for faster verification"
+                                : "Pakia leseni ya biashara au cheti cha TIN kwa uthibitisho wa haraka"}
+                            </p>
+                            <Input
+                              type="file"
+                              accept="image/*,.pdf"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  if (file.size > 5 * 1024 * 1024) {
+                                    setError(language === "en" ? "File size must be less than 5MB" : "Ukubwa wa faili lazima uwe chini ya 5MB");
+                                    return;
+                                  }
+                                  setFormData({ ...formData, businessLicense: file });
+                                }
+                              }}
+                              className="hidden"
+                              id="business-license-upload"
+                            />
+                            <Label htmlFor="business-license-upload" className="cursor-pointer">
+                              <Button type="button" variant="outline" size="sm" asChild>
+                                <span>
+                                  {formData.businessLicense 
+                                    ? (language === "en" ? `File: ${formData.businessLicense.name}` : `Faili: ${formData.businessLicense.name}`)
+                                    : (language === "en" ? "Choose File (Max 5MB)" : "Chagua Faili (Max 5MB)")}
+                                </span>
+                              </Button>
+                            </Label>
+                          </div>
+                        </div>
+
+                        <Alert className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950">
+                          <AlertCircle className="h-4 w-4 text-yellow-600" />
+                          <AlertDescription className="text-yellow-800 dark:text-yellow-200 text-sm">
+                            {language === "en"
+                              ? "All shops are visible by default but require admin verification to display the 'Verified by Smart Fundi' badge and full credentials."
+                              : "Maduka yote yanaonekana kwa default lakini yanahitaji uthibitisho wa msimamizi kuonyesha alama ya 'Imethibitishwa na Smart Fundi' na vyeti kamili."}
                           </AlertDescription>
                         </Alert>
                       </div>
