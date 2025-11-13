@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Menu, Search, Wrench, Store, Calendar, MessageSquare, User, LogOut } from "lucide-react";
+import { Menu, Search, Wrench, Store, Calendar, MessageSquare, User, LogOut, HelpCircle } from "lucide-react";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { ThemeSwitch } from "@/components/ThemeSwitch";
 
@@ -29,6 +29,7 @@ export function Header() {
     { href: "/search", label: language === "en" ? "Find Fundi" : "Tafuta Fundi", icon: Search },
     { href: "/search?type=shop", label: language === "en" ? "Shops" : "Maduka", icon: Store },
     { href: "/events", label: language === "en" ? "Events" : "Matukio", icon: Calendar },
+    { href: "/help", label: language === "en" ? "Help" : "Msaada", icon: HelpCircle },
   ];
 
   const authenticatedLinks = [

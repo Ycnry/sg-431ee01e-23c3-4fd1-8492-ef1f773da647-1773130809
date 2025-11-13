@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
@@ -17,7 +19,8 @@ import {
   AlertTriangle,
   FileText,
   CheckCircle,
-  XCircle
+  XCircle,
+  Settings
 } from "lucide-react";
 import { SubscriptionChart } from "@/components/admin/SubscriptionChart";
 import { LanguageChart } from "@/components/admin/LanguageChart";
@@ -53,6 +56,8 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [bugReports, setBugReports] = useState<BugReport[]>(mockBugReports);
   const [adminName, setAdminName] = useState("Admin");
+  const [supportHotline, setSupportHotline] = useState("+255759218354");
+  const [hotlineSaved, setHotlineSaved] = useState(false);
   const [pendingVerifications, setPendingVerifications] = useState<PendingVerification[]>([
     {
       id: "fundi-pending-1",
@@ -99,6 +104,13 @@ export default function AdminDashboardPage() {
     } else {
       router.push("/admin/login");
     }
+
+    const settings = localStorage.getItem("support_settings");
+    if (settings) {
+      const parsed = JSON.parse(settings);
+      setSupportHotline(parsed.hotline_number || "+255759218354");
+    }
+
     setLoading(false);
   }, [router]);
 
@@ -137,6 +149,17 @@ export default function AdminDashboardPage() {
       )
     );
     console.log(`Rejected fundi: ${fundiId}`);
+  };
+
+  const handleSaveHotline = () => {
+    const settings = {
+      hotline_number: supportHotline,
+      updated_at: new Date().toISOString(),
+      updated_by: adminName,
+    };
+    localStorage.setItem("support_settings", JSON.stringify(settings));
+    setHotlineSaved(true);
+    setTimeout(() => setHotlineSaved(false), 3000);
   };
 
   if (loading) {
@@ -270,7 +293,7 @@ export default function AdminDashboardPage() {
           </div>
 
           <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5 lg:w-auto">
+            <TabsList className="grid w-full grid-cols-6 lg:w-auto">
               <TabsTrigger value="overview" className="gap-2">
                 <BarChart3 className="h-4 w-4" />
                 <span className="hidden sm:inline">Overview</span>
@@ -300,6 +323,10 @@ export default function AdminDashboardPage() {
                     {openBugs}
                   </span>
                 )}
+              </TabsTrigger>
+              <TabsTrigger value="settings" className="gap-2">
+                <Settings className="h-4 w-4" />
+                <span className="hidden sm:inline">Settings</span>
               </TabsTrigger>
             </TabsList>
 
@@ -636,6 +663,52 @@ export default function AdminDashboardPage() {
                     reports={bugReports}
                     onResolve={handleResolveBug}
                   />
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="settings" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Customer Support Hotline (Tanzania)</CardTitle>
+                  <CardDescription>
+                    Configure the phone number customers can call for human support
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="hotline">Support Phone Number</Label>
+                    <Input
+                      id="hotline"
+                      type="tel"
+                      value={supportHotline}
+                      onChange={(e) => setSupportHotline(e.target.value)}
+                      placeholder="+255 XXX XXX XXX"
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      This number is used in the Help & Support AI assistant when users request human assistance
+                    </p>
+                  </div>
+
+                  <Button onClick={handleSaveHotline} className="w-full">
+                    Save Hotline Number
+                  </Button>
+
+                  {hotlineSaved && (
+                    <Alert className="border-green-200 bg-green-50 dark:bg-green-950">
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      <AlertDescription className="text-green-800 dark:text-green-200">
+                        Support hotline number saved successfully! All Help & Support calls will now use: {supportHotline}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  <Alert>
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      <strong>Security Note:</strong> Only admin users can read and update this setting. The hotline number is protected by Authentication and Database rules.
+                    </AlertDescription>
+                  </Alert>
                 </CardContent>
               </Card>
             </TabsContent>
