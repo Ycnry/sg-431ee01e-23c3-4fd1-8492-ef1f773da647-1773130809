@@ -83,6 +83,41 @@ export default function SignUpPage() {
       }
     }
 
+    if (formData.userType === "shop") {
+      if (!formData.businessRegistrationNumber && !formData.storefrontPhoto) {
+        setError(language === "en" 
+          ? "Please provide either a Business Registration Number or upload a storefront photo" 
+          : "Tafadhali toa Nambari ya Usajili wa Biashara au pakia picha ya duka");
+        return;
+      }
+
+      try {
+        const duplicateCheckResponse = await fetch("/api/auth/check-duplicate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userType: "shop",
+            businessName: formData.name,
+            city: formData.email.split("@")[0],
+            phone: formData.email,
+            businessRegistrationNumber: formData.businessRegistrationNumber,
+            storefrontPhotoHash: formData.storefrontPhoto ? await generateFileHash(formData.storefrontPhoto) : null,
+          }),
+        });
+
+        const duplicateResult = await duplicateCheckResponse.json();
+
+        if (duplicateResult.isDuplicate) {
+          setError(language === "en"
+            ? "A shop with this info already exists. Contact support if this is an error."
+            : "Duka lenye taarifa hizi tayari lipo. Wasiliana na msaada ikiwa hii ni hitilafu.");
+          return;
+        }
+      } catch (err) {
+        console.error("Duplicate check failed:", err);
+      }
+    }
+
     setLoading(true);
 
     try {
@@ -110,6 +145,17 @@ export default function SignUpPage() {
         return;
       }
       setFormData({ ...formData, idDocument: file });
+    }
+  };
+
+  const handleStorefrontPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setError(language === "en" ? "File size must be less than 5MB" : "Ukubwa wa faili lazima uwe chini ya 5MB");
+        return;
+      }
+      setFormData({ ...formData, storefrontPhoto: file });
     }
   };
 
@@ -470,7 +516,7 @@ export default function SignUpPage() {
                             <Input
                               type="file"
                               accept="image/*"
-                              onChange={handleFileUpload}
+                              onChange={handleStorefrontPhotoUpload}
                               className="hidden"
                               id="storefront-photo-upload"
                             />

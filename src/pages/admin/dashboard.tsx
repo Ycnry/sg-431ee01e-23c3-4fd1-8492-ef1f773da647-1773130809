@@ -88,6 +88,38 @@ export default function AdminDashboardPage() {
     },
   ]);
 
+  interface PendingShopVerification {
+    id: string;
+    shopName: string;
+    email: string;
+    city: string;
+    phone: string;
+    businessRegistrationNumber?: string;
+    physicalAddress?: string;
+    storefrontPhotoUrl?: string;
+    businessLicenseUrl?: string;
+    tinCertificateUrl?: string;
+    submittedDate: string;
+    verificationStatus: "pending" | "approved" | "rejected";
+    scamReports: number;
+  }
+
+  const [pendingShopVerifications, setPendingShopVerifications] = useState<PendingShopVerification[]>([
+    {
+      id: "shop-pending-1",
+      shopName: "Mwanza Tools & Hardware",
+      email: "mwanza.tools@example.com",
+      city: "Mwanza",
+      phone: "+255 745 123 456",
+      businessRegistrationNumber: "BRELA-98765432",
+      physicalAddress: "Station Rd, Mwanza",
+      storefrontPhotoUrl: "/uploads/shop3-storefront.jpg",
+      submittedDate: "2025-11-12",
+      verificationStatus: "pending",
+      scamReports: 0,
+    },
+  ]);
+
   useEffect(() => {
     const adminData = localStorage.getItem("smartfundi_admin");
     if (adminData) {
@@ -150,6 +182,34 @@ export default function AdminDashboardPage() {
       )
     );
     console.log(`Rejected fundi: ${fundiId}`);
+  };
+
+  const handleApproveShopVerification = (shopId: string) => {
+    setPendingShopVerifications(prev =>
+      prev.map(shop =>
+        shop.id === shopId
+          ? { ...shop, verificationStatus: "approved" }
+          : shop
+      )
+    );
+    console.log(`Approved shop: ${shopId}`);
+  };
+
+  const handleRejectShopVerification = (shopId: string) => {
+    setPendingShopVerifications(prev =>
+      prev.map(shop =>
+        shop.id === shopId
+          ? { ...shop, verificationStatus: "rejected" }
+          : shop
+      )
+    );
+    console.log(`Rejected shop: ${shopId}`);
+  };
+
+  const handleVerifyBySMS = (shopId: string, phone: string) => {
+    const smsMessage = "Smart Fundi: Tuma 'NIMETHIBITISHWA' kwa namba hii ili usajili wako uhalalishwe.";
+    console.log(`Sending SMS verification to ${phone}: ${smsMessage}`);
+    alert(`SMS verification sent to ${phone}. Shop owner should reply 'NIMETHIBITISHWA' to complete verification.`);
   };
 
   const handleSaveHotline = () => {
@@ -315,6 +375,10 @@ export default function AdminDashboardPage() {
                     {pendingVerificationsCount}
                   </span>
                 )}
+              </TabsTrigger>
+              <TabsTrigger value="shop-verifications" className="gap-2">
+                <Store className="h-4 w-4" />
+                <span className="hidden sm:inline">Shop Verifications</span>
               </TabsTrigger>
               <TabsTrigger value="bugs" className="gap-2">
                 <AlertTriangle className="h-4 w-4" />
