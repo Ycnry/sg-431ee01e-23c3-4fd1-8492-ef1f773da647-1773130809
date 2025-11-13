@@ -1,9 +1,9 @@
-
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Users, 
@@ -33,13 +33,27 @@ import {
   BugReport
 } from "@/lib/adminData";
 
+interface PendingVerification {
+  id: string;
+  name: string;
+  email: string;
+  specialty: string;
+  city: string;
+  phone: string;
+  idDocumentUrl: string;
+  documentType: string;
+  submittedDate: string;
+  requiresManualVerification: boolean;
+  verificationStatus: "pending" | "approved" | "rejected";
+}
+
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [bugReports, setBugReports] = useState<BugReport[]>(mockBugReports);
   const [adminName, setAdminName] = useState("Admin");
-  const [pendingVerifications, setPendingVerifications] = useState([
+  const [pendingVerifications, setPendingVerifications] = useState<PendingVerification[]>([
     {
       id: "fundi-pending-1",
       name: "David Msangi",
@@ -51,7 +65,7 @@ export default function AdminDashboardPage() {
       documentType: "Passport",
       submittedDate: "2025-11-10",
       requiresManualVerification: true,
-      verificationStatus: "pending" as const,
+      verificationStatus: "pending",
     },
     {
       id: "fundi-pending-2",
@@ -64,7 +78,7 @@ export default function AdminDashboardPage() {
       documentType: "Driver's License",
       submittedDate: "2025-11-11",
       requiresManualVerification: true,
-      verificationStatus: "pending" as const,
+      verificationStatus: "pending",
     },
   ]);
 
@@ -107,7 +121,7 @@ export default function AdminDashboardPage() {
     setPendingVerifications(prev =>
       prev.map(fundi =>
         fundi.id === fundiId
-          ? { ...fundi, verificationStatus: "approved" as const }
+          ? { ...fundi, verificationStatus: "approved" }
           : fundi
       )
     );
@@ -118,7 +132,7 @@ export default function AdminDashboardPage() {
     setPendingVerifications(prev =>
       prev.map(fundi =>
         fundi.id === fundiId
-          ? { ...fundi, verificationStatus: "rejected" as const }
+          ? { ...fundi, verificationStatus: "rejected" }
           : fundi
       )
     );
