@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
@@ -12,7 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Mail, Lock, User, Loader2, AlertCircle, CheckCircle2, Wrench, UserCircle, Store } from "lucide-react";
+import { Mail, Lock, User, Loader2, AlertCircle, CheckCircle2, Wrench, UserCircle, Store, Upload, FileText } from "lucide-react";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -25,6 +24,8 @@ export default function SignUpPage() {
     password: "",
     confirmPassword: "",
     userType: "customer" as "customer" | "fundi" | "shop",
+    nationalIdNumber: "",
+    idDocument: null as File | null,
   });
   const [magicEmail, setMagicEmail] = useState("");
   const [magicUserType, setMagicUserType] = useState<"customer" | "fundi" | "shop">("customer");
@@ -46,6 +47,38 @@ export default function SignUpPage() {
       return;
     }
 
+    if (formData.userType === "fundi") {
+      if (!formData.nationalIdNumber && !formData.idDocument) {
+        setError(language === "en" 
+          ? "Please provide either a National ID Number or upload an identification document" 
+          : "Tafadhali toa Nambari ya Kitambulisho cha Taifa au pakia hati ya kitambulisho");
+        return;
+      }
+
+      try {
+        const duplicateCheckResponse = await fetch("/api/auth/check-duplicate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            nationalIdNumber: formData.nationalIdNumber,
+            phone: formData.email,
+            idDocumentHash: formData.idDocument ? await generateFileHash(formData.idDocument) : null,
+          }),
+        });
+
+        const duplicateResult = await duplicateCheckResponse.json();
+
+        if (duplicateResult.isDuplicate) {
+          setError(language === "en"
+            ? "An account with this ID or phone number already exists. Please log in or contact support."
+            : "Akaunti yenye kitambulisho hiki au nambari ya simu tayari ipo. Tafadhali ingia au wasiliana na msaada.");
+          return;
+        }
+      } catch (err) {
+        console.error("Duplicate check failed:", err);
+      }
+    }
+
     setLoading(true);
 
     try {
@@ -55,6 +88,24 @@ export default function SignUpPage() {
       setError(err.message || (language === "en" ? "Sign up failed. Please try again." : "Kujisajili kumeshindikana. Tafadhali jaribu tena."));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const generateFileHash = async (file: File): Promise<string> => {
+    const arrayBuffer = await file.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setError(language === "en" ? "File size must be less than 5MB" : "Ukubwa wa faili lazima uwe chini ya 5MB");
+        return;
+      }
+      setFormData({ ...formData, idDocument: file });
     }
   };
 
@@ -276,6 +327,92 @@ export default function SignUpPage() {
                         />
                       </div>
                     </div>
+
+                    {formData.userType === "fundi" && (
+                      <div className="space-y-4 p-4 border-2 border-blue-200 dark:border-blue-800 rounded-lg bg-blue-50 dark:bg-blue-950">
+                        <div className="flex items-center gap-2 mb-2">
+                          <FileText className="h-5 w-5 text-blue-600" />
+                          <h3 className="font-semibold text-blue-900 dark:text-blue-100">
+                            {language === "en" ? "Identity Verification (Required)" : "Uthibitisho wa Kitambulisho (Inahitajika)"}
+                          </h3>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="national-id">
+                            {language === "en" ? "National ID Number (Tanzania NIDA)" : "Nambari ya Kitambulisho cha Taifa (NIDA Tanzania)"}
+                          </Label>
+                          <Input
+                            id="national-id"
+                            type="text"
+                            placeholder={language === "en" ? "Enter your NIDA number" : "Weka nambari yako ya NIDA"}
+                            value={formData.nationalIdNumber}
+                            onChange={(e) => setFormData({ ...formData, nationalIdNumber: e.target.value })}
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            {language === "en" 
+                              ? "This helps prevent duplicate accounts and ensures authenticity"
+                              : "Hii inasaidia kuzuia akaunti za kujirudia na kuhakikisha uhalisi"}
+                          </p>
+                        </div>
+
+                        <div className="relative">
+                          <div className="absolute inset-0 flex items-center">
+                            <span className="w-full border-t" />
+                          </div>
+                          <div className="relative flex justify-center text-xs uppercase">
+                            <span className="bg-blue-50 dark:bg-blue-950 px-2 text-muted-foreground">
+                              {language === "en" ? "Or" : "Au"}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>
+                            {language === "en" 
+                              ? "Upload Government-Issued ID (Alternative)" 
+                              : "Pakia Kitambulisho kilichotolewa na Serikali (Mbadala)"}
+                          </Label>
+                          <div className="border-2 border-dashed rounded-lg p-4 text-center">
+                            <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                            <p className="text-sm text-muted-foreground mb-2">
+                              {language === "en" 
+                                ? "Passport, Driver's License, Voter's Card, or NIDA Application Receipt"
+                                : "Pasipoti, Leseni ya Kuendesha, Kadi ya Kupiga Kura, au Risiti ya Maombi ya NIDA"}
+                            </p>
+                            <Input
+                              type="file"
+                              accept="image/*,.pdf"
+                              onChange={handleFileUpload}
+                              className="hidden"
+                              id="id-document-upload"
+                            />
+                            <Label htmlFor="id-document-upload" className="cursor-pointer">
+                              <Button type="button" variant="outline" size="sm" asChild>
+                                <span>
+                                  {formData.idDocument 
+                                    ? (language === "en" ? `File: ${formData.idDocument.name}` : `Faili: ${formData.idDocument.name}`)
+                                    : (language === "en" ? "Choose File (Max 5MB)" : "Chagua Faili (Max 5MB)")}
+                                </span>
+                              </Button>
+                            </Label>
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            {language === "en" 
+                              ? "Accounts using alternative documents will be manually verified by admin before approval"
+                              : "Akaunti zinazotumia hati mbadala zitathibitishwa na msimamizi kabla ya kuidhinishwa"}
+                          </p>
+                        </div>
+
+                        <Alert className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950">
+                          <AlertCircle className="h-4 w-4 text-yellow-600" />
+                          <AlertDescription className="text-yellow-800 dark:text-yellow-200 text-sm">
+                            {language === "en"
+                              ? "Providing a National ID Number ensures faster verification. Alternative documents require manual review."
+                              : "Kutoa Nambari ya Kitambulisho cha Taifa kunahakikisha uthibitisho wa haraka. Hati mbadala zinahitaji ukaguzi wa mkono."}
+                          </AlertDescription>
+                        </Alert>
+                      </div>
+                    )}
 
                     <Button type="submit" className="w-full" disabled={loading}>
                       {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

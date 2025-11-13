@@ -30,6 +30,11 @@ export interface Fundi extends Omit<User, "photo"> {
   subscriptionActive?: boolean;
   promoted?: boolean;
   isPromoted?: boolean;
+  nationalIdNumber?: string;
+  idDocumentUrl?: string;
+  idDocumentHash?: string;
+  requiresManualVerification?: boolean;
+  verificationStatus?: "pending" | "approved" | "rejected";
 }
 
 export interface Shop {
