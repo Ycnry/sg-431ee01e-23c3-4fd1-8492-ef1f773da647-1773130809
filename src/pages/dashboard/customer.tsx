@@ -16,8 +16,9 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { 
   User, Star, Heart, MessageSquare, History, Settings,
-  Trash2, Edit, Phone, Bell, Globe
+  Trash2, Edit, Phone, Bell, Globe, HelpCircle
 } from "lucide-react";
+import Link from "next/link";
 
 interface BookingHistory {
   id: string;
@@ -495,6 +496,18 @@ export default function CustomerDashboard() {
                         Kiswahili
                       </Button>
                     </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2">
+                      <HelpCircle className="h-5 w-5" />
+                      {language === "en" ? "Need Help?" : "Unahitaji Msaada?"}
+                    </Label>
+                    <Link href="/help" className="w-full">
+                      <Button variant="outline" className="w-full">
+                        {language === "en" ? "Go to Help & Support" : "Nenda kwenye Msaada"}
+                      </Button>
+                    </Link>
                   </div>
 
                   <Button onClick={saveData} className="w-full">

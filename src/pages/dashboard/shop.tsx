@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
@@ -14,7 +13,8 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Store, Upload, MessageSquare, CreditCard, Calendar, CheckCircle2, AlertCircle } from "lucide-react";
+import { Store, Upload, MessageSquare, CreditCard, Calendar, CheckCircle2, AlertCircle, HelpCircle } from "lucide-react";
+import Link from "next/link";
 
 interface PaymentMethod {
   id: string;
@@ -426,6 +426,12 @@ export default function ShopDashboard() {
                     <MessageSquare className="h-4 w-4" />
                     {language === "en" ? "All Messages" : "Ujumbe Wote"}
                   </Button>
+                  <Link href="/help" className="w-full">
+                    <Button variant="outline" className="w-full justify-start gap-2">
+                      <HelpCircle className="h-4 w-4" />
+                      {language === "en" ? "Help & Support" : "Msaada na Usaidizi"}
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
             </div>

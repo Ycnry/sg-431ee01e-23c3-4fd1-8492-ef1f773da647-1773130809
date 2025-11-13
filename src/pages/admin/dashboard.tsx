@@ -20,7 +20,8 @@ import {
   FileText,
   CheckCircle,
   XCircle,
-  Settings
+  Settings,
+  AlertCircle
 } from "lucide-react";
 import { SubscriptionChart } from "@/components/admin/SubscriptionChart";
 import { LanguageChart } from "@/components/admin/LanguageChart";
@@ -696,7 +697,7 @@ export default function AdminDashboardPage() {
 
                   {hotlineSaved && (
                     <Alert className="border-green-200 bg-green-50 dark:bg-green-950">
-                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      <CheckCircle className="h-4 w-4 text-green-600" />
                       <AlertDescription className="text-green-800 dark:text-green-200">
                         Support hotline number saved successfully! All Help & Support calls will now use: {supportHotline}
                       </AlertDescription>

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
@@ -17,8 +16,9 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { 
   Wrench, Upload, MessageSquare, Star, Award, TrendingUp, 
-  Zap, CheckCircle2, AlertCircle, Calendar, FileText 
+  Zap, CheckCircle2, AlertCircle, Calendar, FileText, HelpCircle
 } from "lucide-react";
+import Link from "next/link";
 
 interface Achievement {
   id: string;
@@ -535,6 +535,12 @@ export default function FundiDashboard() {
                     <MessageSquare className="h-4 w-4" />
                     {language === "en" ? "All Messages" : "Ujumbe Wote"}
                   </Button>
+                  <Link href="/help" className="w-full">
+                    <Button variant="outline" className="w-full justify-start gap-2">
+                      <HelpCircle className="h-4 w-4" />
+                      {language === "en" ? "Help & Support" : "Msaada na Usaidizi"}
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
             </div>
