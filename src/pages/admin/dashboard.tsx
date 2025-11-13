@@ -14,7 +14,10 @@ import {
   BarChart3,
   Globe,
   MessageSquare,
-  AlertTriangle
+  AlertTriangle,
+  FileText,
+  CheckCircle,
+  XCircle
 } from "lucide-react";
 import { SubscriptionChart } from "@/components/admin/SubscriptionChart";
 import { LanguageChart } from "@/components/admin/LanguageChart";
@@ -36,6 +39,34 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [bugReports, setBugReports] = useState<BugReport[]>(mockBugReports);
   const [adminName, setAdminName] = useState("Admin");
+  const [pendingVerifications, setPendingVerifications] = useState([
+    {
+      id: "fundi-pending-1",
+      name: "David Msangi",
+      email: "david.msangi@example.com",
+      specialty: "Electrician",
+      city: "Dar es Salaam",
+      phone: "+255 765 432 109",
+      idDocumentUrl: "/uploads/image_133049d0-ae3e-47c2-adcd-3558f0428311.png",
+      documentType: "Passport",
+      submittedDate: "2025-11-10",
+      requiresManualVerification: true,
+      verificationStatus: "pending" as const,
+    },
+    {
+      id: "fundi-pending-2",
+      name: "Grace Mwakasege",
+      email: "grace.mwakasege@example.com",
+      specialty: "Plumber",
+      city: "Arusha",
+      phone: "+255 742 876 543",
+      idDocumentUrl: "/uploads/image_4a24922e-ef18-4310-aabe-2608c6229396.png",
+      documentType: "Driver's License",
+      submittedDate: "2025-11-11",
+      requiresManualVerification: true,
+      verificationStatus: "pending" as const,
+    },
+  ]);
 
   useEffect(() => {
     const adminData = localStorage.getItem("smartfundi_admin");
@@ -72,6 +103,28 @@ export default function AdminDashboardPage() {
     );
   };
 
+  const handleApproveVerification = (fundiId: string) => {
+    setPendingVerifications(prev =>
+      prev.map(fundi =>
+        fundi.id === fundiId
+          ? { ...fundi, verificationStatus: "approved" as const }
+          : fundi
+      )
+    );
+    console.log(`Approved fundi: ${fundiId}`);
+  };
+
+  const handleRejectVerification = (fundiId: string) => {
+    setPendingVerifications(prev =>
+      prev.map(fundi =>
+        fundi.id === fundiId
+          ? { ...fundi, verificationStatus: "rejected" as const }
+          : fundi
+      )
+    );
+    console.log(`Rejected fundi: ${fundiId}`);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -90,6 +143,7 @@ export default function AdminDashboardPage() {
   const totalRevenue = mockRevenueData.reduce((sum, item) => sum + item.revenue, 0);
   const openBugs = bugReports.filter(b => b.status === "open").length;
   const inProgressBugs = bugReports.filter(b => b.status === "in-progress").length;
+  const pendingVerificationsCount = pendingVerifications.filter(v => v.verificationStatus === "pending").length;
 
   return (
     <>
@@ -202,7 +256,7 @@ export default function AdminDashboardPage() {
           </div>
 
           <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4 lg:w-auto">
+            <TabsList className="grid w-full grid-cols-5 lg:w-auto">
               <TabsTrigger value="overview" className="gap-2">
                 <BarChart3 className="h-4 w-4" />
                 <span className="hidden sm:inline">Overview</span>
@@ -214,6 +268,15 @@ export default function AdminDashboardPage() {
               <TabsTrigger value="language" className="gap-2">
                 <MessageSquare className="h-4 w-4" />
                 <span className="hidden sm:inline">Language</span>
+              </TabsTrigger>
+              <TabsTrigger value="verifications" className="gap-2">
+                <FileText className="h-4 w-4" />
+                <span className="hidden sm:inline">Verifications</span>
+                {pendingVerificationsCount > 0 && (
+                  <span className="ml-1 bg-orange-500 text-white text-xs rounded-full px-1.5 py-0.5">
+                    {pendingVerificationsCount}
+                  </span>
+                )}
               </TabsTrigger>
               <TabsTrigger value="bugs" className="gap-2">
                 <AlertTriangle className="h-4 w-4" />
@@ -385,6 +448,149 @@ export default function AdminDashboardPage() {
                       <p className="text-xs text-muted-foreground">Primary language</p>
                     </div>
                   </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="verifications" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Pending Identity Verifications</CardTitle>
+                  <CardDescription>
+                    Fundi accounts using alternative documents requiring manual review
+                  </CardDescription>
+                  <div className="flex items-center gap-4 text-sm pt-2">
+                    <div className="flex items-center gap-2">
+                      <div className="h-3 w-3 rounded-full bg-orange-600"></div>
+                      <span>{pendingVerificationsCount} Pending</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="h-3 w-3 rounded-full bg-green-600"></div>
+                      <span>{pendingVerifications.filter(v => v.verificationStatus === "approved").length} Approved</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="h-3 w-3 rounded-full bg-red-600"></div>
+                      <span>{pendingVerifications.filter(v => v.verificationStatus === "rejected").length} Rejected</span>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {pendingVerifications.length === 0 ? (
+                    <div className="text-center py-12">
+                      <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                      <p className="text-muted-foreground">No pending verifications</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {pendingVerifications.map((fundi) => (
+                        <div
+                          key={fundi.id}
+                          className={`border-2 rounded-lg p-4 ${
+                            fundi.verificationStatus === "pending"
+                              ? "border-orange-200 bg-orange-50 dark:bg-orange-950"
+                              : fundi.verificationStatus === "approved"
+                              ? "border-green-200 bg-green-50 dark:bg-green-950"
+                              : "border-red-200 bg-red-50 dark:bg-red-950"
+                          }`}
+                        >
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-4">
+                              <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-lg">
+                                <Wrench className="h-6 w-6 text-blue-600" />
+                              </div>
+                              <div>
+                                <h3 className="font-semibold text-lg">{fundi.name}</h3>
+                                <p className="text-sm text-muted-foreground">
+                                  {fundi.specialty} • {fundi.city}
+                                </p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  Submitted: {fundi.submittedDate}
+                                </p>
+                              </div>
+                            </div>
+                            <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                              fundi.verificationStatus === "pending"
+                                ? "bg-orange-500 text-white"
+                                : fundi.verificationStatus === "approved"
+                                ? "bg-green-500 text-white"
+                                : "bg-red-500 text-white"
+                            }`}>
+                              {fundi.verificationStatus.toUpperCase()}
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
+                            <div>
+                              <p className="text-muted-foreground">Email</p>
+                              <p className="font-medium">{fundi.email}</p>
+                            </div>
+                            <div>
+                              <p className="text-muted-foreground">Phone</p>
+                              <p className="font-medium">{fundi.phone}</p>
+                            </div>
+                          </div>
+
+                          <div className="mb-4">
+                            <p className="text-sm font-medium mb-2">
+                              Uploaded Document: {fundi.documentType}
+                            </p>
+                            <div className="border-2 border-dashed rounded-lg p-4 bg-white dark:bg-gray-900">
+                              <div className="flex items-center gap-2 text-blue-600">
+                                <FileText className="h-5 w-5" />
+                                <span className="text-sm font-medium">
+                                  {fundi.documentType} Document
+                                </span>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Click to view full document
+                              </p>
+                            </div>
+                          </div>
+
+                          <Alert className="mb-4 border-yellow-200 bg-yellow-50 dark:bg-yellow-950">
+                            <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                            <AlertDescription className="text-yellow-800 dark:text-yellow-200 text-sm">
+                              <strong>Action Required:</strong> This fundi provided an alternative government-issued document instead of a National ID Number. Please verify the document authenticity before approving.
+                            </AlertDescription>
+                          </Alert>
+
+                          {fundi.verificationStatus === "pending" && (
+                            <div className="flex gap-2">
+                              <Button
+                                className="flex-1 bg-green-600 hover:bg-green-700"
+                                onClick={() => handleApproveVerification(fundi.id)}
+                              >
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Approve & Activate
+                              </Button>
+                              <Button
+                                variant="outline"
+                                className="flex-1 border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+                                onClick={() => handleRejectVerification(fundi.id)}
+                              >
+                                <XCircle className="h-4 w-4 mr-2" />
+                                Reject
+                              </Button>
+                            </div>
+                          )}
+
+                          {fundi.verificationStatus === "approved" && (
+                            <div className="flex items-center gap-2 text-green-600">
+                              <CheckCircle className="h-5 w-5" />
+                              <span className="font-medium">Account Approved & Activated</span>
+                            </div>
+                          )}
+
+                          {fundi.verificationStatus === "rejected" && (
+                            <div className="flex items-center gap-2 text-red-600">
+                              <XCircle className="h-5 w-5" />
+                              <span className="font-medium">Account Rejected - User Notified</span>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
