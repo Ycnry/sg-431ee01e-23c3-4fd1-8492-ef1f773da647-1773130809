@@ -21,7 +21,9 @@ import {
   CheckCircle,
   XCircle,
   Settings,
-  AlertCircle
+  AlertCircle,
+  MapPinned,
+  Phone
 } from "lucide-react";
 import { SubscriptionChart } from "@/components/admin/SubscriptionChart";
 import { LanguageChart } from "@/components/admin/LanguageChart";
@@ -691,6 +693,188 @@ export default function AdminDashboardPage() {
                             <div className="flex items-center gap-2 text-red-600">
                               <XCircle className="h-5 w-5" />
                               <span className="font-medium">Account Rejected - User Notified</span>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="shop-verifications" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Pending Shop Verifications</CardTitle>
+                  <CardDescription>
+                    Shop accounts requiring verification before displaying full credentials
+                  </CardDescription>
+                  <div className="flex items-center gap-4 text-sm pt-2">
+                    <div className="flex items-center gap-2">
+                      <div className="h-3 w-3 rounded-full bg-orange-600"></div>
+                      <span>{pendingShopVerifications.filter(s => s.verificationStatus === "pending").length} Pending</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="h-3 w-3 rounded-full bg-green-600"></div>
+                      <span>{pendingShopVerifications.filter(s => s.verificationStatus === "approved").length} Approved</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="h-3 w-3 rounded-full bg-red-600"></div>
+                      <span>{pendingShopVerifications.filter(s => s.verificationStatus === "rejected").length} Rejected</span>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {pendingShopVerifications.length === 0 ? (
+                    <div className="text-center py-12">
+                      <Store className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                      <p className="text-muted-foreground">No pending shop verifications</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {pendingShopVerifications.map((shop) => (
+                        <div
+                          key={shop.id}
+                          className={`border-2 rounded-lg p-4 ${
+                            shop.verificationStatus === "pending"
+                              ? "border-orange-200 bg-orange-50 dark:bg-orange-950"
+                              : shop.verificationStatus === "approved"
+                              ? "border-green-200 bg-green-50 dark:bg-green-950"
+                              : "border-red-200 bg-red-50 dark:bg-red-950"
+                          }`}
+                        >
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-4">
+                              <div className="bg-green-100 dark:bg-green-900 p-3 rounded-lg">
+                                <Store className="h-6 w-6 text-green-600" />
+                              </div>
+                              <div>
+                                <h3 className="font-semibold text-lg">{shop.shopName}</h3>
+                                <p className="text-sm text-muted-foreground">{shop.city}</p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  Submitted: {shop.submittedDate}
+                                </p>
+                              </div>
+                            </div>
+                            <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                              shop.verificationStatus === "pending"
+                                ? "bg-orange-500 text-white"
+                                : shop.verificationStatus === "approved"
+                                ? "bg-green-500 text-white"
+                                : "bg-red-500 text-white"
+                            }`}>
+                              {shop.verificationStatus.toUpperCase()}
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
+                            <div>
+                              <p className="text-muted-foreground">Email</p>
+                              <p className="font-medium">{shop.email}</p>
+                            </div>
+                            <div>
+                              <p className="text-muted-foreground">Phone</p>
+                              <p className="font-medium">{shop.phone}</p>
+                            </div>
+                          </div>
+
+                          {shop.businessRegistrationNumber && (
+                            <div className="flex items-start gap-3 p-3 bg-muted rounded-lg mb-3">
+                              <FileText className="h-5 w-5 text-blue-600 mt-0.5" />
+                              <div className="flex-1">
+                                <p className="font-medium text-sm">Business Registration (BRELA)</p>
+                                <p className="text-sm text-muted-foreground">{shop.businessRegistrationNumber}</p>
+                              </div>
+                            </div>
+                          )}
+
+                          {shop.physicalAddress && (
+                            <div className="flex items-start gap-3 p-3 bg-muted rounded-lg mb-3">
+                              <MapPinned className="h-5 w-5 text-blue-600 mt-0.5" />
+                              <div className="flex-1">
+                                <p className="font-medium text-sm">Physical Address</p>
+                                <p className="text-sm text-muted-foreground">{shop.physicalAddress}</p>
+                              </div>
+                            </div>
+                          )}
+
+                          {(shop.storefrontPhotoUrl || shop.businessLicenseUrl || shop.tinCertificateUrl) && (
+                            <div className="mb-4">
+                              <p className="font-medium text-sm mb-2">Uploaded Documents</p>
+                              <div className="grid grid-cols-3 gap-2">
+                                {shop.storefrontPhotoUrl && (
+                                  <div className="border rounded-lg p-2 text-center">
+                                    <FileText className="h-8 w-8 mx-auto mb-1 text-muted-foreground" />
+                                    <p className="text-xs">Storefront Photo</p>
+                                  </div>
+                                )}
+                                {shop.businessLicenseUrl && (
+                                  <div className="border rounded-lg p-2 text-center">
+                                    <FileText className="h-8 w-8 mx-auto mb-1 text-muted-foreground" />
+                                    <p className="text-xs">Business License</p>
+                                  </div>
+                                )}
+                                {shop.tinCertificateUrl && (
+                                  <div className="border rounded-lg p-2 text-center">
+                                    <FileText className="h-8 w-8 mx-auto mb-1 text-muted-foreground" />
+                                    <p className="text-xs">TIN Certificate</p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {shop.scamReports >= 2 && (
+                            <Alert className="mb-4 border-red-200 bg-red-50 dark:bg-red-950">
+                              <AlertTriangle className="h-4 w-4 text-red-600" />
+                              <AlertDescription className="text-red-800 dark:text-red-200 text-sm">
+                                <strong>⚠️ Flagged for Review:</strong> This shop has received {shop.scamReports} scam report(s) from customers.
+                              </AlertDescription>
+                            </Alert>
+                          )}
+
+                          {shop.verificationStatus === "pending" && (
+                            <div className="space-y-2">
+                              <div className="grid grid-cols-2 gap-2">
+                                <Button
+                                  className="bg-green-600 hover:bg-green-700"
+                                  onClick={() => handleApproveShopVerification(shop.id)}
+                                >
+                                  <CheckCircle className="h-4 w-4 mr-2" />
+                                  Approve & Activate
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  className="border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+                                  onClick={() => handleRejectShopVerification(shop.id)}
+                                >
+                                  <XCircle className="h-4 w-4 mr-2" />
+                                  Reject
+                                </Button>
+                              </div>
+                              <Button
+                                variant="outline"
+                                className="w-full"
+                                onClick={() => handleVerifyBySMS(shop.id, shop.phone)}
+                              >
+                                <Phone className="h-4 w-4 mr-2" />
+                                Verify by SMS/Call
+                              </Button>
+                            </div>
+                          )}
+
+                          {shop.verificationStatus === "approved" && (
+                            <div className="flex items-center gap-2 text-green-600">
+                              <CheckCircle className="h-5 w-5" />
+                              <span className="font-medium">Shop Approved & Verified</span>
+                            </div>
+                          )}
+
+                          {shop.verificationStatus === "rejected" && (
+                            <div className="flex items-center gap-2 text-red-600">
+                              <XCircle className="h-5 w-5" />
+                              <span className="font-medium">Shop Rejected - Owner Notified</span>
                             </div>
                           )}
                         </div>
