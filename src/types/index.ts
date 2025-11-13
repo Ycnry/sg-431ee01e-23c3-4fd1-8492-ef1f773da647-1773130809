@@ -39,11 +39,11 @@ export interface Fundi extends Omit<User, "photo"> {
 
 export interface Shop {
   id: string;
-  name: string; // Shops have `name`, not `shopName` to be consistent with fundi
+  name: string;
   city: string;
   rating: number;
   reviewCount: number;
-  image?: string; // Use `image` consistently
+  image?: string;
   logo?: string;
   category: string;
   openingHours: string;
@@ -53,10 +53,23 @@ export interface Shop {
   verified: boolean;
   ward?: string;
   categories?: string[];
-  shopName?: string; // Keep for now for compatibility, but prefer `name`
+  shopName?: string;
   subscriptionActive?: boolean;
   promoted?: boolean;
   isPromoted?: boolean;
+  businessRegistrationNumber?: string;
+  physicalAddress?: string;
+  verificationStatus?: "pending" | "approved" | "rejected";
+  businessLicenseUrl?: string;
+  tinCertificateUrl?: string;
+  storefrontPhotoUrl?: string;
+  credentialsDocumentHash?: string;
+  trustPoints?: number;
+  customerVerifications?: number;
+  scamReports?: number;
+  communityVerified?: boolean;
+  verifiedAt?: string;
+  phoneVerified?: boolean;
 }
 
 export interface Message {
