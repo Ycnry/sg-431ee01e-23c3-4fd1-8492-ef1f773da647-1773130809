@@ -80,6 +80,12 @@ export interface Message {
   text: string;
   timestamp: string;
   read: boolean;
+  mediaUrl?: string;
+  mediaType?: "image" | "video";
+  thumbnailUrl?: string;
+  fileSize?: number;
+  uploadProgress?: number;
+  uploadError?: string;
 }
 
 export interface Conversation {
