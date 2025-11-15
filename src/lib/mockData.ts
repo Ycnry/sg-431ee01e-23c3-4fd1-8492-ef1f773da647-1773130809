@@ -199,6 +199,51 @@ export function initializeMockSubscriptions() {
   }
 }
 
+// Sample media messages for testing
+export function initializeSampleMediaMessages() {
+  if (typeof window !== "undefined") {
+    const sampleMessages = [
+      {
+        id: "msg1",
+        conversationId: "conv1",
+        senderId: "customer1",
+        receiverId: "1",
+        text: "Hi, I need help with my electrical panel",
+        timestamp: new Date(Date.now() - 3600000).toISOString(),
+        read: true,
+      },
+      {
+        id: "msg2",
+        conversationId: "conv1",
+        senderId: "customer1",
+        receiverId: "1",
+        text: "",
+        timestamp: new Date(Date.now() - 3500000).toISOString(),
+        read: true,
+        mediaUrl: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800",
+        mediaType: "image" as const,
+        thumbnailUrl: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=200",
+        fileSize: 245000,
+      },
+      {
+        id: "msg3",
+        conversationId: "conv1",
+        senderId: "1",
+        receiverId: "customer1",
+        text: "I can see the issue. I'll need to replace that circuit breaker. When would be a good time for me to come over?",
+        timestamp: new Date(Date.now() - 3400000).toISOString(),
+        read: true,
+      },
+    ];
+
+    const existing = localStorage.getItem("chat_conv1");
+    if (!existing) {
+      localStorage.setItem("chat_conv1", JSON.stringify(sampleMessages));
+      console.log("Initialized sample media messages");
+    }
+  }
+}
+
 export const mockEvents: Event[] = [
   {
     id: "e1",
