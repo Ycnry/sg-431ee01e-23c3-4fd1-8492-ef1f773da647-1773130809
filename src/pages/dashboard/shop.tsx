@@ -429,7 +429,13 @@ export default function ShopDashboard() {
                   <Link href="/how-to-pay" className="w-full">
                     <Button variant="outline" className="w-full justify-start gap-2">
                       <Wallet className="h-4 w-4" />
-                      {language === "en" ? "How to Pay" : "Jinsi ya Kulipa"}
+                      {language === "en" ? "Mobile Money Guide" : "Mwongozo wa Pesa ya Simu"}
+                    </Button>
+                  </Link>
+                  <Link href="/how-to-pay-bank" className="w-full">
+                    <Button variant="outline" className="w-full justify-start gap-2">
+                      <Wallet className="h-4 w-4" />
+                      {language === "en" ? "Bank SIM Banking Guide" : "Mwongozo wa SIM Banking"}
                     </Button>
                   </Link>
                   <Link href="/help" className="w-full">

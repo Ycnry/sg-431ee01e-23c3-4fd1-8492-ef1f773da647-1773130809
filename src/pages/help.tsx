@@ -6,7 +6,7 @@ import { HelpSupport } from "@/components/HelpSupport";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Wallet, HelpCircle } from "lucide-react";
+import { Wallet, HelpCircle, Building2 } from "lucide-react";
 
 export default function HelpPage() {
   const { language } = useLanguage();
@@ -49,15 +49,21 @@ export default function HelpPage() {
               </CardTitle>
               <CardDescription>
                 {language === "en"
-                  ? "Learn how to pay fundis and shops using M-Pesa, Airtel Money, or Mixx by Yas"
-                  : "Jifunze jinsi ya kulipa mafundi na maduka kwa kutumia M-Pesa, Airtel Money, au Mixx by Yas"}
+                  ? "Learn how to pay fundis and shops using mobile money or bank SIM banking"
+                  : "Jifunze jinsi ya kulipa mafundi na maduka kwa kutumia pesa ya simu au SIM banking ya benki"}
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <Link href="/how-to-pay">
+            <CardContent className="space-y-3">
+              <Link href="/how-to-pay" className="block">
                 <Button size="lg" className="w-full gap-2">
                   <Wallet className="h-5 w-5" />
-                  {language === "en" ? "View Payment Guide" : "Angalia Mwongozo wa Malipo"}
+                  {language === "en" ? "Mobile Money Guide (M-Pesa, Airtel, Mixx)" : "Mwongozo wa Pesa ya Simu (M-Pesa, Airtel, Mixx)"}
+                </Button>
+              </Link>
+              <Link href="/how-to-pay-bank" className="block">
+                <Button size="lg" variant="outline" className="w-full gap-2">
+                  <Building2 className="h-5 w-5" />
+                  {language === "en" ? "Bank SIM Banking Guide (CRDB, NMB, NBC, TPB)" : "Mwongozo wa SIM Banking (CRDB, NMB, NBC, TPB)"}
                 </Button>
               </Link>
             </CardContent>

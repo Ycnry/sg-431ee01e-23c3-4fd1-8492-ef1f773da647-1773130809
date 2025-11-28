@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -218,7 +217,7 @@ export default function HowToPayPage() {
         </Card>
 
         {/* Need Help Section */}
-        <Card className="text-center bg-gradient-to-r from-blue-600 to-orange-500 text-white border-0">
+        <Card className="text-center bg-gradient-to-r from-blue-600 to-orange-500 text-white border-0 mb-8">
           <CardHeader>
             <CardTitle className="text-2xl flex items-center justify-center gap-2">
               <HelpCircle className="h-6 w-6" />
@@ -233,6 +232,28 @@ export default function HowToPayPage() {
               <Button size="lg" variant="secondary" className="gap-2">
                 <HelpCircle className="h-5 w-5" />
                 {t("howToPay.needHelp")}
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        {/* Alternative Payment: Bank SIM Banking */}
+        <Card className="mb-8 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Phone className="h-6 w-6 text-green-600" />
+              {t("howToPayBank.alternatives.title")}
+            </CardTitle>
+            <CardDescription className="text-base">
+              {t("howToPayBank.alternatives.description")}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link href="/how-to-pay-bank">
+              <Button className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white shadow-lg">
+                <Phone className="w-4 h-4 mr-2" />
+                {t("howToPayBank.alternatives.link")}
+                <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
           </CardContent>
