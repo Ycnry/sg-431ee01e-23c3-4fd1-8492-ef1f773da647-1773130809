@@ -29,7 +29,6 @@ export function Header() {
     { href: "/search", label: language === "en" ? "Find Fundi" : "Tafuta Fundi", icon: Search },
     { href: "/search?type=shop", label: language === "en" ? "Shops" : "Maduka", icon: Store },
     { href: "/events", label: language === "en" ? "Events" : "Matukio", icon: Calendar },
-    { href: "/how-to-pay", label: t("nav.howToPay"), icon: Wallet },
     { href: "/help", label: language === "en" ? "Help" : "Msaada", icon: HelpCircle },
   ];
 
