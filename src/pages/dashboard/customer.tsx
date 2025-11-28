@@ -16,7 +16,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { 
   User, Star, Heart, MessageSquare, History, Settings,
-  Trash2, Edit, Phone, Bell, Globe, HelpCircle
+  Trash2, Edit, Phone, Bell, Globe, HelpCircle, Wallet
 } from "lucide-react";
 import Link from "next/link";
 

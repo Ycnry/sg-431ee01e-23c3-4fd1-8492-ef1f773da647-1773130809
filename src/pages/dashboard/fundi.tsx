@@ -16,7 +16,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { 
   Wrench, Upload, MessageSquare, Star, Award, TrendingUp, 
-  Zap, CheckCircle2, AlertCircle, Calendar, FileText, HelpCircle
+  Zap, CheckCircle2, AlertCircle, Calendar, FileText, HelpCircle, Wallet
 } from "lucide-react";
 import Link from "next/link";
 
@@ -535,6 +535,12 @@ export default function FundiDashboard() {
                     <MessageSquare className="h-4 w-4" />
                     {language === "en" ? "All Messages" : "Ujumbe Wote"}
                   </Button>
+                  <Link href="/how-to-pay" className="w-full">
+                    <Button variant="outline" className="w-full justify-start gap-2">
+                      <Wallet className="h-4 w-4" />
+                      {language === "en" ? "How to Pay" : "Jinsi ya Kulipa"}
+                    </Button>
+                  </Link>
                   <Link href="/help" className="w-full">
                     <Button variant="outline" className="w-full justify-start gap-2">
                       <HelpCircle className="h-4 w-4" />
