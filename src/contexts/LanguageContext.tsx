@@ -174,6 +174,87 @@ const translations: Record<string, Record<Language, string>> = {
   "howToPay.common.confirm": { en: "Confirm", sw: "Thibitisha" },
   "howToPay.common.success": { en: "Success", sw: "Mafanikio" },
   "howToPay.common.step": { en: "Step", sw: "Hatua" },
+  
+  // How to Pay - Bank SIM Banking Page
+  "howToPayBank.title": { en: "How to Pay via Bank SIM Banking", sw: "Jinsi ya Kulipa kwa SIM Banking ya Benki" },
+  "howToPayBank.subtitle": { en: "Pay using your bank's mobile banking service - no smartphone needed", sw: "Lipa kwa kutumia huduma ya benki ya simu - hakuna haja ya simu ya kisasa" },
+  "howToPayBank.intro": { en: "Most Tanzanian banks offer USSD-based mobile banking that works on any phone. Choose your bank below and follow the simple steps.", sw: "Benki nyingi za Tanzania zinatoa huduma ya benki ya simu inayofanya kazi kwenye simu yoyote. Chagua benki yako hapa chini na fuata hatua rahisi." },
+  
+  // CRDB Bank - SimBanking (*133#)
+  "howToPayBank.crdb.title": { en: "CRDB Bank - SimBanking", sw: "CRDB Bank - SimBanking" },
+  "howToPayBank.crdb.ussd": { en: "Dial: *133#", sw: "Piga: *133#" },
+  "howToPayBank.crdb.step1": { en: "Dial *133# from your phone and press Call", sw: "Bonyeza *133# kwenye simu yako kisha Call" },
+  "howToPayBank.crdb.step2": { en: "Enter your SimBanking PIN", sw: "Ingiza Namba yako ya Siri ya SimBanking" },
+  "howToPayBank.crdb.step3": { en: "Select: 2. Pay Bills", sw: "Chagua: 2. Lipa Bili" },
+  "howToPayBank.crdb.step4": { en: "Select: 1. Pay to Business", sw: "Chagua: 1. Lipa kwa Biashara" },
+  "howToPayBank.crdb.step5": { en: "Enter Business Number (provided by shop/fundi - e.g., 123456)", sw: "Ingiza Nambari ya Biashara (iliyotolewa na duka/fundi - mfano: 123456)" },
+  "howToPayBank.crdb.step6": { en: "Enter Reference/Account (e.g., \"Smart Fundi\" or \"FundID123\")", sw: "Ingiza Kumbukumbu/Akaunti (mfano: \"Smart Fundi\" au \"FundID123\")" },
+  "howToPayBank.crdb.step7": { en: "Enter Amount (e.g., 5,000 TZS)", sw: "Ingiza Kiasi (mfano: 5,000 TZS)" },
+  "howToPayBank.crdb.step8": { en: "Confirm with your PIN", sw: "Thibitisha kwa PIN yako" },
+  "howToPayBank.crdb.step9": { en: "Done! You will receive a confirmation SMS - save or screenshot it", sw: "Umeshasalia! Utaipokea ujumbe wa uthibitisho - uhifadhi au upige picha" },
+  
+  // NMB Bank - Mkononi (*131# or App)
+  "howToPayBank.nmb.title": { en: "NMB Bank - Mkononi", sw: "NMB Bank - Mkononi" },
+  "howToPayBank.nmb.ussd": { en: "Dial: *131# or use NMB App", sw: "Piga: *131# au tumia NMB App" },
+  "howToPayBank.nmb.step1": { en: "Dial *131# or open NMB Mobile App", sw: "Bonyeza *131# au fungua NMB Mobile App" },
+  "howToPayBank.nmb.step2": { en: "Enter your Mkononi PIN or login to app", sw: "Ingiza PIN yako ya Mkononi au ingia kwenye app" },
+  "howToPayBank.nmb.step3": { en: "Select: 4. Make Payments", sw: "Chagua: 4. Fanya Malipo" },
+  "howToPayBank.nmb.step4": { en: "Select: 1. Pay to Business", sw: "Chagua: 1. Lipa kwa Biashara" },
+  "howToPayBank.nmb.step5": { en: "Enter Business PayBill/Till Number (from shop/fundi)", sw: "Ingiza Nambari ya PayBill/Till ya Biashara (kutoka kwa duka/fundi)" },
+  "howToPayBank.nmb.step6": { en: "Enter Reference Number (optional - e.g., your name or invoice number)", sw: "Ingiza Nambari ya Kumbukumbu (opsional - mfano: jina lako au nambari ya ankara)" },
+  "howToPayBank.nmb.step7": { en: "Enter Amount (e.g., 5,000 TZS)", sw: "Ingiza Kiasi (mfano: 5,000 TZS)" },
+  "howToPayBank.nmb.step8": { en: "Confirm with your PIN", sw: "Thibitisha kwa PIN yako" },
+  "howToPayBank.nmb.step9": { en: "Success! Save the confirmation SMS for your records", sw: "Mafanikio! Hifadhi ujumbe wa uthibitisho kwa rekodi zako" },
+  
+  // NBC - M-Benki (*135#)
+  "howToPayBank.nbc.title": { en: "NBC - M-Benki", sw: "NBC - M-Benki" },
+  "howToPayBank.nbc.ussd": { en: "Dial: *135#", sw: "Piga: *135#" },
+  "howToPayBank.nbc.step1": { en: "Dial *135# from your mobile phone", sw: "Bonyeza *135# kwenye simu yako ya mkononi" },
+  "howToPayBank.nbc.step2": { en: "Enter your M-Benki PIN", sw: "Ingiza PIN yako ya M-Benki" },
+  "howToPayBank.nbc.step3": { en: "Select: 3. Payments", sw: "Chagua: 3. Malipo" },
+  "howToPayBank.nbc.step4": { en: "Select: 2. Pay Bill", sw: "Chagua: 2. Lipa Bili" },
+  "howToPayBank.nbc.step5": { en: "Enter Business Number (till/paybill number from provider)", sw: "Ingiza Nambari ya Biashara (nambari ya till/paybill kutoka kwa mtoaji)" },
+  "howToPayBank.nbc.step6": { en: "Enter Account Reference (e.g., \"Smart Fundi\" or service ID)", sw: "Ingiza Kumbukumbu ya Akaunti (mfano: \"Smart Fundi\" au ID ya huduma)" },
+  "howToPayBank.nbc.step7": { en: "Enter Payment Amount (e.g., 5,000 TZS)", sw: "Ingiza Kiasi cha Malipo (mfano: 5,000 TZS)" },
+  "howToPayBank.nbc.step8": { en: "Verify details and confirm with PIN", sw: "Thibitisha maelezo na kuthibitisha kwa PIN" },
+  "howToPayBank.nbc.step9": { en: "Complete! Keep your confirmation message safe", sw: "Imekamilika! Hifadhi ujumbe wako wa uthibitisho salama" },
+  
+  // TPB Bank - Yote Bando (*165#)
+  "howToPayBank.tpb.title": { en: "TPB Bank - Yote Bando", sw: "TPB Bank - Yote Bando" },
+  "howToPayBank.tpb.ussd": { en: "Dial: *165#", sw: "Piga: *165#" },
+  "howToPayBank.tpb.step1": { en: "Dial *165# and press Call", sw: "Bonyeza *165# kisha Call" },
+  "howToPayBank.tpb.step2": { en: "Enter your Yote Bando PIN", sw: "Ingiza PIN yako ya Yote Bando" },
+  "howToPayBank.tpb.step3": { en: "Select: 2. Send Money", sw: "Chagua: 2. Tuma Pesa" },
+  "howToPayBank.tpb.step4": { en: "Select: 3. Pay to Business", sw: "Chagua: 3. Lipa kwa Biashara" },
+  "howToPayBank.tpb.step5": { en: "Enter Business/Till Number (ask your fundi/shop for this)", sw: "Ingiza Nambari ya Biashara/Till (uliza fundi/duka lako nambari hii)" },
+  "howToPayBank.tpb.step6": { en: "Enter Reference (your name, invoice, or \"Smart Fundi\")", sw: "Ingiza Kumbukumbu (jina lako, ankara, au \"Smart Fundi\")" },
+  "howToPayBank.tpb.step7": { en: "Enter Amount to Pay (e.g., 5,000 TZS)", sw: "Ingiza Kiasi cha Kulipa (mfano: 5,000 TZS)" },
+  "howToPayBank.tpb.step8": { en: "Confirm transaction with your PIN", sw: "Thibitisha muamala kwa PIN yako" },
+  "howToPayBank.tpb.step9": { en: "Payment successful! Screenshot or save the confirmation SMS", sw: "Malipo yamefanikiwa! Piga picha au hifadhi ujumbe wa uthibitisho" },
+  
+  // Bank Payment Tips
+  "howToPayBank.tips.title": { en: "Important Banking Tips", sw: "Vidokezo Muhimu vya Benki" },
+  "howToPayBank.tips.tip1": { en: "Works on any phone - no internet or smartphone required", sw: "Inafanya kazi kwenye simu yoyote - hakuna haja ya mtandao au simu ya kisasa" },
+  "howToPayBank.tips.tip2": { en: "Always confirm the business name before entering PIN", sw: "Daima thibitisha jina la biashara kabla ya kuingiza PIN" },
+  "howToPayBank.tips.tip3": { en: "Keep all confirmation messages for at least 3 months", sw: "Hifadhi ujumbe wote wa uthibitisho kwa angalau miezi 3" },
+  "howToPayBank.tips.tip4": { en: "If payment fails, wait 5 minutes before trying again", sw: "Kama malipo yameshindwa, subiri dakika 5 kabla ya kujaribu tena" },
+  "howToPayBank.tips.tip5": { en: "Contact your bank immediately if you see wrong transactions", sw: "Wasiliana na benki yako mara moja kama unaona muamala usio sahihi" },
+  "howToPayBank.tips.tip6": { en: "Never share your banking PIN with anyone", sw: "Usimshirikishe mtu yeyote PIN yako ya benki" },
+  
+  // Bank Payment Common Terms
+  "howToPayBank.common.businessNumber": { en: "Business Number", sw: "Nambari ya Biashara" },
+  "howToPayBank.common.paybill": { en: "PayBill/Till Number", sw: "Nambari ya PayBill/Till" },
+  "howToPayBank.common.reference": { en: "Reference/Account", sw: "Kumbukumbu/Akaunti" },
+  "howToPayBank.common.amount": { en: "Amount", sw: "Kiasi" },
+  "howToPayBank.common.pin": { en: "PIN", sw: "Namba ya Siri" },
+  "howToPayBank.common.confirm": { en: "Confirm", sw: "Thibitisha" },
+  "howToPayBank.common.sms": { en: "SMS Confirmation", sw: "Uthibitisho wa SMS" },
+  "howToPayBank.common.example": { en: "Example", sw: "Mfano" },
+  
+  // Alternative Payment Methods Link
+  "howToPayBank.alternatives.title": { en: "Other Payment Methods", sw: "Njia Nyingine za Malipo" },
+  "howToPayBank.alternatives.description": { en: "Prefer mobile money? View M-Pesa, Airtel Money, and Mixx payment guides", sw: "Unapendelea pesa ya simu? Angalia miongozo ya M-Pesa, Airtel Money, na Mixx" },
+  "howToPayBank.alternatives.link": { en: "Mobile Money Payment Guide", sw: "Mwongozo wa Malipo ya Pesa ya Simu" },
 };
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
