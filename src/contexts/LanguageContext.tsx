@@ -19,6 +19,7 @@ const translations: Record<string, Record<Language, string>> = {
   "nav.signin": { en: "Sign In", sw: "Ingia" },
   "nav.signup": { en: "Sign Up", sw: "Jisajili" },
   "nav.messages": { en: "Messages", sw: "Ujumbe" },
+  "nav.howToPay": { en: "How to Pay", sw: "Jinsi ya Kulipa" },
   
   // Splash & Welcome
   "splash.tagline": { en: "Connecting You to Skilled Technicians", sw: "Kukuunganisha na Mafundi Hodari" },
@@ -113,6 +114,66 @@ const translations: Record<string, Record<Language, string>> = {
   "messaging.noMessages": { en: "No messages yet", sw: "Hakuna ujumbe bado" },
   "messaging.selectChat": { en: "Select a conversation to start messaging", sw: "Chagua mazungumzo kuanza kutuma ujumbe" },
   "messaging.typePlaceholder": { en: "Type a message...", sw: "Andika ujumbe..." },
+
+  // How to Pay Page
+  "howToPay.title": { en: "How to Pay a Fundi or Shop", sw: "Jinsi ya Kulipa Fundi au Duka" },
+  "howToPay.subtitle": { en: "Choose your mobile money provider and follow the simple steps", sw: "Chagua mtoa huduma wako wa pesa na fuata hatua rahisi" },
+  "howToPay.needHelp": { en: "Need Help?", sw: "Unahitaji Msaada?" },
+  "howToPay.contactSupport": { en: "Contact our support team", sw: "Wasiliana na timu yetu ya msaada" },
+  
+  // M-Pesa Instructions
+  "howToPay.mpesa.title": { en: "Vodacom M-Pesa", sw: "Vodacom M-Pesa" },
+  "howToPay.mpesa.step1": { en: "Open your M-Pesa app or dial *150#", sw: "Fungua M-Pesa yako au kama haiko, bonyeza *150#" },
+  "howToPay.mpesa.step2": { en: "Select \"Lipa Na M-Pesa\"", sw: "Chagua \"Lipa Na M-Pesa\"" },
+  "howToPay.mpesa.step3": { en: "Select \"Lipa Kwa Simu\"", sw: "Chagua \"Lipa Kwa Simu\"" },
+  "howToPay.mpesa.step4": { en: "Enter Business Number (Lipa Number provided by shop/fundi)", sw: "Ingiza Nambari ya Biashara (Lipa Number iliyotolewa na duka/fundi)" },
+  "howToPay.mpesa.step5": { en: "Enter Account/Reference (Optional - e.g., \"Smart Fundi\")", sw: "Ingiza Kumbukumbu (Opsional - mfano: \"Smart Fundi\")" },
+  "howToPay.mpesa.step6": { en: "Enter Amount (e.g., 5,000 TZS)", sw: "Ingiza Kiasi (mfano: 5,000 TZS)" },
+  "howToPay.mpesa.step7": { en: "Enter your M-Pesa PIN to confirm", sw: "Ingiza Namba yako ya Siri ya M-Pesa kuthibitisha" },
+  "howToPay.mpesa.step8": { en: "Done! Send the confirmation SMS screenshot as proof", sw: "Umeshasalia! Tuma picha ya SMS ya uthibitisho kama ushahidi" },
+  "howToPay.mpesa.example": { en: "Example Business Number: 400200", sw: "Mfano wa Nambari ya Biashara: 400200" },
+  
+  // Airtel Money Instructions
+  "howToPay.airtel.title": { en: "Airtel Money", sw: "Airtel Money" },
+  "howToPay.airtel.step1": { en: "Open Airtel Money app or dial *150*60#", sw: "Fungua Airtel Money au bonyeza *150*60#" },
+  "howToPay.airtel.step2": { en: "Select \"Make Payment\"", sw: "Chagua \"Fanya Malipo\"" },
+  "howToPay.airtel.step3": { en: "Select \"Lipa Number\"", sw: "Chagua \"Lipa Number\"" },
+  "howToPay.airtel.step4": { en: "Enter the Lipa Number (provided by shop/fundi)", sw: "Ingiza Lipa Number (iliyotolewa na duka/fundi)" },
+  "howToPay.airtel.step5": { en: "Enter Account Number (Optional - e.g., your name or \"Smart Fundi\")", sw: "Ingiza Nambari ya Akaunti (Opsional - mfano: jina lako au \"Smart Fundi\")" },
+  "howToPay.airtel.step6": { en: "Enter Amount (e.g., 5,000 TZS)", sw: "Ingiza Kiasi (mfano: 5,000 TZS)" },
+  "howToPay.airtel.step7": { en: "Enter your Airtel Money PIN", sw: "Ingiza PIN yako ya Airtel Money" },
+  "howToPay.airtel.step8": { en: "Success! Save the confirmation message as proof", sw: "Mafanikio! Hifadhi ujumbe wa uthibitisho kama ushahidi" },
+  "howToPay.airtel.example": { en: "Example Lipa Number: 123456", sw: "Mfano wa Lipa Number: 123456" },
+  
+  // Mixx by Yas Instructions
+  "howToPay.mixx.title": { en: "Mixx by Yas (Halotel)", sw: "Mixx by Yas (Halotel)" },
+  "howToPay.mixx.step1": { en: "Open Mixx by Yas app or dial *150*88#", sw: "Fungua Mixx by Yas au bonyeza *150*88#" },
+  "howToPay.mixx.step2": { en: "Select \"Send Money\"", sw: "Chagua \"Tuma Pesa\"" },
+  "howToPay.mixx.step3": { en: "Select \"Pay Bill\"", sw: "Chagua \"Lipa Bili\"" },
+  "howToPay.mixx.step4": { en: "Enter Business Number (Lipa Number from shop/fundi)", sw: "Ingiza Nambari ya Biashara (Lipa Number kutoka kwa duka/fundi)" },
+  "howToPay.mixx.step5": { en: "Enter Reference (Optional - e.g., \"Smart Fundi\" or your name)", sw: "Ingiza Rejea (Opsional - mfano: \"Smart Fundi\" au jina lako)" },
+  "howToPay.mixx.step6": { en: "Enter Amount (e.g., 5,000 TZS)", sw: "Ingiza Kiasi (mfano: 5,000 TZS)" },
+  "howToPay.mixx.step7": { en: "Enter your Mixx PIN to confirm", sw: "Ingiza PIN yako ya Mixx kuthibitisha" },
+  "howToPay.mixx.step8": { en: "Complete! Keep the confirmation SMS as proof of payment", sw: "Imekamilika! Hifadhi SMS ya uthibitisho kama ushahidi wa malipo" },
+  "howToPay.mixx.example": { en: "Example Business Number: 789000", sw: "Mfano wa Nambari ya Biashara: 789000" },
+  
+  // Payment Tips
+  "howToPay.tips.title": { en: "Payment Tips", sw: "Vidokezo vya Malipo" },
+  "howToPay.tips.tip1": { en: "Always ask for the Lipa Number before making payment", sw: "Daima uliza Lipa Number kabla ya kulipa" },
+  "howToPay.tips.tip2": { en: "Save confirmation messages for at least 30 days", sw: "Hifadhi ujumbe wa uthibitisho kwa angalau siku 30" },
+  "howToPay.tips.tip3": { en: "Verify the business name matches before confirming", sw: "Thibitisha jina la biashara linafanana kabla ya kuthibitisha" },
+  "howToPay.tips.tip4": { en: "Never share your PIN with anyone", sw: "Usimshirikishe mtu yeyote PIN yako" },
+  "howToPay.tips.tip5": { en: "Contact support if payment fails", sw: "Wasiliana na msaada kama malipo yameshindwa" },
+  
+  // Common Terms
+  "howToPay.common.businessNumber": { en: "Business Number", sw: "Nambari ya Biashara" },
+  "howToPay.common.lipaNumber": { en: "Lipa Number", sw: "Lipa Number" },
+  "howToPay.common.amount": { en: "Amount", sw: "Kiasi" },
+  "howToPay.common.reference": { en: "Reference/Account", sw: "Rejea/Akaunti" },
+  "howToPay.common.pin": { en: "PIN", sw: "Namba ya Siri" },
+  "howToPay.common.confirm": { en: "Confirm", sw: "Thibitisha" },
+  "howToPay.common.success": { en: "Success", sw: "Mafanikio" },
+  "howToPay.common.step": { en: "Step", sw: "Hatua" },
 };
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
