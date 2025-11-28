@@ -503,25 +503,11 @@ export default function CustomerDashboard() {
                       <HelpCircle className="h-5 w-5" />
                       {language === "en" ? "Need Help?" : "Unahitaji Msaada?"}
                     </Label>
-                    <div className="space-y-2">
-                      <Link href="/how-to-pay" className="w-full">
-                        <Button variant="outline" className="w-full justify-start gap-2">
-                          <Wallet className="h-4 w-4" />
-                          {language === "en" ? "Mobile Money Payment Guide" : "Mwongozo wa Malipo ya Pesa ya Simu"}
-                        </Button>
-                      </Link>
-                      <Link href="/how-to-pay-bank" className="w-full">
-                        <Button variant="outline" className="w-full justify-start gap-2">
-                          <Wallet className="h-4 w-4" />
-                          {language === "en" ? "Bank SIM Banking Guide" : "Mwongozo wa SIM Banking ya Benki"}
-                        </Button>
-                      </Link>
-                      <Link href="/help" className="w-full">
-                        <Button variant="outline" className="w-full">
-                          {language === "en" ? "Go to Help & Support" : "Nenda kwenye Msaada"}
-                        </Button>
-                      </Link>
-                    </div>
+                    <Link href="/help" className="w-full">
+                      <Button variant="outline" className="w-full">
+                        {language === "en" ? "Go to Help & Support" : "Nenda kwenye Msaada"}
+                      </Button>
+                    </Link>
                   </div>
 
                   <Button onClick={saveData} className="w-full">
