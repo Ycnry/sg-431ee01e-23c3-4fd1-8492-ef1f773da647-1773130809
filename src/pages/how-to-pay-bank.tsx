@@ -284,9 +284,9 @@ export default function HowToPayBankPage() {
                 <Button 
                   size="lg" 
                   onClick={callSupportHotline}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white shadow-lg gap-2 mb-3"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white shadow-lg gap-2 mb-3 hover:scale-105 transition-all duration-300 hover:shadow-xl group"
                 >
-                  <Phone className="w-5 h-5" />
+                  <Phone className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
                   {t("language") === "en" ? "Call Support Now" : "Piga Simu Sasa"}
                 </Button>
                 <Link href="/help">

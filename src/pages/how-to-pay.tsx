@@ -244,9 +244,9 @@ export default function HowToPayPage() {
               <Button 
                 size="lg" 
                 onClick={callSupportHotline}
-                className="w-full bg-white text-blue-600 hover:bg-white/90 gap-2"
+                className="w-full bg-green-600 hover:bg-green-700 text-white shadow-lg gap-2 hover:scale-105 transition-all duration-300 hover:shadow-xl group"
               >
-                <Phone className="h-5 w-5" />
+                <Phone className="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
                 {t("howToPay.needHelp")}
               </Button>
             </div>

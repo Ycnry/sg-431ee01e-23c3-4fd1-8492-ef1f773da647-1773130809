@@ -71,9 +71,9 @@ export default function HelpPage() {
                 <Button 
                   size="lg" 
                   onClick={callSupportHotline}
-                  className="w-full gap-2 bg-green-600 hover:bg-green-700"
+                  className="w-full gap-2 bg-green-600 hover:bg-green-700 hover:scale-105 transition-all duration-300 hover:shadow-lg"
                 >
-                  <Phone className="h-5 w-5" />
+                  <Phone className="h-5 w-5 animate-pulse" />
                   {language === "en" ? "Call Support Now" : "Piga Simu Sasa"}
                 </Button>
               </div>

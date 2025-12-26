@@ -179,9 +179,9 @@ export function HelpSupport() {
         {showCallButton && (
           <Button
             onClick={callSupportHotline}
-            className="w-full bg-green-600 hover:bg-green-700 text-white py-6 text-lg"
+            className="w-full bg-green-600 hover:bg-green-700 text-white py-6 text-lg hover:scale-105 transition-all duration-300 hover:shadow-xl group"
           >
-            <Phone className="h-5 w-5 mr-2" />
+            <Phone className="h-5 w-5 mr-2 group-hover:rotate-12 transition-transform duration-300" />
             {language === "en" ? "Call Support" : "Piga Simu Msaada"}
             <Badge variant="secondary" className="ml-2">{formatPhoneNumber(supportHotline)}</Badge>
           </Button>
