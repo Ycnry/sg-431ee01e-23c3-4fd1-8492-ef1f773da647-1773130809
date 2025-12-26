@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { Header } from "@/components/Header";
@@ -10,10 +9,16 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Phone, Building2, CreditCard, CheckCircle2, AlertCircle, ArrowRight, HelpCircle, Smartphone } from "lucide-react";
+import { getSupportHotline, callSupportHotline, formatPhoneNumber } from "@/lib/settings";
 
 export default function HowToPayBankPage() {
   const { t } = useLanguage();
   const [expandedBank, setExpandedBank] = useState<string>("");
+  const [supportHotline, setSupportHotline] = useState("");
+
+  useEffect(() => {
+    setSupportHotline(getSupportHotline());
+  }, []);
 
   const banks = [
     {
@@ -258,20 +263,39 @@ export default function HowToPayBankPage() {
 
           {/* Help Section */}
           <Card className="bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border-green-200 dark:border-green-800">
-            <CardContent className="p-8 text-center">
-              <HelpCircle className="w-16 h-16 text-green-600 dark:text-green-400 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">
-                {t("howToPay.needHelp")}
-              </h3>
-              <p className="text-slate-600 dark:text-slate-300 mb-6">
-                {t("howToPay.contactSupport")}
-              </p>
-              <Link href="/help">
-                <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white shadow-lg">
-                  <HelpCircle className="w-5 h-5 mr-2" />
+            <CardContent className="p-8 text-center space-y-6">
+              <HelpCircle className="w-16 h-16 text-green-600 dark:text-green-400 mx-auto" />
+              <div>
+                <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">
                   {t("howToPay.needHelp")}
+                </h3>
+                <p className="text-slate-600 dark:text-slate-300">
+                  {t("howToPay.contactSupport")}
+                </p>
+              </div>
+              
+              <div className="bg-white/50 dark:bg-slate-800/50 rounded-lg p-4">
+                <p className="text-sm text-muted-foreground mb-2">
+                  {t("language") === "en" ? "Customer Support Hotline" : "Hotline ya Huduma kwa Wateja"}
+                </p>
+                <p className="text-2xl font-bold text-green-600 mb-4">
+                  {formatPhoneNumber(supportHotline)}
+                </p>
+                <Button 
+                  size="lg" 
+                  onClick={callSupportHotline}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white shadow-lg gap-2 mb-3"
+                >
+                  <Phone className="w-5 h-5" />
+                  {t("language") === "en" ? "Call Support Now" : "Piga Simu Sasa"}
                 </Button>
-              </Link>
+                <Link href="/help">
+                  <Button size="lg" variant="outline" className="w-full gap-2">
+                    <HelpCircle className="w-5 h-5" />
+                    {t("nav.help")}
+                  </Button>
+                </Link>
+              </div>
             </CardContent>
           </Card>
         </main>

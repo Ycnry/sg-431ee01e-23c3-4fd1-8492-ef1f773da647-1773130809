@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { Header } from "@/components/Header";
@@ -6,10 +6,17 @@ import { HelpSupport } from "@/components/HelpSupport";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Wallet, HelpCircle, Building2 } from "lucide-react";
+import { Wallet, HelpCircle, Building2, Phone } from "lucide-react";
+import { getSupportHotline, callSupportHotline, formatPhoneNumber } from "@/lib/settings";
 
 export default function HelpPage() {
   const { language } = useLanguage();
+  const [hotline, setHotline] = useState("+255796381261");
+
+  // Load hotline on mount
+  useEffect(() => {
+    setHotline(getSupportHotline());
+  }, []);
 
   const metaTitle = language === "en" 
     ? "Help & Support - Smart Fundi" 
@@ -39,6 +46,44 @@ export default function HelpPage() {
                 : "Pata msaada wa haraka kutoka kwa msaidizi wetu wa AI au wasiliana na msaada moja kwa moja"}
             </p>
           </div>
+
+          {/* Call Support Hotline */}
+          <Card className="mb-6 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20 border-2 border-green-200 dark:border-green-800">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Phone className="h-6 w-6 text-green-600" />
+                {language === "en" ? "Need Human Support?" : "Unahitaji Msaada wa Mtu?"}
+              </CardTitle>
+              <CardDescription>
+                {language === "en"
+                  ? "Call our customer support hotline for immediate assistance"
+                  : "Piga simu kwa hotline yetu ya huduma kwa wateja kupata msaada wa haraka"}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="text-center p-4 bg-white/50 dark:bg-gray-900/50 rounded-lg">
+                <p className="text-sm text-muted-foreground mb-2">
+                  {language === "en" ? "Customer Support Hotline" : "Hotline ya Huduma kwa Wateja"}
+                </p>
+                <p className="text-3xl font-bold text-green-600 mb-4">
+                  {formatPhoneNumber(hotline)}
+                </p>
+                <Button 
+                  size="lg" 
+                  onClick={callSupportHotline}
+                  className="w-full gap-2 bg-green-600 hover:bg-green-700"
+                >
+                  <Phone className="h-5 w-5" />
+                  {language === "en" ? "Call Support Now" : "Piga Simu Sasa"}
+                </Button>
+              </div>
+              <p className="text-xs text-center text-muted-foreground">
+                {language === "en"
+                  ? "Available during business hours (Mon-Sat, 8AM-6PM EAT)"
+                  : "Inapatikana wakati wa biashara (Jumatatu-Jumamosi, 8AM-6PM EAT)"}
+              </p>
+            </CardContent>
+          </Card>
 
           {/* How to Pay Quick Link */}
           <Card className="mb-6 bg-gradient-to-r from-blue-50 to-orange-50 dark:from-blue-950/20 dark:to-orange-950/20 border-2">

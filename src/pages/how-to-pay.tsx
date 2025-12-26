@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,10 +8,16 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Smartphone, CreditCard, HelpCircle, CheckCircle, ArrowRight, Phone } from "lucide-react";
 import Link from "next/link";
+import { getSupportHotline, callSupportHotline, formatPhoneNumber } from "@/lib/settings";
 
 export default function HowToPayPage() {
   const { t } = useLanguage();
   const [openSection, setOpenSection] = useState<string>("mpesa");
+  const [supportHotline, setSupportHotline] = useState("");
+
+  useEffect(() => {
+    setSupportHotline(getSupportHotline());
+  }, []);
 
   const paymentMethods = [
     {
@@ -227,13 +233,31 @@ export default function HowToPayPage() {
               {t("howToPay.contactSupport")}
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <Link href="/help">
-              <Button size="lg" variant="secondary" className="gap-2">
-                <HelpCircle className="h-5 w-5" />
+          <CardContent className="space-y-4">
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+              <p className="text-sm text-white/80 mb-2">
+                {t("howToPay.needHelp")} - {t("howToPay.contactSupport")}
+              </p>
+              <p className="text-2xl font-bold mb-4">
+                {formatPhoneNumber(supportHotline)}
+              </p>
+              <Button 
+                size="lg" 
+                onClick={callSupportHotline}
+                className="w-full bg-white text-blue-600 hover:bg-white/90 gap-2"
+              >
+                <Phone className="h-5 w-5" />
                 {t("howToPay.needHelp")}
               </Button>
-            </Link>
+            </div>
+            <div className="flex justify-center gap-4">
+              <Link href="/help">
+                <Button size="lg" variant="secondary" className="gap-2">
+                  <HelpCircle className="h-5 w-5" />
+                  {t("nav.help")}
+                </Button>
+              </Link>
+            </div>
           </CardContent>
         </Card>
 

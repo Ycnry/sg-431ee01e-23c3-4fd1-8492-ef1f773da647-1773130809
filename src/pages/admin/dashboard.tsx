@@ -38,6 +38,11 @@ import {
   formatTZS,
   BugReport
 } from "@/lib/adminData";
+import {
+  getSupportHotline,
+  updateSupportHotline,
+  formatPhoneNumber
+} from "@/lib/settings";
 
 interface PendingVerification {
   id: string;
@@ -59,7 +64,7 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [bugReports, setBugReports] = useState<BugReport[]>(mockBugReports);
   const [adminName, setAdminName] = useState("Admin");
-  const [supportHotline, setSupportHotline] = useState("+255759218354");
+  const [supportHotline, setSupportHotline] = useState("");
   const [hotlineSaved, setHotlineSaved] = useState(false);
   const [pendingVerifications, setPendingVerifications] = useState<PendingVerification[]>([
     {
@@ -140,11 +145,8 @@ export default function AdminDashboardPage() {
       router.push("/admin/login");
     }
 
-    const settings = localStorage.getItem("support_settings");
-    if (settings) {
-      const parsed = JSON.parse(settings);
-      setSupportHotline(parsed.hotline_number || "+255759218354");
-    }
+    // Load support hotline from settings
+    setSupportHotline(getSupportHotline());
 
     setLoading(false);
   }, [router]);
@@ -215,14 +217,11 @@ export default function AdminDashboardPage() {
   };
 
   const handleSaveHotline = () => {
-    const settings = {
-      hotline_number: supportHotline,
-      updated_at: new Date().toISOString(),
-      updated_by: adminName,
-    };
-    localStorage.setItem("support_settings", JSON.stringify(settings));
-    setHotlineSaved(true);
-    setTimeout(() => setHotlineSaved(false), 3000);
+    const success = updateSupportHotline(supportHotline, adminName);
+    if (success) {
+      setHotlineSaved(true);
+      setTimeout(() => setHotlineSaved(false), 3000);
+    }
   };
 
   if (loading) {
@@ -927,35 +926,51 @@ export default function AdminDashboardPage() {
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="hotline">Support Phone Number</Label>
-                    <Input
-                      id="hotline"
-                      type="tel"
-                      value={supportHotline}
-                      onChange={(e) => setSupportHotline(e.target.value)}
-                      placeholder="+255 XXX XXX XXX"
-                    />
+                    <div className="flex gap-2">
+                      <Input
+                        id="hotline"
+                        type="tel"
+                        value={supportHotline}
+                        onChange={(e) => setSupportHotline(e.target.value)}
+                        placeholder="+255 XXX XXX XXX"
+                        className="flex-1"
+                      />
+                      <Button onClick={handleSaveHotline} className="gap-2">
+                        <Phone className="h-4 w-4" />
+                        Save
+                      </Button>
+                    </div>
                     <p className="text-sm text-muted-foreground">
-                      This number is used in the Help & Support AI assistant when users request human assistance
+                      This number is displayed in Help & Support and used when users request human assistance
                     </p>
                   </div>
-
-                  <Button onClick={handleSaveHotline} className="w-full">
-                    Save Hotline Number
-                  </Button>
 
                   {hotlineSaved && (
                     <Alert className="border-green-200 bg-green-50 dark:bg-green-950">
                       <CheckCircle className="h-4 w-4 text-green-600" />
                       <AlertDescription className="text-green-800 dark:text-green-200">
-                        Support hotline number saved successfully! All Help & Support calls will now use: {supportHotline}
+                        Support hotline updated successfully! New number: <strong>{formatPhoneNumber(supportHotline)}</strong>
                       </AlertDescription>
                     </Alert>
                   )}
 
+                  <div className="p-4 border rounded-lg bg-muted/50">
+                    <h4 className="font-medium mb-2 flex items-center gap-2">
+                      <Phone className="h-4 w-4" />
+                      Current Hotline
+                    </h4>
+                    <p className="text-2xl font-bold text-blue-600">
+                      {formatPhoneNumber(supportHotline)}
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Displayed across the app for customer support
+                    </p>
+                  </div>
+
                   <Alert>
                     <AlertCircle className="h-4 w-4" />
                     <AlertDescription>
-                      <strong>Security Note:</strong> Only admin users can read and update this setting. The hotline number is protected by Authentication and Database rules.
+                      <strong>Note:</strong> This setting is stored locally. In production with Supabase, it would be secured with admin-only database rules.
                     </AlertDescription>
                   </Alert>
                 </CardContent>

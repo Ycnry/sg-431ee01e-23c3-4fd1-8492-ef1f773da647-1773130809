@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { MessageSquare, Phone, Send, Bot, User } from "lucide-react";
+import { getSupportHotline, callSupportHotline, formatPhoneNumber } from "@/lib/settings";
 
 interface Message {
   id: string;
@@ -20,15 +20,12 @@ export function HelpSupport() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [showCallButton, setShowCallButton] = useState(false);
-  const [supportHotline, setSupportHotline] = useState("+255759218354");
+  const [supportHotline, setSupportHotline] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const settings = localStorage.getItem("support_settings");
-    if (settings) {
-      const parsed = JSON.parse(settings);
-      setSupportHotline(parsed.hotline_number || "+255759218354");
-    }
+    // Load support hotline from settings
+    setSupportHotline(getSupportHotline());
 
     const welcomeMessage: Message = {
       id: "welcome",
@@ -122,7 +119,7 @@ export function HelpSupport() {
   };
 
   const handleCallSupport = () => {
-    window.location.href = `tel:${supportHotline}`;
+    callSupportHotline(supportHotline);
   };
 
   return (
@@ -181,12 +178,12 @@ export function HelpSupport() {
 
         {showCallButton && (
           <Button
-            onClick={handleCallSupport}
+            onClick={callSupportHotline}
             className="w-full bg-green-600 hover:bg-green-700 text-white py-6 text-lg"
           >
             <Phone className="h-5 w-5 mr-2" />
             {language === "en" ? "Call Support" : "Piga Simu Msaada"}
-            <Badge variant="secondary" className="ml-2">{supportHotline}</Badge>
+            <Badge variant="secondary" className="ml-2">{formatPhoneNumber(supportHotline)}</Badge>
           </Button>
         )}
 
