@@ -119,7 +119,7 @@ export function HelpSupport() {
   };
 
   const handleCallSupport = () => {
-    callSupportHotline(supportHotline);
+    callSupportHotline();
   };
 
   return (
