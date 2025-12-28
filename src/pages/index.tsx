@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Head from "next/head";
 import { SplashScreen } from "@/components/SplashScreen";
@@ -7,6 +6,7 @@ import { Header } from "@/components/Header";
 import { FundiCard } from "@/components/FundiCard";
 import { ShopCard } from "@/components/ShopCard";
 import { EventCard } from "@/components/EventCard";
+import { LiveChatWidget } from "@/components/LiveChatWidget";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -363,6 +363,8 @@ export default function Home() {
             <p>&copy; 2025 Smart Fundi. {language === "en" ? "All rights reserved." : "Haki zote zimehifadhiwa."}</p>
           </div>
         </footer>
+
+        <LiveChatWidget position="bottom-right" />
       </div>
     </>
   );

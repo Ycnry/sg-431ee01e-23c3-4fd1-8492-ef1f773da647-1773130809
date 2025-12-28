@@ -3,6 +3,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { HelpSupport } from "@/components/HelpSupport";
+import { LiveChatWidget } from "@/components/LiveChatWidget";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -116,6 +117,8 @@ export default function HelpPage() {
 
           <HelpSupport />
         </main>
+
+        <LiveChatWidget position="bottom-right" />
       </div>
     </>
   );
