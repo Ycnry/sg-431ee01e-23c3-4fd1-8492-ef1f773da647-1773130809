@@ -16,9 +16,10 @@ import { cn } from "@/lib/utils";
 export default function HowToPayPage() {
   const { t } = useLanguage();
   const [openSection, setOpenSection] = useState<string>("mpesa");
-  const [supportHotline] = useState<string>("+255 123 456 789");
+  const [supportHotline] = useState(getSupportHotline());
   const [mpesaLogoError, setMpesaLogoError] = useState(false);
   const [airtelLogoError, setAirtelLogoError] = useState(false);
+  const [mixxLogoError, setMixxLogoError] = useState(false);
 
   const scrollToMethod = (id: string) => {
     setOpenSection(id);
@@ -76,6 +77,7 @@ export default function HowToPayPage() {
       icon: Zap,
       color: "bg-blue-600",
       ussd: "*150*01#",
+      logoPath: "/Mixx_by_Yas-860x645-1.jpg",
       steps: [
         t("howToPay.mixx.step1"),
         t("howToPay.mixx.step2"),
@@ -142,15 +144,15 @@ export default function HowToPayPage() {
               <Card
                 key={method.id}
                 className={cn(
-                  "cursor-pointer transition-all hover:scale-105 border-2",
+                  "cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl border-2",
                   method.color,
-                  "text-white"
+                  openSection === method.id ? "ring-4 ring-white/50 scale-105 shadow-2xl" : ""
                 )}
                 onClick={() => scrollToMethod(method.id)}
               >
                 <CardHeader className="p-4 md:p-6">
                   <div className="flex flex-col items-center gap-3 md:gap-4">
-                    {/* Logo or Icon */}
+                    {/* Logo/Icon Container - Centered */}
                     <div className="flex items-center justify-center">
                       {method.id === "mpesa" && method.logoPath && !mpesaLogoError ? (
                         <Image
@@ -172,17 +174,27 @@ export default function HowToPayPage() {
                           onError={() => setAirtelLogoError(true)}
                           priority
                         />
+                      ) : method.id === "mixx" && method.logoPath && !mixxLogoError ? (
+                        <Image
+                          src={method.logoPath}
+                          alt="Mixx by Yas Logo"
+                          width={60}
+                          height={60}
+                          className="object-contain w-12 h-12 md:w-16 md:h-16"
+                          onError={() => setMixxLogoError(true)}
+                          priority
+                        />
                       ) : (
                         <Icon className="h-12 w-12 md:h-16 md:w-16 text-white" />
                       )}
                     </div>
 
-                    {/* Title & USSD Code */}
+                    {/* Title & USSD Code - Centered Below Logo */}
                     <div className="flex flex-col items-center gap-1 text-center">
-                      <CardTitle className="text-base md:text-lg font-bold">
+                      <CardTitle className="text-white text-base md:text-lg font-bold">
                         {method.title}
                       </CardTitle>
-                      <p className="text-xs md:text-sm font-mono opacity-90">
+                      <p className="text-white/90 text-xs md:text-sm font-mono font-semibold">
                         {method.ussd}
                       </p>
                     </div>
@@ -199,52 +211,48 @@ export default function HowToPayPage() {
             const Icon = method.icon;
             return (
               <AccordionItem id={method.id} key={method.id} value={method.id} className="border rounded-lg mb-4 overflow-hidden">
-                <AccordionTrigger className="px-4 md:px-6 py-3 md:py-4 hover:no-underline hover:bg-muted/50 transition-colors">
+                <AccordionTrigger className="px-4 md:px-6 py-3 md:py-4 hover:no-underline hover:bg-white/5 transition-colors">
                   <div className="flex items-center gap-3 md:gap-4 w-full">
-                    {/* Logo or Icon */}
-                    <div className="flex items-center justify-center flex-shrink-0">
+                    {/* Logo/Icon */}
+                    <div className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 flex-shrink-0">
                       {method.id === "mpesa" && method.logoPath && !mpesaLogoError ? (
-                        <div className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center">
-                          <Image
-                            src={method.logoPath}
-                            alt="M-Pesa Logo"
-                            width={40}
-                            height={40}
-                            className="object-contain w-full h-full"
-                            onError={() => setMpesaLogoError(true)}
-                            priority
-                          />
-                        </div>
+                        <Image
+                          src={method.logoPath}
+                          alt="M-Pesa Logo"
+                          width={40}
+                          height={40}
+                          className="object-contain w-8 h-8 md:w-10 md:h-10"
+                          onError={() => setMpesaLogoError(true)}
+                        />
                       ) : method.id === "airtel" && method.logoPath && !airtelLogoError ? (
-                        <div className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center">
-                          <Image
-                            src={method.logoPath}
-                            alt="Airtel Money Logo"
-                            width={40}
-                            height={40}
-                            className="object-contain w-full h-full"
-                            onError={() => setAirtelLogoError(true)}
-                            priority
-                          />
-                        </div>
+                        <Image
+                          src={method.logoPath}
+                          alt="Airtel Money Logo"
+                          width={40}
+                          height={40}
+                          className="object-contain w-8 h-8 md:w-10 md:h-10"
+                          onError={() => setAirtelLogoError(true)}
+                        />
+                      ) : method.id === "mixx" && method.logoPath && !mixxLogoError ? (
+                        <Image
+                          src={method.logoPath}
+                          alt="Mixx by Yas Logo"
+                          width={40}
+                          height={40}
+                          className="object-contain w-8 h-8 md:w-10 md:h-10"
+                          onError={() => setMixxLogoError(true)}
+                        />
                       ) : (
-                        <div
-                          className={cn(
-                            "p-2 md:p-3 rounded-full",
-                            method.color
-                          )}
-                        >
-                          <Icon className="h-4 w-4 md:h-5 md:w-5 text-white" />
-                        </div>
+                        <Icon className="h-6 w-6 md:h-8 md:w-8 text-white" />
                       )}
                     </div>
 
-                    {/* Title & USSD */}
-                    <div className="flex-1 text-left">
-                      <h3 className="font-semibold text-sm md:text-base">
+                    {/* Title and USSD */}
+                    <div className="flex flex-col items-start gap-0.5 flex-1">
+                      <h3 className="text-white font-bold text-sm md:text-base">
                         {method.title}
                       </h3>
-                      <p className="text-xs md:text-sm text-muted-foreground font-mono">
+                      <p className="text-white/80 text-xs md:text-sm font-mono">
                         {method.ussd}
                       </p>
                     </div>
