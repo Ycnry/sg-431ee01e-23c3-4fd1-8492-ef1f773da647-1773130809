@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Smartphone, CreditCard, HelpCircle, CheckCircle, ArrowRight, Phone } from "lucide-react";
+import { Smartphone, CreditCard, HelpCircle, CheckCircle, ArrowRight, Phone, Zap } from "lucide-react";
 import Link from "next/link";
 import { getSupportHotline, callSupportHotline, formatPhoneNumber } from "@/lib/settings";
 
@@ -58,22 +58,22 @@ export default function HowToPayPage() {
       example: t("howToPay.airtel.example"),
     },
     {
-      id: "tigo",
-      title: t("howToPay.tigo.title"),
-      icon: Phone,
+      id: "mixx",
+      title: t("howToPay.mixx.title"),
+      icon: Zap,
       color: "bg-blue-600",
       ussd: "*150*01#",
       steps: [
-        t("howToPay.tigo.step1"),
-        t("howToPay.tigo.step2"),
-        t("howToPay.tigo.step3"),
-        t("howToPay.tigo.step4"),
-        t("howToPay.tigo.step5"),
-        t("howToPay.tigo.step6"),
-        t("howToPay.tigo.step7"),
-        t("howToPay.tigo.step8"),
+        t("howToPay.mixx.step1"),
+        t("howToPay.mixx.step2"),
+        t("howToPay.mixx.step3"),
+        t("howToPay.mixx.step4"),
+        t("howToPay.mixx.step5"),
+        t("howToPay.mixx.step6"),
+        t("howToPay.mixx.step7"),
+        t("howToPay.mixx.step8"),
       ],
-      example: t("howToPay.tigo.example"),
+      example: t("howToPay.mixx.example"),
     },
     {
       id: "halotel",
