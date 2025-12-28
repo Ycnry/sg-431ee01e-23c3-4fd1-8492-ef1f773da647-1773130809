@@ -9,12 +9,14 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Smartphone, CreditCard, HelpCircle, CheckCircle, ArrowRight, Phone, Zap } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { getSupportHotline, callSupportHotline, formatPhoneNumber } from "@/lib/settings";
 
 export default function HowToPayPage() {
   const { t } = useLanguage();
   const [openSection, setOpenSection] = useState<string>("mpesa");
   const [supportHotline, setSupportHotline] = useState("");
+  const [mpesaLogoError, setMpesaLogoError] = useState(false);
 
   useEffect(() => {
     setSupportHotline(getSupportHotline());
@@ -27,6 +29,7 @@ export default function HowToPayPage() {
       icon: Smartphone,
       color: "bg-red-600",
       ussd: "*150*00#",
+      logoPath: "/mpesa-logo.png",
       steps: [
         t("howToPay.mpesa.step1"),
         t("howToPay.mpesa.step2"),
@@ -134,8 +137,20 @@ export default function HowToPayPage() {
                 onClick={() => setOpenSection(method.id)}
               >
                 <CardHeader className="text-center pb-3 md:pb-4 px-3 md:px-6">
-                  <div className={`${method.color} w-12 h-12 md:w-16 md:h-16 rounded-full mx-auto mb-2 md:mb-3 flex items-center justify-center`}>
-                    <Icon className="h-6 w-6 md:h-8 md:w-8 text-white" />
+                  <div className="container overflow-hidden">
+                    {method.id === "mpesa" && !mpesaLogoError ? (
+                      <Image
+                        src={method.logoPath || ""}
+                        alt="M-Pesa Logo"
+                        width={60}
+                        height={60}
+                        className="object-contain w-12 h-12 md:w-16 md:h-16"
+                        onError={() => setMpesaLogoError(true)}
+                        priority
+                      />
+                    ) : (
+                      <Icon className="h-6 w-6 md:h-8 md:w-8 text-white" />
+                    )}
                   </div>
                   <CardTitle className="text-base md:text-lg break-words">{method.title}</CardTitle>
                   <CardDescription className="text-xs md:text-sm font-mono break-all">
@@ -155,8 +170,19 @@ export default function HowToPayPage() {
               <AccordionItem key={method.id} value={method.id} className="border rounded-lg mb-4 overflow-hidden">
                 <AccordionTrigger className="px-4 md:px-6 py-3 md:py-4 hover:no-underline hover:bg-muted/50">
                   <div className="flex items-center gap-3 md:gap-4 w-full">
-                    <div className={`${method.color} w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center flex-shrink-0`}>
-                      <Icon className="h-5 w-5 md:h-6 md:w-6 text-white" />
+                    <div className={`${method.color} w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden`}>
+                      {method.id === "mpesa" && !mpesaLogoError ? (
+                        <Image
+                          src={method.logoPath || ""}
+                          alt="M-Pesa Logo"
+                          width={48}
+                          height={48}
+                          className="object-contain w-8 h-8 md:w-10 md:h-10"
+                          onError={() => setMpesaLogoError(true)}
+                        />
+                      ) : (
+                        <Icon className="h-5 w-5 md:h-6 md:w-6 text-white" />
+                      )}
                     </div>
                     <div className="text-left flex-1 min-w-0">
                       <h3 className="text-base md:text-xl font-semibold break-words">{method.title}</h3>
