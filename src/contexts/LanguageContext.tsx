@@ -145,17 +145,29 @@ const translations: Record<string, Record<Language, string>> = {
   "howToPay.airtel.step8": { en: "Success! Save the confirmation message as proof", sw: "Mafanikio! Hifadhi ujumbe wa uthibitisho kama ushahidi" },
   "howToPay.airtel.example": { en: "Example Lipa Number: 123456", sw: "Mfano wa Lipa Number: 123456" },
   
-  // Mixx by Yas Instructions
-  "howToPay.mixx.title": { en: "Mixx by Yas (Halotel)", sw: "Mixx by Yas (Halotel)" },
-  "howToPay.mixx.step1": { en: "Open Mixx by Yas app or dial *150*88#", sw: "Fungua Mixx by Yas au bonyeza *150*88#" },
-  "howToPay.mixx.step2": { en: "Select \"Send Money\"", sw: "Chagua \"Tuma Pesa\"" },
-  "howToPay.mixx.step3": { en: "Select \"Pay Bill\"", sw: "Chagua \"Lipa Bili\"" },
-  "howToPay.mixx.step4": { en: "Enter Business Number (Lipa Number from shop/fundi)", sw: "Ingiza Nambari ya Biashara (Lipa Number kutoka kwa duka/fundi)" },
-  "howToPay.mixx.step5": { en: "Enter Reference (Optional - e.g., \"Smart Fundi\" or your name)", sw: "Ingiza Rejea (Opsional - mfano: \"Smart Fundi\" au jina lako)" },
+  // Mixx by Yas (Tigo) Instructions
+  "howToPay.mixx.title": { en: "Mixx by Yas (Tigo)", sw: "Mixx by Yas (Tigo)" },
+  "howToPay.mixx.step1": { en: "Dial *150*01# from your Tigo phone", sw: "Bonyeza *150*01# kwenye simu yako ya Tigo" },
+  "howToPay.mixx.step2": { en: "Enter your Mixx PIN", sw: "Ingiza PIN yako ya Mixx" },
+  "howToPay.mixx.step3": { en: "Select \"Lipa Bili\" or \"Pay Bill\"", sw: "Chagua \"Lipa Bili\"" },
+  "howToPay.mixx.step4": { en: "Enter Business PayBill Number (from shop/fundi)", sw: "Ingiza Nambari ya PayBill ya Biashara (kutoka kwa duka/fundi)" },
+  "howToPay.mixx.step5": { en: "Enter Reference (e.g., \"Smart Fundi\" or invoice number)", sw: "Ingiza Kumbukumbu (mfano: \"Smart Fundi\" au nambari ya ankara)" },
   "howToPay.mixx.step6": { en: "Enter Amount (e.g., 5,000 TZS)", sw: "Ingiza Kiasi (mfano: 5,000 TZS)" },
-  "howToPay.mixx.step7": { en: "Enter your Mixx PIN to confirm", sw: "Ingiza PIN yako ya Mixx kuthibitisha" },
-  "howToPay.mixx.step8": { en: "Complete! Keep the confirmation SMS as proof of payment", sw: "Imekamilika! Hifadhi SMS ya uthibitisho kama ushahidi wa malipo" },
-  "howToPay.mixx.example": { en: "Example Business Number: 789000", sw: "Mfano wa Nambari ya Biashara: 789000" },
+  "howToPay.mixx.step7": { en: "Confirm with your PIN", sw: "Thibitisha kwa PIN yako" },
+  "howToPay.mixx.step8": { en: "Complete! Save the confirmation SMS", sw: "Imekamilika! Hifadhi SMS ya uthibitisho" },
+  "howToPay.mixx.example": { en: "Example PayBill: 400200", sw: "Mfano wa PayBill: 400200" },
+  
+  // Halotel Instructions
+  "howToPay.halotel.title": { en: "Halotel", sw: "Halotel" },
+  "howToPay.halotel.step1": { en: "Dial *150*88# from your Halotel phone", sw: "Bonyeza *150*88# kwenye simu yako ya Halotel" },
+  "howToPay.halotel.step2": { en: "Enter your Halotel Money PIN", sw: "Ingiza PIN yako ya Halotel Money" },
+  "howToPay.halotel.step3": { en: "Select \"Pay Bill\" or \"Lipa Bili\"", sw: "Chagua \"Lipa Bili\"" },
+  "howToPay.halotel.step4": { en: "Enter Business Number (provided by shop/fundi)", sw: "Ingiza Nambari ya Biashara (iliyotolewa na duka/fundi)" },
+  "howToPay.halotel.step5": { en: "Enter Reference (e.g., \"Smart Fundi\")", sw: "Ingiza Kumbukumbu (mfano: \"Smart Fundi\")" },
+  "howToPay.halotel.step6": { en: "Enter Amount (e.g., 5,000 TZS)", sw: "Ingiza Kiasi (mfano: 5,000 TZS)" },
+  "howToPay.halotel.step7": { en: "Confirm transaction with PIN", sw: "Thibitisha muamala kwa PIN" },
+  "howToPay.halotel.step8": { en: "Done! Keep the confirmation message", sw: "Umeshasalia! Hifadhi ujumbe wa uthibitisho" },
+  "howToPay.halotel.example": { en: "Example Business Number: 789000", sw: "Mfano wa Nambari ya Biashara: 789000" },
   
   // Payment Tips
   "howToPay.tips.title": { en: "Payment Tips", sw: "Vidokezo vya Malipo" },

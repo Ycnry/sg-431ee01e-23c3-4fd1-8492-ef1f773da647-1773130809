@@ -26,7 +26,7 @@ export default function HowToPayPage() {
       title: t("howToPay.mpesa.title"),
       icon: Smartphone,
       color: "bg-red-600",
-      ussd: "*150#",
+      ussd: "*150*00#",
       steps: [
         t("howToPay.mpesa.step1"),
         t("howToPay.mpesa.step2"),
@@ -58,22 +58,40 @@ export default function HowToPayPage() {
       example: t("howToPay.airtel.example"),
     },
     {
-      id: "mixx",
-      title: t("howToPay.mixx.title"),
+      id: "tigo",
+      title: t("howToPay.tigo.title"),
+      icon: Phone,
+      color: "bg-blue-600",
+      ussd: "*150*01#",
+      steps: [
+        t("howToPay.tigo.step1"),
+        t("howToPay.tigo.step2"),
+        t("howToPay.tigo.step3"),
+        t("howToPay.tigo.step4"),
+        t("howToPay.tigo.step5"),
+        t("howToPay.tigo.step6"),
+        t("howToPay.tigo.step7"),
+        t("howToPay.tigo.step8"),
+      ],
+      example: t("howToPay.tigo.example"),
+    },
+    {
+      id: "halotel",
+      title: t("howToPay.halotel.title"),
       icon: Phone,
       color: "bg-purple-600",
       ussd: "*150*88#",
       steps: [
-        t("howToPay.mixx.step1"),
-        t("howToPay.mixx.step2"),
-        t("howToPay.mixx.step3"),
-        t("howToPay.mixx.step4"),
-        t("howToPay.mixx.step5"),
-        t("howToPay.mixx.step6"),
-        t("howToPay.mixx.step7"),
-        t("howToPay.mixx.step8"),
+        t("howToPay.halotel.step1"),
+        t("howToPay.halotel.step2"),
+        t("howToPay.halotel.step3"),
+        t("howToPay.halotel.step4"),
+        t("howToPay.halotel.step5"),
+        t("howToPay.halotel.step6"),
+        t("howToPay.halotel.step7"),
+        t("howToPay.halotel.step8"),
       ],
-      example: t("howToPay.mixx.example"),
+      example: t("howToPay.halotel.example"),
     },
   ];
 
@@ -104,7 +122,7 @@ export default function HowToPayPage() {
         </div>
 
         {/* Payment Methods Cards */}
-        <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-3 mb-6 md:mb-8">
+        <div className="grid gap-3 md:gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 mb-6 md:mb-8">
           {paymentMethods.map((method) => {
             const Icon = method.icon;
             return (

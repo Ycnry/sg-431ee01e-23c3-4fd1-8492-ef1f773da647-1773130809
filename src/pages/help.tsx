@@ -89,27 +89,37 @@ export default function HelpPage() {
           {/* How to Pay Quick Link */}
           <Card className="mb-6 bg-gradient-to-r from-blue-50 to-orange-50 dark:from-blue-950/20 dark:to-orange-950/20 border-2">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Wallet className="h-6 w-6 text-blue-600" />
-                {language === "en" ? "Need Help with Payments?" : "Unahitaji Msaada na Malipo?"}
+              <CardTitle className="flex items-center gap-2 text-base md:text-lg">
+                <Wallet className="h-5 w-5 md:h-6 md:w-6 text-blue-600 flex-shrink-0" />
+                <span className="break-words leading-tight">
+                  {language === "en" ? "Need Help with Payments?" : "Unahitaji Msaada na Malipo?"}
+                </span>
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-xs md:text-sm break-words leading-relaxed">
                 {language === "en"
                   ? "Learn how to pay fundis and shops using mobile money or bank SIM banking"
                   : "Jifunze jinsi ya kulipa mafundi na maduka kwa kutumia pesa ya simu au SIM banking ya benki"}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-3 px-3 md:px-6">
               <Link href="/how-to-pay" className="block">
-                <Button size="lg" className="w-full gap-2">
-                  <Wallet className="h-5 w-5" />
-                  {language === "en" ? "Mobile Money Guide (M-Pesa, Airtel, Mixx)" : "Mwongozo wa Pesa ya Simu (M-Pesa, Airtel, Mixx)"}
+                <Button size="lg" className="w-full gap-2 h-auto py-3 md:py-4 text-xs sm:text-sm md:text-base">
+                  <Wallet className="h-4 w-4 md:h-5 md:w-5 flex-shrink-0" />
+                  <span className="break-words whitespace-normal leading-tight text-left flex-1">
+                    {language === "en" 
+                      ? "Mobile Money Guide (M-Pesa, Airtel, Tigo, Halotel)" 
+                      : "Mwongozo wa Pesa ya Simu (M-Pesa, Airtel, Tigo, Halotel)"}
+                  </span>
                 </Button>
               </Link>
               <Link href="/how-to-pay-bank" className="block">
-                <Button size="lg" variant="outline" className="w-full gap-2">
-                  <Building2 className="h-5 w-5" />
-                  {language === "en" ? "Bank SIM Banking Guide (CRDB, NMB, NBC, TPB)" : "Mwongozo wa SIM Banking (CRDB, NMB, NBC, TPB)"}
+                <Button size="lg" variant="outline" className="w-full gap-2 h-auto py-3 md:py-4 text-xs sm:text-sm md:text-base">
+                  <Building2 className="h-4 w-4 md:h-5 md:w-5 flex-shrink-0" />
+                  <span className="break-words whitespace-normal leading-tight text-left flex-1">
+                    {language === "en" 
+                      ? "Bank SIM Banking Guide (CRDB, NMB, NBC, TPB)" 
+                      : "Mwongozo wa SIM Banking (CRDB, NMB, NBC, TPB)"}
+                  </span>
                 </Button>
               </Link>
             </CardContent>
