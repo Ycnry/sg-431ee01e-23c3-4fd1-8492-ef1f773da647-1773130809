@@ -146,7 +146,7 @@ const translations: Record<string, Record<Language, string>> = {
   "howToPay.airtel.example": { en: "Example Lipa Number: 123456", sw: "Mfano wa Lipa Number: 123456" },
   
   // Mixx by Yas (Tigo) Instructions
-  "howToPay.mixx.title": { en: "Mixx by Yas (Tigo)", sw: "Mixx by Yas (Tigo)" },
+  "howToPay.mixx.title": { en: "Mixx by Yas", sw: "Mixx by Yas" },
   "howToPay.mixx.step1": { en: "Dial *150*01# from your Tigo phone", sw: "Bonyeza *150*01# kwenye simu yako ya Tigo" },
   "howToPay.mixx.step2": { en: "Enter your Mixx PIN", sw: "Ingiza PIN yako ya Mixx" },
   "howToPay.mixx.step3": { en: "Select \"Lipa Bili\" or \"Pay Bill\"", sw: "Chagua \"Lipa Bili\"" },
