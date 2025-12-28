@@ -11,16 +11,14 @@ import { Smartphone, CreditCard, HelpCircle, CheckCircle, ArrowRight, Phone, Zap
 import Link from "next/link";
 import Image from "next/image";
 import { getSupportHotline, callSupportHotline, formatPhoneNumber } from "@/lib/settings";
+import { cn } from "@/lib/utils";
 
 export default function HowToPayPage() {
   const { t } = useLanguage();
   const [openSection, setOpenSection] = useState<string>("mpesa");
-  const [supportHotline, setSupportHotline] = useState("");
+  const [supportHotline] = useState<string>("+255 123 456 789");
   const [mpesaLogoError, setMpesaLogoError] = useState(false);
-
-  useEffect(() => {
-    setSupportHotline(getSupportHotline());
-  }, []);
+  const [airtelLogoError, setAirtelLogoError] = useState(false);
 
   const scrollToMethod = (id: string) => {
     setOpenSection(id);
@@ -57,8 +55,9 @@ export default function HowToPayPage() {
       id: "airtel",
       title: t("howToPay.airtel.title"),
       icon: CreditCard,
-      color: "bg-red-500",
+      color: "bg-red-600",
       ussd: "*150*60#",
+      logoPath: "/airtel.jpg",
       steps: [
         t("howToPay.airtel.step1"),
         t("howToPay.airtel.step2"),
@@ -136,48 +135,62 @@ export default function HowToPayPage() {
         </div>
 
         {/* Payment Methods Cards */}
-        <div className="grid gap-3 md:gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
-        {paymentMethods.map((method) => {
-          const Icon = method.icon;
-          return (
-            <Card
-              key={method.id}
-              className={`${method.color} cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl overflow-hidden`}
-              onClick={() => scrollToMethod(method.id)}
-            >
-              <CardHeader className="p-4 md:p-6 text-center">
-                <div className="flex flex-col items-center gap-3 md:gap-4">
-                  {/* Logo or Icon - Centered */}
-                  <div className="flex items-center justify-center">
-                    {method.id === "mpesa" && !mpesaLogoError ? (
-                      <Image
-                        src={method.logoPath!}
-                        alt="M-Pesa Logo"
-                        width={60}
-                        height={60}
-                        className="object-contain w-12 h-12 md:w-16 md:h-16"
-                        onError={() => setMpesaLogoError(true)}
-                        priority
-                      />
-                    ) : (
-                      <Icon className="h-8 w-8 md:h-12 md:w-12 text-white" />
-                    )}
+        <div className="grid gap-3 md:gap-4 grid-cols-2 lg:grid-cols-4">
+          {paymentMethods.map((method) => {
+            const Icon = method.icon;
+            return (
+              <Card
+                key={method.id}
+                className={cn(
+                  "cursor-pointer transition-all hover:scale-105 border-2",
+                  method.color,
+                  "text-white"
+                )}
+                onClick={() => scrollToMethod(method.id)}
+              >
+                <CardHeader className="p-4 md:p-6">
+                  <div className="flex flex-col items-center gap-3 md:gap-4">
+                    {/* Logo or Icon */}
+                    <div className="flex items-center justify-center">
+                      {method.id === "mpesa" && method.logoPath && !mpesaLogoError ? (
+                        <Image
+                          src={method.logoPath}
+                          alt="M-Pesa Logo"
+                          width={60}
+                          height={60}
+                          className="object-contain w-12 h-12 md:w-16 md:h-16"
+                          onError={() => setMpesaLogoError(true)}
+                          priority
+                        />
+                      ) : method.id === "airtel" && method.logoPath && !airtelLogoError ? (
+                        <Image
+                          src={method.logoPath}
+                          alt="Airtel Money Logo"
+                          width={60}
+                          height={60}
+                          className="object-contain w-12 h-12 md:w-16 md:h-16"
+                          onError={() => setAirtelLogoError(true)}
+                          priority
+                        />
+                      ) : (
+                        <Icon className="h-12 w-12 md:h-16 md:w-16 text-white" />
+                      )}
+                    </div>
+
+                    {/* Title & USSD Code */}
+                    <div className="flex flex-col items-center gap-1 text-center">
+                      <CardTitle className="text-base md:text-lg font-bold">
+                        {method.title}
+                      </CardTitle>
+                      <p className="text-xs md:text-sm font-mono opacity-90">
+                        {method.ussd}
+                      </p>
+                    </div>
                   </div>
-                  
-                  {/* Title - Below Logo */}
-                  <div className="flex flex-col items-center gap-1">
-                    <CardTitle className="text-base md:text-lg text-white font-bold">
-                      {method.title}
-                    </CardTitle>
-                    <p className="text-xs md:text-sm text-white/90 font-mono">
-                      {method.ussd}
-                    </p>
-                  </div>
-                </div>
-              </CardHeader>
-            </Card>
-          );
-        })}
+                </CardHeader>
+              </Card>
+            );
+          })}
         </div>
 
         {/* Step-by-Step Instructions */}
@@ -188,27 +201,52 @@ export default function HowToPayPage() {
               <AccordionItem id={method.id} key={method.id} value={method.id} className="border rounded-lg mb-4 overflow-hidden">
                 <AccordionTrigger className="px-4 md:px-6 py-3 md:py-4 hover:no-underline hover:bg-muted/50 transition-colors">
                   <div className="flex items-center gap-3 md:gap-4 w-full">
-                    {/* Logo or Icon Container - Fixed Width */}
-                    <div className="flex items-center justify-center flex-shrink-0 w-10 h-10 md:w-12 md:h-12">
-                      {method.id === "mpesa" && !mpesaLogoError ? (
-                        <Image
-                          src={method.logoPath!}
-                          alt="M-Pesa Logo"
-                          width={40}
-                          height={40}
-                          className="object-contain w-8 h-8 md:w-10 md:h-10"
-                          onError={() => setMpesaLogoError(true)}
-                          priority
-                        />
+                    {/* Logo or Icon */}
+                    <div className="flex items-center justify-center flex-shrink-0">
+                      {method.id === "mpesa" && method.logoPath && !mpesaLogoError ? (
+                        <div className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center">
+                          <Image
+                            src={method.logoPath}
+                            alt="M-Pesa Logo"
+                            width={40}
+                            height={40}
+                            className="object-contain w-full h-full"
+                            onError={() => setMpesaLogoError(true)}
+                            priority
+                          />
+                        </div>
+                      ) : method.id === "airtel" && method.logoPath && !airtelLogoError ? (
+                        <div className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center">
+                          <Image
+                            src={method.logoPath}
+                            alt="Airtel Money Logo"
+                            width={40}
+                            height={40}
+                            className="object-contain w-full h-full"
+                            onError={() => setAirtelLogoError(true)}
+                            priority
+                          />
+                        </div>
                       ) : (
-                        <Icon className="h-6 w-6 md:h-8 md:w-8" />
+                        <div
+                          className={cn(
+                            "p-2 md:p-3 rounded-full",
+                            method.color
+                          )}
+                        >
+                          <Icon className="h-4 w-4 md:h-5 md:w-5 text-white" />
+                        </div>
                       )}
                     </div>
-                    
-                    {/* Text Content */}
+
+                    {/* Title & USSD */}
                     <div className="flex-1 text-left">
-                      <h3 className="font-bold text-base md:text-lg">{method.title}</h3>
-                      <p className="text-xs md:text-sm text-muted-foreground font-mono">{method.ussd}</p>
+                      <h3 className="font-semibold text-sm md:text-base">
+                        {method.title}
+                      </h3>
+                      <p className="text-xs md:text-sm text-muted-foreground font-mono">
+                        {method.ussd}
+                      </p>
                     </div>
                   </div>
                 </AccordionTrigger>
