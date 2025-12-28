@@ -20,6 +20,7 @@ export default function HowToPayPage() {
   const [mpesaLogoError, setMpesaLogoError] = useState(false);
   const [airtelLogoError, setAirtelLogoError] = useState(false);
   const [mixxLogoError, setMixxLogoError] = useState(false);
+  const [halotelLogoError, setHalotelLogoError] = useState(false);
 
   const scrollToMethod = (id: string) => {
     setOpenSection(id);
@@ -94,8 +95,10 @@ export default function HowToPayPage() {
       id: "halotel",
       title: t("howToPay.halotel.title"),
       icon: Phone,
-      color: "bg-purple-600",
+      color: "bg-[#F15A24]",
       ussd: "*150*88#",
+      logoPath: "/halopesa_tanzania_logo.jpg",
+      brandColor: "#FFFFFF",
       steps: [
         t("howToPay.halotel.step1"),
         t("howToPay.halotel.step2"),
@@ -137,22 +140,21 @@ export default function HowToPayPage() {
         </div>
 
         {/* Payment Methods Cards */}
-        <div className="grid gap-3 md:gap-4 grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 md:gap-4 grid-cols-2 md:grid-cols-4">
           {paymentMethods.map((method) => {
             const Icon = method.icon;
             return (
               <Card
                 key={method.id}
                 className={cn(
-                  "cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl border-2",
-                  method.color,
-                  openSection === method.id ? "ring-4 ring-white/50 scale-105 shadow-2xl" : ""
+                  "cursor-pointer transition-all hover:scale-105 hover:shadow-lg",
+                  method.color
                 )}
                 onClick={() => scrollToMethod(method.id)}
               >
-                <CardHeader className="p-4 md:p-6">
+                <CardHeader className="p-3 md:p-4">
                   <div className="flex flex-col items-center gap-3 md:gap-4">
-                    {/* Logo/Icon Container - Centered */}
+                    {/* Logo/Icon Display */}
                     <div className="flex items-center justify-center">
                       {method.id === "mpesa" && method.logoPath && !mpesaLogoError ? (
                         <Image
@@ -184,17 +186,30 @@ export default function HowToPayPage() {
                           onError={() => setMixxLogoError(true)}
                           priority
                         />
+                      ) : method.id === "halotel" && method.logoPath && !halotelLogoError ? (
+                        <Image
+                          src={method.logoPath}
+                          alt="Halotel Logo"
+                          width={60}
+                          height={60}
+                          className="object-contain w-12 h-12 md:w-16 md:h-16"
+                          onError={() => setHalotelLogoError(true)}
+                          priority
+                        />
                       ) : (
                         <Icon className="h-12 w-12 md:h-16 md:w-16 text-white" />
                       )}
                     </div>
 
-                    {/* Title & USSD Code - Centered Below Logo */}
-                    <div className="flex flex-col items-center gap-1 text-center">
-                      <CardTitle className="text-white text-base md:text-lg font-bold">
+                    {/* Title & USSD Code */}
+                    <div className="flex flex-col items-center gap-1">
+                      <CardTitle 
+                        className="text-sm md:text-base text-center font-semibold"
+                        style={method.brandColor ? { color: method.brandColor } : { color: 'white' }}
+                      >
                         {method.title}
                       </CardTitle>
-                      <p className="text-white/90 text-xs md:text-sm font-mono font-semibold">
+                      <p className="text-xs md:text-sm text-white/90 font-mono">
                         {method.ussd}
                       </p>
                     </div>
@@ -211,10 +226,10 @@ export default function HowToPayPage() {
             const Icon = method.icon;
             return (
               <AccordionItem id={method.id} key={method.id} value={method.id} className="border rounded-lg mb-4 overflow-hidden">
-                <AccordionTrigger className="px-4 md:px-6 py-3 md:py-4 hover:no-underline hover:bg-white/5 transition-colors">
+                <AccordionTrigger className="px-4 md:px-6 py-3 md:py-4 hover:no-underline [&[data-state=open]>div>svg]:rotate-180">
                   <div className="flex items-center gap-3 md:gap-4 w-full">
                     {/* Logo/Icon */}
-                    <div className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 flex-shrink-0">
+                    <div className={cn("rounded-lg p-2 flex items-center justify-center shrink-0", method.color)}>
                       {method.id === "mpesa" && method.logoPath && !mpesaLogoError ? (
                         <Image
                           src={method.logoPath}
@@ -242,17 +257,29 @@ export default function HowToPayPage() {
                           className="object-contain w-8 h-8 md:w-10 md:h-10"
                           onError={() => setMixxLogoError(true)}
                         />
+                      ) : method.id === "halotel" && method.logoPath && !halotelLogoError ? (
+                        <Image
+                          src={method.logoPath}
+                          alt="Halotel Logo"
+                          width={40}
+                          height={40}
+                          className="object-contain w-8 h-8 md:w-10 md:h-10"
+                          onError={() => setHalotelLogoError(true)}
+                        />
                       ) : (
                         <Icon className="h-6 w-6 md:h-8 md:w-8 text-white" />
                       )}
                     </div>
 
-                    {/* Title and USSD */}
-                    <div className="flex flex-col items-start gap-0.5 flex-1">
-                      <h3 className="text-white font-bold text-sm md:text-base">
+                    {/* Title & USSD */}
+                    <div className="flex flex-col items-start flex-1 min-w-0">
+                      <h3 
+                        className="font-semibold text-sm md:text-base"
+                        style={method.brandColor ? { color: method.brandColor } : undefined}
+                      >
                         {method.title}
                       </h3>
-                      <p className="text-white/80 text-xs md:text-sm font-mono">
+                      <p className="text-xs md:text-sm text-muted-foreground font-mono">
                         {method.ussd}
                       </p>
                     </div>

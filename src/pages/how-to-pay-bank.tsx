@@ -9,12 +9,12 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Phone, Building2, CreditCard, CheckCircle2, AlertCircle, ArrowRight, HelpCircle, Smartphone } from "lucide-react";
+import { Phone, Building2, CreditCard, CheckCircle2, AlertCircle, ArrowRight, HelpCircle, Smartphone, Hash, FileText, Lock } from "lucide-react";
 import { getSupportHotline, callSupportHotline, formatPhoneNumber } from "@/lib/settings";
 
 export default function HowToPayBankPage() {
   const { t } = useLanguage();
-  const [expandedBank, setExpandedBank] = useState<string>("");
+  const [expandedBank, setExpandedBank] = useState<string>("crdb");
   const [supportHotline, setSupportHotline] = useState("");
 
   useEffect(() => {
@@ -24,75 +24,75 @@ export default function HowToPayBankPage() {
   const banks = [
     {
       id: "crdb",
-      name: "CRDB Bank - SimBanking",
-      ussd: "*133#",
+      name: "CRDB Bank",
+      ussd: "*150*03#",
+      color: "bg-green-600",
       icon: Building2,
-      color: "bg-green-500",
       steps: [
         { key: "howToPayBank.crdb.step1", icon: Phone },
-        { key: "howToPayBank.crdb.step2", icon: CreditCard },
-        { key: "howToPayBank.crdb.step3", icon: ArrowRight },
-        { key: "howToPayBank.crdb.step4", icon: ArrowRight },
-        { key: "howToPayBank.crdb.step5", icon: Building2 },
-        { key: "howToPayBank.crdb.step6", icon: CreditCard },
+        { key: "howToPayBank.crdb.step2", icon: Lock },
+        { key: "howToPayBank.crdb.step3", icon: Smartphone },
+        { key: "howToPayBank.crdb.step4", icon: CreditCard },
+        { key: "howToPayBank.crdb.step5", icon: Hash },
+        { key: "howToPayBank.crdb.step6", icon: FileText },
         { key: "howToPayBank.crdb.step7", icon: CreditCard },
         { key: "howToPayBank.crdb.step8", icon: CheckCircle2 },
         { key: "howToPayBank.crdb.step9", icon: CheckCircle2 },
-      ],
+      ]
     },
     {
       id: "nmb",
-      name: "NMB Bank - Mkononi",
-      ussd: "*131#",
-      icon: Building2,
+      name: "NMB Bank",
+      ussd: "*150*66#",
       color: "bg-blue-600",
+      icon: Building2,
       steps: [
         { key: "howToPayBank.nmb.step1", icon: Phone },
-        { key: "howToPayBank.nmb.step2", icon: CreditCard },
-        { key: "howToPayBank.nmb.step3", icon: ArrowRight },
-        { key: "howToPayBank.nmb.step4", icon: ArrowRight },
-        { key: "howToPayBank.nmb.step5", icon: Building2 },
-        { key: "howToPayBank.nmb.step6", icon: CreditCard },
+        { key: "howToPayBank.nmb.step2", icon: Lock },
+        { key: "howToPayBank.nmb.step3", icon: Smartphone },
+        { key: "howToPayBank.nmb.step4", icon: CreditCard },
+        { key: "howToPayBank.nmb.step5", icon: Hash },
+        { key: "howToPayBank.nmb.step6", icon: FileText },
         { key: "howToPayBank.nmb.step7", icon: CreditCard },
         { key: "howToPayBank.nmb.step8", icon: CheckCircle2 },
         { key: "howToPayBank.nmb.step9", icon: CheckCircle2 },
-      ],
+      ]
     },
     {
       id: "nbc",
-      name: "NBC - M-Benki",
-      ussd: "*135#",
-      icon: Building2,
+      name: "NBC Bank",
+      ussd: "*150*55#",
       color: "bg-red-600",
+      icon: Building2,
       steps: [
         { key: "howToPayBank.nbc.step1", icon: Phone },
-        { key: "howToPayBank.nbc.step2", icon: CreditCard },
-        { key: "howToPayBank.nbc.step3", icon: ArrowRight },
-        { key: "howToPayBank.nbc.step4", icon: ArrowRight },
-        { key: "howToPayBank.nbc.step5", icon: Building2 },
-        { key: "howToPayBank.nbc.step6", icon: CreditCard },
+        { key: "howToPayBank.nbc.step2", icon: Lock },
+        { key: "howToPayBank.nbc.step3", icon: Smartphone },
+        { key: "howToPayBank.nbc.step4", icon: CreditCard },
+        { key: "howToPayBank.nbc.step5", icon: Hash },
+        { key: "howToPayBank.nbc.step6", icon: FileText },
         { key: "howToPayBank.nbc.step7", icon: CreditCard },
         { key: "howToPayBank.nbc.step8", icon: CheckCircle2 },
         { key: "howToPayBank.nbc.step9", icon: CheckCircle2 },
-      ],
+      ]
     },
     {
-      id: "tpb",
-      name: "TPB Bank - Yote Bando",
-      ussd: "*165#",
-      icon: Building2,
+      id: "azania",
+      name: "Azania Bank",
+      ussd: "*150*75#",
       color: "bg-purple-600",
+      icon: Building2,
       steps: [
-        { key: "howToPayBank.tpb.step1", icon: Phone },
-        { key: "howToPayBank.tpb.step2", icon: CreditCard },
-        { key: "howToPayBank.tpb.step3", icon: ArrowRight },
-        { key: "howToPayBank.tpb.step4", icon: ArrowRight },
-        { key: "howToPayBank.tpb.step5", icon: Building2 },
-        { key: "howToPayBank.tpb.step6", icon: CreditCard },
-        { key: "howToPayBank.tpb.step7", icon: CreditCard },
-        { key: "howToPayBank.tpb.step8", icon: CheckCircle2 },
-        { key: "howToPayBank.tpb.step9", icon: CheckCircle2 },
-      ],
+        { key: "howToPayBank.azania.step1", icon: Phone },
+        { key: "howToPayBank.azania.step2", icon: Lock },
+        { key: "howToPayBank.azania.step3", icon: Smartphone },
+        { key: "howToPayBank.azania.step4", icon: CreditCard },
+        { key: "howToPayBank.azania.step5", icon: Hash },
+        { key: "howToPayBank.azania.step6", icon: FileText },
+        { key: "howToPayBank.azania.step7", icon: CreditCard },
+        { key: "howToPayBank.azania.step8", icon: CheckCircle2 },
+        { key: "howToPayBank.azania.step9", icon: CheckCircle2 },
+      ]
     },
   ];
 
