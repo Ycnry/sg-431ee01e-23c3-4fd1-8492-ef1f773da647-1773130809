@@ -2,6 +2,7 @@ import type { NextApiResponse } from "next";
 import { withSecureApi, type AuthenticatedRequest } from "@/middleware/authMiddleware";
 import { supabase } from "@/integrations/supabase/client";
 import { generateAccessToken, generateRefreshToken, hashRefreshToken, type AuthUser } from "@/lib/auth";
+import type { EmailOtpType } from "@supabase/supabase-js";
 
 async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
@@ -18,9 +19,13 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
       });
     }
 
+    // Validate OTP type
+    const validEmailTypes: EmailOtpType[] = ["signup", "invite", "magiclink", "recovery", "email_change", "email"];
+    const otpType = validEmailTypes.includes(type as EmailOtpType) ? (type as EmailOtpType) : "magiclink";
+
     const { data, error } = await supabase.auth.verifyOtp({
       token_hash: token,
-      type: type as "magiclink" | "sms",
+      type: otpType,
     });
 
     if (error || !data.user) {
