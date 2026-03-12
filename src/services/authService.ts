@@ -1,181 +1,274 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { User, Session } from "@supabase/supabase-js";
 
-export interface AuthUser {
-  id: string;
-  email: string;
-  user_metadata?: any;
-  created_at?: string;
+// =====================================================
+// AUTH SERVICE - CLIENT SIDE INTEGRATION
+// =====================================================
+
+export interface SignUpData {
+  email?: string;
+  phone?: string;
+  password: string;
+  full_name: string;
+  role: "customer" | "fundi" | "shop";
+  city: string;
+  ward?: string;
+  specialty?: string[];
+  bio?: string;
+  whatsapp?: string;
+  national_id?: string;
+  shop_name?: string;
+  shop_categories?: string[];
+  opening_hours?: Record<string, { open: string; close: string; closed?: boolean }>;
 }
 
-export interface AuthError {
-  message: string;
-  code?: string;
+export interface SignInData {
+  identifier: string; // email or phone
+  password: string;
+  remember_me?: boolean;
 }
 
-// Dynamic URL Helper
-const getURL = () => {
-  let url = process?.env?.NEXT_PUBLIC_VERCEL_URL ?? 
-           process?.env?.NEXT_PUBLIC_SITE_URL ?? 
-           'http://localhost:3000'
-  
-  // Handle undefined or null url
-  if (!url) {
-    url = 'http://localhost:3000';
+export interface AuthResponse {
+  success: boolean;
+  user?: {
+    id: string;
+    email?: string;
+    phone?: string;
+    full_name: string;
+    role: string;
+    verification_status: string;
+    is_verified: boolean;
+    avatar_url?: string;
+    city?: string;
+  };
+  error?: string;
+  errorCode?: string;
+}
+
+/**
+ * Get the current redirect URL for OAuth/magic links
+ * Works for both localhost and deployed environments
+ */
+export function getRedirectUrl(path: string = "/auth/callback"): string {
+  if (typeof window !== "undefined") {
+    return `${window.location.origin}${path}`;
   }
-  
-  // Ensure url has protocol
-  url = url.startsWith('http') ? url : `https://${url}`
-  
-  // Ensure url ends with slash
-  url = url.endsWith('/') ? url : `${url}/`
-  
-  return url
+  // Fallback for server-side
+  return `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}${path}`;
 }
 
-export const authService = {
-  // Get current user
-  async getCurrentUser(): Promise<AuthUser | null> {
-    const { data: { user } } = await supabase.auth.getUser();
-    return user ? {
-      id: user.id,
-      email: user.email || "",
-      user_metadata: user.user_metadata,
-      created_at: user.created_at
-    } : null;
-  },
+/**
+ * Sign up a new user via our secure API
+ */
+export async function signUp(data: SignUpData): Promise<AuthResponse> {
+  try {
+    const response = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+      credentials: "include", // Include cookies
+    });
 
-  // Get current session
-  async getCurrentSession(): Promise<Session | null> {
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: result.error || "Registration failed",
+        errorCode: result.code,
+      };
+    }
+
+    return {
+      success: true,
+      user: result.user,
+    };
+  } catch (error) {
+    console.error("Sign up error:", error);
+    return {
+      success: false,
+      error: "Network error. Please try again.",
+      errorCode: "NETWORK_ERROR",
+    };
+  }
+}
+
+/**
+ * Sign in an existing user via our secure API
+ */
+export async function signIn(data: SignInData): Promise<AuthResponse> {
+  try {
+    const response = await fetch("/api/auth/signin", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+      credentials: "include", // Include cookies
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: result.error || "Login failed",
+        errorCode: result.code,
+      };
+    }
+
+    return {
+      success: true,
+      user: result.user,
+    };
+  } catch (error) {
+    console.error("Sign in error:", error);
+    return {
+      success: false,
+      error: "Network error. Please try again.",
+      errorCode: "NETWORK_ERROR",
+    };
+  }
+}
+
+/**
+ * Check if email or phone is already registered
+ */
+export async function checkDuplicate(email?: string, phone?: string): Promise<{
+  isDuplicate: boolean;
+  duplicateField?: "email" | "phone";
+  message?: string;
+}> {
+  try {
+    const response = await fetch("/api/auth/check-duplicate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, phone }),
+    });
+
+    const result = await response.json();
+
+    return {
+      isDuplicate: result.isDuplicate || false,
+      duplicateField: result.duplicateField,
+      message: result.message,
+    };
+  } catch (error) {
+    console.error("Check duplicate error:", error);
+    return {
+      isDuplicate: false,
+    };
+  }
+}
+
+/**
+ * Send a magic link or OTP for passwordless login
+ */
+export async function sendMagicLink(email?: string, phone?: string): Promise<{
+  success: boolean;
+  message?: string;
+  error?: string;
+}> {
+  try {
+    const response = await fetch("/api/auth/magic-link", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, phone }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: result.error,
+      };
+    }
+
+    return {
+      success: true,
+      message: result.message,
+    };
+  } catch (error) {
+    console.error("Magic link error:", error);
+    return {
+      success: false,
+      error: "Network error. Please try again.",
+    };
+  }
+}
+
+/**
+ * Sign out the current user
+ */
+export async function signOut(): Promise<void> {
+  try {
+    // Clear Supabase session
+    await supabase.auth.signOut();
+    
+    // Clear our custom cookies by calling a logout endpoint
+    // The cookies will be cleared server-side
+    document.cookie = "access_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    document.cookie = "refresh_token=; Path=/api/auth; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+  } catch (error) {
+    console.error("Sign out error:", error);
+  }
+}
+
+/**
+ * Get the current authenticated user from session
+ */
+export async function getCurrentUser(): Promise<AuthResponse["user"] | null> {
+  try {
     const { data: { session } } = await supabase.auth.getSession();
-    return session;
-  },
-
-  // Sign up with email and password
-  async signUp(email: string, password: string): Promise<{ user: AuthUser | null; error: AuthError | null }> {
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${getURL()}auth/confirm-email`
-        }
-      });
-
-      if (error) {
-        return { user: null, error: { message: error.message, code: error.status?.toString() } };
-      }
-
-      const authUser = data.user ? {
-        id: data.user.id,
-        email: data.user.email || "",
-        user_metadata: data.user.user_metadata,
-        created_at: data.user.created_at
-      } : null;
-
-      return { user: authUser, error: null };
-    } catch (error) {
-      return { 
-        user: null, 
-        error: { message: "An unexpected error occurred during sign up" } 
-      };
+    
+    if (!session?.user) {
+      return null;
     }
-  },
 
-  // Sign in with email and password
-  async signIn(email: string, password: string): Promise<{ user: AuthUser | null; error: AuthError | null }> {
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+    // Fetch user profile from our custom table
+    const { data: profile } = await supabase
+      .from("smart_fundi_users")
+      .select("*")
+      .eq("id", session.user.id)
+      .single();
 
-      if (error) {
-        return { user: null, error: { message: error.message, code: error.status?.toString() } };
-      }
-
-      const authUser = data.user ? {
-        id: data.user.id,
-        email: data.user.email || "",
-        user_metadata: data.user.user_metadata,
-        created_at: data.user.created_at
-      } : null;
-
-      return { user: authUser, error: null };
-    } catch (error) {
-      return { 
-        user: null, 
-        error: { message: "An unexpected error occurred during sign in" } 
-      };
+    if (!profile) {
+      return null;
     }
-  },
 
-  // Sign out
-  async signOut(): Promise<{ error: AuthError | null }> {
-    try {
-      const { error } = await supabase.auth.signOut();
-      
-      if (error) {
-        return { error: { message: error.message } };
-      }
-
-      return { error: null };
-    } catch (error) {
-      return { 
-        error: { message: "An unexpected error occurred during sign out" } 
-      };
-    }
-  },
-
-  // Reset password
-  async resetPassword(email: string): Promise<{ error: AuthError | null }> {
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${getURL()}auth/reset-password`,
-      });
-
-      if (error) {
-        return { error: { message: error.message } };
-      }
-
-      return { error: null };
-    } catch (error) {
-      return { 
-        error: { message: "An unexpected error occurred during password reset" } 
-      };
-    }
-  },
-
-  // Confirm email (REQUIRED)
-  async confirmEmail(token: string, type: 'signup' | 'recovery' | 'email_change' = 'signup'): Promise<{ user: AuthUser | null; error: AuthError | null }> {
-    try {
-      const { data, error } = await supabase.auth.verifyOtp({
-        token_hash: token,
-        type: type
-      });
-
-      if (error) {
-        return { user: null, error: { message: error.message, code: error.status?.toString() } };
-      }
-
-      const authUser = data.user ? {
-        id: data.user.id,
-        email: data.user.email || "",
-        user_metadata: data.user.user_metadata,
-        created_at: data.user.created_at
-      } : null;
-
-      return { user: authUser, error: null };
-    } catch (error) {
-      return { 
-        user: null, 
-        error: { message: "An unexpected error occurred during email confirmation" } 
-      };
-    }
-  },
-
-  // Listen to auth state changes
-  onAuthStateChange(callback: (event: string, session: Session | null) => void) {
-    return supabase.auth.onAuthStateChange(callback);
+    return {
+      id: profile.id,
+      email: profile.email || undefined,
+      phone: profile.phone || undefined,
+      full_name: profile.full_name,
+      role: profile.role,
+      verification_status: profile.verification_status,
+      is_verified: profile.is_verified || false,
+      avatar_url: profile.avatar_url || undefined,
+      city: profile.city || undefined,
+    };
+  } catch (error) {
+    console.error("Get current user error:", error);
+    return null;
   }
-};
+}
+
+/**
+ * Subscribe to auth state changes
+ */
+export function onAuthStateChange(callback: (user: AuthResponse["user"] | null) => void) {
+  return supabase.auth.onAuthStateChange(async (event, session) => {
+    if (session?.user) {
+      const user = await getCurrentUser();
+      callback(user);
+    } else {
+      callback(null);
+    }
+  });
+}
