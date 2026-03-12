@@ -1,43 +1,80 @@
-
 import type { NextApiRequest, NextApiResponse } from "next";
-import { User } from "@/types";
+import { withSecureApi, type AuthenticatedRequest } from "@/middleware/authMiddleware";
+import { registrationSchema, sanitize } from "@/lib/validation";
+import { registerUser } from "@/lib/auth";
+import { getClientIp } from "@/lib/rateLimit";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-    const { name, email, password, userType } = req.body;
-
-    if (!name || !email || !password || !userType) {
-      return res.status(400).json({ error: "All fields are required" });
+    // Sanitize input
+    const sanitizedBody = sanitize.object(req.body);
+    
+    // Validate input
+    const validationResult = registrationSchema.safeParse(sanitizedBody);
+    
+    if (!validationResult.success) {
+      return res.status(400).json({
+        error: "Data si sahihi / Invalid input data",
+        code: "VALIDATION_ERROR",
+        details: validationResult.error.errors.map((e) => ({
+          field: e.path.join("."),
+          message: e.message,
+        })),
+      });
     }
 
-    if (!["customer", "fundi", "shop"].includes(userType)) {
-      return res.status(400).json({ error: "Invalid user type" });
+    const data = validationResult.data;
+    const ipAddress = getClientIp(new Headers(req.headers as Record<string, string>));
+
+    // Register user
+    const result = await registerUser(data);
+
+    if (!result.success) {
+      return res.status(400).json({
+        error: result.error,
+        code: result.errorCode,
+      });
     }
 
-    const mockUser: User = {
-      id: "user-" + Date.now(),
-      name: name,
-      email: email,
-      createdAt: new Date().toISOString(),
-    };
+    // Set HttpOnly cookies for tokens
+    const cookieOptions = [
+      `access_token=${result.tokens?.accessToken}`,
+      "HttpOnly",
+      "Secure",
+      "SameSite=Strict",
+      "Path=/",
+      `Max-Age=${15 * 60}`, // 15 minutes
+    ].join("; ");
 
-    const token = "mock-jwt-token-" + Math.random().toString(36);
+    const refreshCookieOptions = [
+      `refresh_token=${result.tokens?.refreshToken}`,
+      "HttpOnly",
+      "Secure",
+      "SameSite=Strict",
+      "Path=/api/auth",
+      `Max-Age=${7 * 24 * 60 * 60}`, // 7 days
+    ].join("; ");
+
+    res.setHeader("Set-Cookie", [cookieOptions, refreshCookieOptions]);
 
     return res.status(201).json({
       success: true,
-      user: mockUser,
-      token: token,
-      message: "Account created successfully",
+      user: result.user,
+      message: "Usajili umefanikiwa / Registration successful",
     });
   } catch (error) {
-    console.error("Sign up error:", error);
-    return res.status(500).json({ error: "Sign up failed" });
+    console.error("Signup error:", error);
+    return res.status(500).json({
+      error: "Hitilafu ya ndani / Internal server error",
+      code: "INTERNAL_ERROR",
+    });
   }
 }
+
+export default withSecureApi(handler, {
+  rateLimit: "auth/register",
+});

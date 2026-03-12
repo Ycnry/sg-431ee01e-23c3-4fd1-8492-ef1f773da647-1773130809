@@ -1,41 +1,81 @@
+import type { NextApiResponse } from "next";
+import { withSecureApi, type AuthenticatedRequest } from "@/middleware/authMiddleware";
+import { emailSchema, phoneSchema, sanitize } from "@/lib/validation";
+import { supabase } from "@/integrations/supabase/client";
 
-import type { NextApiRequest, NextApiResponse } from "next";
-
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-    const { email } = req.body;
+    const { email, phone } = sanitize.object(req.body) as { email?: string; phone?: string };
 
-    if (!email) {
-      return res.status(400).json({ error: "Email is required" });
+    if (email) {
+      const emailResult = emailSchema.safeParse(email);
+      if (!emailResult.success) {
+        return res.status(400).json({
+          error: "Barua pepe si sahihi / Invalid email format",
+          code: "INVALID_EMAIL",
+        });
+      }
+
+      const { error } = await supabase.auth.signInWithOtp({
+        email: emailResult.data,
+      });
+
+      if (error) {
+        return res.status(400).json({
+          error: error.message,
+          code: "OTP_ERROR",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Kiungo kimetumwa kwa barua pepe / Magic link sent to email",
+      });
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ error: "Invalid email format" });
+    if (phone) {
+      const phoneResult = phoneSchema.safeParse(phone);
+      if (!phoneResult.success) {
+        return res.status(400).json({
+          error: "Nambari ya simu si sahihi / Invalid phone format",
+          code: "INVALID_PHONE",
+        });
+      }
+
+      const { error } = await supabase.auth.signInWithOtp({
+        phone: phoneResult.data,
+      });
+
+      if (error) {
+        return res.status(400).json({
+          error: error.message,
+          code: "OTP_ERROR",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "OTP imetumwa kwa simu / OTP sent to phone",
+      });
     }
 
-    const magicToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
-
-    const magicLink = `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/auth/verify-magic-link?token=${magicToken}&email=${encodeURIComponent(email)}`;
-
-    console.log("Magic link generated:", magicLink);
-    console.log("Expires at:", expiresAt);
-
-    return res.status(200).json({
-      success: true,
-      message: "Magic link sent to your email",
-      magicLink: magicLink,
+    return res.status(400).json({
+      error: "Lazima utoe barua pepe au nambari ya simu / Must provide email or phone",
+      code: "MISSING_IDENTIFIER",
     });
   } catch (error) {
     console.error("Magic link error:", error);
-    return res.status(500).json({ error: "Failed to send magic link" });
+    return res.status(500).json({
+      error: "Hitilafu ya ndani / Internal server error",
+      code: "INTERNAL_ERROR",
+    });
   }
 }
+
+export default withSecureApi(handler, {
+  rateLimit: "auth/password-reset",
+});
