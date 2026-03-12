@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { SignJWT, jwtVerify } from "jose";
 import { v4 as uuidv4 } from "uuid";
 import type { Registration, Login } from "./validation";
+import type { Tables } from "@/integrations/supabase/types";
 
 // =====================================================
 // AUTHENTICATION CONFIGURATION
@@ -45,6 +46,8 @@ export interface AuthResult {
   error?: string;
   errorCode?: string;
 }
+
+type SmartFundiUser = Tables<"smart_fundi_users">;
 
 // =====================================================
 // PASSWORD HASHING
@@ -150,8 +153,8 @@ export async function registerUser(data: Registration): Promise<AuthResult> {
     // Hash password for our custom storage
     const passwordHash = await hashPassword(data.password);
 
-    // Prepare user data based on role
-    const userData: Record<string, unknown> = {
+    // Prepare base user data
+    const baseUserData: Partial<SmartFundiUser> = {
       id: authUser.user.id,
       email: data.email || null,
       phone: data.phone || null,
@@ -166,21 +169,39 @@ export async function registerUser(data: Registration): Promise<AuthResult> {
 
     // Add role-specific fields
     if (data.role === "fundi") {
-      userData.specialty = data.specialty;
-      userData.bio = data.bio || null;
-      userData.whatsapp = data.whatsapp || null;
-      userData.national_id = data.national_id || null;
+      baseUserData.specialty = data.specialty;
+      baseUserData.bio = data.bio || null;
+      baseUserData.whatsapp = data.whatsapp || null;
+      baseUserData.national_id = data.national_id || null;
     } else if (data.role === "shop") {
-      userData.shop_name = data.shop_name;
-      userData.shop_categories = data.shop_categories;
-      userData.opening_hours = data.opening_hours || null;
-      userData.whatsapp = data.whatsapp || null;
+      baseUserData.shop_name = data.shop_name;
+      baseUserData.shop_categories = data.shop_categories;
+      baseUserData.opening_hours = data.opening_hours || null;
+      baseUserData.whatsapp = data.whatsapp || null;
     }
 
     // Insert into smart_fundi_users table
     const { error: insertError } = await supabase
       .from("smart_fundi_users")
-      .insert(userData);
+      .insert({
+        id: baseUserData.id!,
+        full_name: baseUserData.full_name!,
+        email: baseUserData.email,
+        phone: baseUserData.phone,
+        role: baseUserData.role,
+        city: baseUserData.city,
+        ward: baseUserData.ward,
+        password_hash: baseUserData.password_hash,
+        verification_status: baseUserData.verification_status,
+        is_verified: baseUserData.is_verified,
+        specialty: baseUserData.specialty,
+        bio: baseUserData.bio,
+        whatsapp: baseUserData.whatsapp,
+        national_id: baseUserData.national_id,
+        shop_name: baseUserData.shop_name,
+        shop_categories: baseUserData.shop_categories,
+        opening_hours: baseUserData.opening_hours,
+      });
 
     if (insertError) {
       // Rollback auth user if profile creation fails
@@ -283,12 +304,20 @@ export async function loginUser(data: Login, ipAddress?: string): Promise<AuthRe
     }
 
     // Verify password
+    if (!user.password_hash) {
+      return {
+        success: false,
+        error: "Akaunti haina nenosiri / Account has no password set",
+        errorCode: "NO_PASSWORD",
+      };
+    }
+
     const isValidPassword = await verifyPassword(data.password, user.password_hash);
 
     if (!isValidPassword) {
       // Increment failed login attempts
       const newAttempts = (user.failed_login_attempts || 0) + 1;
-      const updateData: Record<string, unknown> = {
+      const updateData: Partial<SmartFundiUser> = {
         failed_login_attempts: newAttempts,
       };
 
@@ -325,14 +354,14 @@ export async function loginUser(data: Login, ipAddress?: string): Promise<AuthRe
     // Generate tokens
     const authUser: AuthUser = {
       id: user.id,
-      email: user.email,
-      phone: user.phone,
+      email: user.email || undefined,
+      phone: user.phone || undefined,
       full_name: user.full_name,
-      role: user.role,
-      verification_status: user.verification_status,
-      is_verified: user.is_verified,
-      avatar_url: user.avatar_url,
-      city: user.city,
+      role: user.role as AuthUser["role"],
+      verification_status: user.verification_status as AuthUser["verification_status"],
+      is_verified: user.is_verified || false,
+      avatar_url: user.avatar_url || undefined,
+      city: user.city || undefined,
     };
 
     const accessToken = await generateAccessToken(authUser);
@@ -397,7 +426,7 @@ export async function refreshAccessToken(refreshToken: string): Promise<AuthResu
     }
 
     // Find matching session
-    let matchedSession = null;
+    let matchedSession: (typeof sessions)[0] | null = null;
     for (const session of sessions) {
       const isMatch = await bcrypt.compare(refreshToken, session.refresh_token_hash);
       if (isMatch) {
@@ -414,7 +443,7 @@ export async function refreshAccessToken(refreshToken: string): Promise<AuthResu
       };
     }
 
-    const userData = matchedSession.smart_fundi_users;
+    const userData = matchedSession.smart_fundi_users as SmartFundiUser | null;
     if (!userData || !userData.is_active) {
       return {
         success: false,
@@ -426,14 +455,14 @@ export async function refreshAccessToken(refreshToken: string): Promise<AuthResu
     // Generate new access token
     const authUser: AuthUser = {
       id: userData.id,
-      email: userData.email,
-      phone: userData.phone,
+      email: userData.email || undefined,
+      phone: userData.phone || undefined,
       full_name: userData.full_name,
-      role: userData.role,
-      verification_status: userData.verification_status,
-      is_verified: userData.is_verified,
-      avatar_url: userData.avatar_url,
-      city: userData.city,
+      role: userData.role as AuthUser["role"],
+      verification_status: userData.verification_status as AuthUser["verification_status"],
+      is_verified: userData.is_verified || false,
+      avatar_url: userData.avatar_url || undefined,
+      city: userData.city || undefined,
     };
 
     const accessToken = await generateAccessToken(authUser);

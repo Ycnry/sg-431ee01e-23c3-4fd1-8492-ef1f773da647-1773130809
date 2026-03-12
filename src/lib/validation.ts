@@ -235,48 +235,77 @@ export const openingHoursSchema = z.object({
 // REGISTRATION SCHEMAS
 // =====================================================
 
-// Base registration schema
-const baseRegistrationSchema = z.object({
+// Base registration fields (without refine - allows extend)
+const baseRegistrationFields = {
   full_name: nameSchema,
   email: emailSchema.optional(),
   phone: phoneSchema.optional(),
   password: passwordSchema,
   city: citySchema,
   ward: z.string().min(2).max(100).transform((val) => sanitize.full(val)).optional(),
+};
+
+// Customer registration schema
+export const customerRegistrationSchema = z.object({
+  ...baseRegistrationFields,
+  role: z.literal("customer"),
 }).refine((data) => data.email || data.phone, {
   message: "Lazima utoe barua pepe au nambari ya simu / Must provide email or phone number",
   path: ["email"],
 });
 
-// Customer registration schema
-export const customerRegistrationSchema = baseRegistrationSchema.extend({
-  role: z.literal("customer"),
-});
-
 // Fundi registration schema
-export const fundiRegistrationSchema = baseRegistrationSchema.extend({
+export const fundiRegistrationSchema = z.object({
+  ...baseRegistrationFields,
   role: z.literal("fundi"),
   specialty: specialtySchema,
   bio: bioSchema,
   whatsapp: whatsappSchema,
   national_id: nationalIdSchema.optional(),
+}).refine((data) => data.email || data.phone, {
+  message: "Lazima utoe barua pepe au nambari ya simu / Must provide email or phone number",
+  path: ["email"],
 });
 
 // Shop registration schema
-export const shopRegistrationSchema = baseRegistrationSchema.extend({
+export const shopRegistrationSchema = z.object({
+  ...baseRegistrationFields,
   role: z.literal("shop"),
   shop_name: z.string().min(2).max(100).transform((val) => sanitize.full(val)),
   shop_categories: shopCategoriesSchema,
   opening_hours: openingHoursSchema,
   whatsapp: whatsappSchema,
+}).refine((data) => data.email || data.phone, {
+  message: "Lazima utoe barua pepe au nambari ya simu / Must provide email or phone number",
+  path: ["email"],
 });
 
 // Combined registration schema
 export const registrationSchema = z.discriminatedUnion("role", [
-  customerRegistrationSchema,
-  fundiRegistrationSchema,
-  shopRegistrationSchema,
-]);
+  z.object({
+    ...baseRegistrationFields,
+    role: z.literal("customer"),
+  }),
+  z.object({
+    ...baseRegistrationFields,
+    role: z.literal("fundi"),
+    specialty: specialtySchema,
+    bio: bioSchema,
+    whatsapp: whatsappSchema,
+    national_id: nationalIdSchema.optional(),
+  }),
+  z.object({
+    ...baseRegistrationFields,
+    role: z.literal("shop"),
+    shop_name: z.string().min(2).max(100).transform((val) => sanitize.full(val)),
+    shop_categories: shopCategoriesSchema,
+    opening_hours: openingHoursSchema,
+    whatsapp: whatsappSchema,
+  }),
+]).refine((data) => data.email || data.phone, {
+  message: "Lazima utoe barua pepe au nambari ya simu / Must provide email or phone number",
+  path: ["email"],
+});
 
 // =====================================================
 // LOGIN SCHEMA
