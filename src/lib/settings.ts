@@ -1,105 +1,140 @@
+// =====================================================
+// SMART FUNDI - APPLICATION SETTINGS
+// =====================================================
+
 /**
- * App Settings Management
- * Stores configuration like support hotline in localStorage
- * In production with Supabase, this would use a database table with admin-only access
+ * Environment variable access with type safety
+ * All sensitive keys must be in .env.local and never committed
  */
 
-export interface AppSettings {
-  hotline_number: string;
-  last_updated: string;
-  updated_by?: string;
+// Database
+export const DATABASE_URL = process.env.DATABASE_URL || "";
+
+// JWT Configuration
+export const JWT_SECRET = process.env.JWT_SECRET || "smart-fundi-jwt-secret-change-in-production";
+export const JWT_EXPIRES_IN = "7d";
+export const REFRESH_TOKEN_EXPIRES_IN = "30d";
+
+// Supabase (auto-configured)
+export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+export const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+
+// Payment APIs
+export const VODACOM_API_KEY = process.env.VODACOM_API_KEY || "";
+export const VODACOM_API_SECRET = process.env.VODACOM_API_SECRET || "";
+export const VODACOM_SHORTCODE = process.env.VODACOM_SHORTCODE || "";
+export const VODACOM_PASSKEY = process.env.VODACOM_PASSKEY || "";
+
+// Support
+export const SUPPORT_PHONE = process.env.SUPPORT_PHONE || "+255123456789";
+export const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || "support@smartfundi.co.tz";
+
+// Rate Limiting Configuration (requests per window)
+export const RATE_LIMITS = {
+  // Auth endpoints
+  "auth/login": { maxRequests: 5, windowSeconds: 900 }, // 5 per 15 min
+  "auth/register": { maxRequests: 5, windowSeconds: 900 }, // 5 per 15 min
+  "auth/password-reset": { maxRequests: 3, windowSeconds: 3600 }, // 3 per hour
+  "auth/verify": { maxRequests: 10, windowSeconds: 900 }, // 10 per 15 min
+  
+  // Payment endpoints
+  "payments/mpesa": { maxRequests: 10, windowSeconds: 3600 }, // 10 per hour
+  "payments/subscription": { maxRequests: 5, windowSeconds: 3600 }, // 5 per hour
+  
+  // Search endpoints
+  "search/providers": { maxRequests: 30, windowSeconds: 60 }, // 30 per minute
+  "search/shops": { maxRequests: 30, windowSeconds: 60 }, // 30 per minute
+  
+  // Chat/messaging
+  "chat/messages": { maxRequests: 20, windowSeconds: 60 }, // 20 per minute
+  "chat/conversations": { maxRequests: 30, windowSeconds: 60 }, // 30 per minute
+  
+  // Admin endpoints
+  "admin/dashboard": { maxRequests: 100, windowSeconds: 3600 }, // 100 per hour
+  "admin/users": { maxRequests: 50, windowSeconds: 3600 }, // 50 per hour
+  "admin/reports": { maxRequests: 20, windowSeconds: 3600 }, // 20 per hour
+  
+  // General API
+  "api/general": { maxRequests: 60, windowSeconds: 60 }, // 60 per minute
+} as const;
+
+// Password hashing configuration
+export const BCRYPT_ROUNDS = 12;
+
+// Session configuration
+export const SESSION_COOKIE_NAME = "smart_fundi_session";
+export const SESSION_MAX_AGE = 7 * 24 * 60 * 60; // 7 days in seconds
+export const REMEMBER_ME_MAX_AGE = 30 * 24 * 60 * 60; // 30 days in seconds
+
+// Validation settings
+export const VALIDATION = {
+  name: {
+    minLength: 2,
+    maxLength: 50,
+  },
+  password: {
+    minLength: 8,
+    maxLength: 128,
+  },
+  bio: {
+    maxLength: 500,
+  },
+  nationalId: {
+    minLength: 16,
+  },
+  phone: {
+    pattern: /^\+255[67]\d{8}$/,
+  },
+};
+
+// Subscription prices (in TZS)
+export const SUBSCRIPTION_PRICES = {
+  fundi: {
+    monthly: 5000,
+    trial_days: 30,
+  },
+  shop: {
+    monthly: 15000,
+    trial_days: 14,
+  },
+  promotion: {
+    daily: 1500,
+    max_slots: 3,
+  },
+  event: {
+    per_event: 25000,
+  },
+} as const;
+
+// File upload limits
+export const FILE_LIMITS = {
+  avatar: {
+    maxSize: 5 * 1024 * 1024, // 5MB
+    allowedTypes: ["image/jpeg", "image/png", "image/webp"],
+  },
+  document: {
+    maxSize: 10 * 1024 * 1024, // 10MB
+    allowedTypes: ["application/pdf", "image/jpeg", "image/png"],
+  },
+} as const;
+
+/**
+ * Get environment variable with fallback
+ */
+export function getEnvVar(key: string, fallback: string = ""): string {
+  return process.env[key] || fallback;
 }
 
-const SETTINGS_KEY = "app_settings_support_contact";
-const DEFAULT_HOTLINE = "+255796381261";
-
 /**
- * Get the current support hotline number
+ * Check if running in production
  */
-export function getSupportHotline(): string {
-  if (typeof window === "undefined") return DEFAULT_HOTLINE;
-  
-  try {
-    const stored = localStorage.getItem(SETTINGS_KEY);
-    if (stored) {
-      const settings: AppSettings = JSON.parse(stored);
-      return settings.hotline_number || DEFAULT_HOTLINE;
-    }
-  } catch (error) {
-    console.error("Error reading support hotline:", error);
-  }
-  
-  return DEFAULT_HOTLINE;
+export function isProduction(): boolean {
+  return process.env.NODE_ENV === "production";
 }
 
 /**
- * Update the support hotline number (Admin only)
+ * Check if running in development
  */
-export function updateSupportHotline(
-  hotline: string,
-  adminEmail?: string
-): boolean {
-  if (typeof window === "undefined") return false;
-  
-  try {
-    const settings: AppSettings = {
-      hotline_number: hotline,
-      last_updated: new Date().toISOString(),
-      updated_by: adminEmail,
-    };
-    
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-    return true;
-  } catch (error) {
-    console.error("Error updating support hotline:", error);
-    return false;
-  }
-}
-
-/**
- * Get all app settings
- */
-export function getAppSettings(): AppSettings {
-  if (typeof window === "undefined") {
-    return {
-      hotline_number: DEFAULT_HOTLINE,
-      last_updated: new Date().toISOString(),
-    };
-  }
-  
-  try {
-    const stored = localStorage.getItem(SETTINGS_KEY);
-    if (stored) {
-      return JSON.parse(stored);
-    }
-  } catch (error) {
-    console.error("Error reading app settings:", error);
-  }
-  
-  return {
-    hotline_number: DEFAULT_HOTLINE,
-    last_updated: new Date().toISOString(),
-  };
-}
-
-/**
- * Trigger phone call to support hotline
- */
-export function callSupportHotline(): void {
-  const hotline = getSupportHotline();
-  // Remove spaces and formatting for tel: protocol
-  const cleanNumber = hotline.replace(/\s+/g, "");
-  window.location.href = `tel:${cleanNumber}`;
-}
-
-/**
- * Format phone number for display
- */
-export function formatPhoneNumber(phone: string): string {
-  // Format: +255 796 381 261
-  const cleaned = phone.replace(/\D/g, "");
-  if (cleaned.startsWith("255")) {
-    return `+255 ${cleaned.slice(3, 6)} ${cleaned.slice(6, 9)} ${cleaned.slice(9)}`;
-  }
-  return phone;
+export function isDevelopment(): boolean {
+  return process.env.NODE_ENV === "development";
 }
