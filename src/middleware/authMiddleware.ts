@@ -92,8 +92,8 @@ export function withAuth(handler: NextApiHandler, options: MiddlewareOptions = {
         authReq.user?.id,
         req.url || "",
         "admin_access_denied",
-        "Unauthorized admin access attempt",
-        "warning"
+        "role",
+        { attempted_role: authReq.user?.role }
       );
 
       return res.status(403).json({
@@ -130,19 +130,18 @@ async function logSecurityEvent(
   ipAddress: string,
   userId: string | undefined,
   endpoint: string,
-  eventType: string,
-  message: string,
-  severity: "info" | "warning" | "critical" = "warning"
+  errorType: string,
+  fieldName: string,
+  requestData?: Record<string, unknown>
 ): Promise<void> {
   try {
     await supabase.rpc("log_validation_failure", {
-      p_ip_address: ipAddress,
       p_user_id: userId || null,
       p_endpoint: endpoint,
-      p_validation_type: eventType,
-      p_input_data: {},
-      p_error_message: message,
-      p_severity: severity,
+      p_field_name: fieldName,
+      p_error_type: errorType,
+      p_ip_address: ipAddress,
+      p_request_data: requestData || null,
     });
   } catch (err) {
     console.error("Failed to log security event:", err);
@@ -172,8 +171,8 @@ export function withValidation<T>(
         (req as AuthenticatedRequest).user?.id,
         req.url || "",
         "validation_failure",
-        JSON.stringify(validationError.errors || "Validation failed"),
-        "warning"
+        validationError.errors?.[0]?.path.join(".") || "unknown",
+        { errors: validationError.errors }
       );
 
       return res.status(400).json({
