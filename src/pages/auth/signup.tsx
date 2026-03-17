@@ -123,8 +123,9 @@ export default function SignUpPage() {
     try {
       await signUp(formData.name, formData.email, formData.password, formData.userType);
       router.push("/");
-    } catch (err: any) {
-      setError(err.message || (language === "en" ? "Sign up failed. Please try again." : "Kujisajili kumeshindikana. Tafadhali jaribu tena."));
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : (language === "en" ? "Sign up failed. Please try again." : "Kujisajili kumeshindikana. Tafadhali jaribu tena.");
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -165,8 +166,9 @@ export default function SignUpPage() {
 
     try {
       await signInWithGoogle();
-    } catch (err: any) {
-      setError(err.message || (language === "en" ? "Google sign up failed. Please try again." : "Kujisajili kwa Google kumeshindikana. Tafadhali jaribu tena."));
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : (language === "en" ? "Google sign up failed. Please try again." : "Kujisajili kwa Google kumeshindikana. Tafadhali jaribu tena.");
+      setError(errorMessage);
       setLoading(false);
     }
   };
@@ -180,8 +182,9 @@ export default function SignUpPage() {
     try {
       await sendMagicLink(magicEmail);
       setMagicLinkSent(true);
-    } catch (err: any) {
-      setError(err.message || (language === "en" ? "Failed to send magic link. Please try again." : "Imeshindikana kutuma kiungo cha ajabu. Tafadhali jaribu tena."));
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : (language === "en" ? "Failed to send magic link. Please try again." : "Imeshindikana kutuma kiungo cha ajabu. Tafadhali jaribu tena.");
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -196,14 +199,14 @@ export default function SignUpPage() {
     },
     {
       value: "fundi",
-      label: language === "en" ? "Fundi / Technician" : "Fundi / Mtaalamu",
+      label: language === "en" ? "Fundi" : "Fundi",
       description: language === "en" ? "Provide skilled services" : "Toa huduma za ujuzi",
       icon: Wrench,
     },
     {
       value: "shop",
-      label: language === "en" ? "Shop Owner" : "Mmiliki wa Duka",
-      description: language === "en" ? "Hardware & tools supplier" : "Muuzaji wa vifaa na zana",
+      label: language === "en" ? "Shop" : "Duka",
+      description: language === "en" ? "Sell tools & supplies" : "Uza zana na vifaa",
       icon: Store,
     },
   ];
@@ -214,62 +217,64 @@ export default function SignUpPage() {
     <>
       <Head>
         <title>{metaTitle}</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50 dark:from-gray-950 dark:to-gray-900 flex items-center justify-center p-4 py-12">
-        <div className="w-full max-w-2xl">
-          <div className="text-center mb-8">
-            <Link href="/" className="inline-flex items-center gap-2 mb-4">
-              <div className="bg-blue-600 p-3 rounded-lg">
-                <Wrench className="h-8 w-8 text-white" />
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50 dark:from-gray-950 dark:to-gray-900 flex items-center justify-center p-3 sm:p-4 py-6 sm:py-12">
+        <div className="w-full max-w-lg">
+          {/* Logo Section - Mobile Optimized */}
+          <div className="text-center mb-4 sm:mb-8">
+            <Link href="/" className="inline-flex items-center gap-2 mb-2 sm:mb-4">
+              <div className="bg-blue-600 p-2 sm:p-3 rounded-lg">
+                <Wrench className="h-5 w-5 sm:h-8 sm:w-8 text-white" />
               </div>
-              <span className="font-bold text-2xl">
+              <span className="font-bold text-lg sm:text-2xl">
                 <span className="text-blue-600">SMART</span>{" "}
                 <span className="text-orange-500">FUNDI</span>
               </span>
             </Link>
-            <h1 className="text-3xl font-bold mt-4">
-              {language === "en" ? "Create Your Account" : "Fungua Akaunti Yako"}
+            <h1 className="text-xl sm:text-3xl font-bold mt-2 sm:mt-4">
+              {language === "en" ? "Create Account" : "Fungua Akaunti"}
             </h1>
-            <p className="text-muted-foreground mt-2">
-              {language === "en" ? "Join Smart Fundi community today" : "Jiunge na jamii ya Smart Fundi leo"}
+            <p className="text-xs sm:text-base text-muted-foreground mt-1 sm:mt-2">
+              {language === "en" ? "Join Smart Fundi today" : "Jiunge na Smart Fundi leo"}
             </p>
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>
+          <Card className="shadow-lg border-0 sm:border">
+            <CardHeader className="px-3 sm:px-6 pb-2 sm:pb-4 pt-4 sm:pt-6">
+              <CardTitle className="text-base sm:text-xl">
                 {language === "en" ? "Sign Up" : "Jisajili"}
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-xs sm:text-sm">
                 {language === "en" 
-                  ? "Choose your preferred sign up method" 
-                  : "Chagua njia unayopendelea ya kujisajili"}
+                  ? "Choose your sign up method" 
+                  : "Chagua njia ya kujisajili"}
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-3 sm:px-6 pb-4 sm:pb-6">
               {error && (
-                <Alert variant="destructive" className="mb-4">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
+                <Alert variant="destructive" className="mb-3 sm:mb-4">
+                  <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                  <AlertDescription className="text-xs sm:text-sm ml-2">{error}</AlertDescription>
                 </Alert>
               )}
 
-              <Tabs defaultValue="email" className="space-y-4">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="email">
+              <Tabs defaultValue="email" className="space-y-3 sm:space-y-4">
+                <TabsList className="grid w-full grid-cols-2 h-9 sm:h-11">
+                  <TabsTrigger value="email" className="text-xs sm:text-sm">
                     {language === "en" ? "Email" : "Barua pepe"}
                   </TabsTrigger>
-                  <TabsTrigger value="magic">
-                    {language === "en" ? "Magic Link" : "Kiungo cha Ajabu"}
+                  <TabsTrigger value="magic" className="text-xs sm:text-sm">
+                    {language === "en" ? "Magic Link" : "Kiungo"}
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="email" className="space-y-4">
-                  <form onSubmit={handleSignUp} className="space-y-4">
-                    <div className="space-y-3">
-                      <Label className="text-base font-semibold">
+                <TabsContent value="email" className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
+                  <form onSubmit={handleSignUp} className="space-y-3 sm:space-y-4">
+                    {/* User Type Selection - Mobile Optimized */}
+                    <div className="space-y-2">
+                      <Label className="text-xs sm:text-sm font-semibold">
                         {language === "en" ? "I am a..." : "Mimi ni..."}
                       </Label>
                       <RadioGroup
@@ -277,7 +282,7 @@ export default function SignUpPage() {
                         onValueChange={(value: "customer" | "fundi" | "shop") =>
                           setFormData({ ...formData, userType: value })
                         }
-                        className="grid gap-3"
+                        className="grid grid-cols-3 gap-2"
                       >
                         {userTypes.map((type) => {
                           const Icon = type.icon;
@@ -290,13 +295,10 @@ export default function SignUpPage() {
                               />
                               <Label
                                 htmlFor={type.value}
-                                className="flex items-center gap-4 rounded-lg border-2 border-muted bg-background p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-blue-600 peer-data-[state=checked]:bg-blue-50 dark:peer-data-[state=checked]:bg-blue-950 cursor-pointer transition-all"
+                                className="flex flex-col items-center gap-1 rounded-lg border-2 border-muted bg-background p-2 sm:p-3 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-blue-600 peer-data-[state=checked]:bg-blue-50 dark:peer-data-[state=checked]:bg-blue-950 cursor-pointer transition-all text-center"
                               >
-                                <Icon className="h-6 w-6 flex-shrink-0" />
-                                <div className="flex-1">
-                                  <p className="font-medium">{type.label}</p>
-                                  <p className="text-sm text-muted-foreground">{type.description}</p>
-                                </div>
+                                <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+                                <span className="text-xs sm:text-sm font-medium">{type.label}</span>
                               </Label>
                             </div>
                           );
@@ -304,8 +306,9 @@ export default function SignUpPage() {
                       </RadioGroup>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="name">
+                    {/* Name Field */}
+                    <div className="space-y-1.5">
+                      <Label htmlFor="name" className="text-xs sm:text-sm">
                         {language === "en" ? "Full Name" : "Jina Kamili"}
                       </Label>
                       <div className="relative">
@@ -316,14 +319,15 @@ export default function SignUpPage() {
                           placeholder={language === "en" ? "John Doe" : "Jina Lako"}
                           value={formData.name}
                           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          className="pl-10"
+                          className="pl-10 h-9 sm:h-11 text-sm"
                           required
                         />
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-email">
+                    {/* Email Field */}
+                    <div className="space-y-1.5">
+                      <Label htmlFor="signup-email" className="text-xs sm:text-sm">
                         {language === "en" ? "Email" : "Barua pepe"}
                       </Label>
                       <div className="relative">
@@ -334,101 +338,87 @@ export default function SignUpPage() {
                           placeholder={language === "en" ? "your@email.com" : "email@yako.com"}
                           value={formData.email}
                           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          className="pl-10"
+                          className="pl-10 h-9 sm:h-11 text-sm"
                           required
                         />
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-password">
-                        {language === "en" ? "Password" : "Nywila"}
-                      </Label>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="signup-password"
-                          type="password"
-                          placeholder={language === "en" ? "Create a password" : "Unda nywila"}
-                          value={formData.password}
-                          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                          className="pl-10"
-                          required
-                          minLength={6}
-                        />
+                    {/* Password Fields */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <Label htmlFor="signup-password" className="text-xs sm:text-sm">
+                          {language === "en" ? "Password" : "Nywila"}
+                        </Label>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            id="signup-password"
+                            type="password"
+                            placeholder="••••••"
+                            value={formData.password}
+                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                            className="pl-10 h-9 sm:h-11 text-sm"
+                            required
+                            minLength={6}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label htmlFor="confirm-password" className="text-xs sm:text-sm">
+                          {language === "en" ? "Confirm" : "Thibitisha"}
+                        </Label>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            id="confirm-password"
+                            type="password"
+                            placeholder="••••••"
+                            value={formData.confirmPassword}
+                            onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                            className="pl-10 h-9 sm:h-11 text-sm"
+                            required
+                            minLength={6}
+                          />
+                        </div>
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="confirm-password">
-                        {language === "en" ? "Confirm Password" : "Thibitisha Nywila"}
-                      </Label>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="confirm-password"
-                          type="password"
-                          placeholder={language === "en" ? "Confirm your password" : "Thibitisha nywila yako"}
-                          value={formData.confirmPassword}
-                          onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                          className="pl-10"
-                          required
-                          minLength={6}
-                        />
-                      </div>
-                    </div>
-
+                    {/* Fundi Verification Section - Mobile Optimized */}
                     {formData.userType === "fundi" && (
-                      <div className="space-y-4 p-4 border-2 border-blue-200 dark:border-blue-800 rounded-lg bg-blue-50 dark:bg-blue-950">
-                        <div className="flex items-center gap-2 mb-2">
-                          <FileText className="h-5 w-5 text-blue-600" />
-                          <h3 className="font-semibold text-blue-900 dark:text-blue-100">
-                            {language === "en" ? "Identity Verification (Required)" : "Uthibitisho wa Kitambulisho (Inahitajika)"}
+                      <div className="space-y-3 p-3 border-2 border-blue-200 dark:border-blue-800 rounded-lg bg-blue-50 dark:bg-blue-950">
+                        <div className="flex items-center gap-2">
+                          <FileText className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                          <h3 className="text-xs sm:text-sm font-semibold text-blue-900 dark:text-blue-100">
+                            {language === "en" ? "ID Verification" : "Uthibitisho wa Kitambulisho"}
                           </h3>
                         </div>
                         
-                        <div className="space-y-2">
-                          <Label htmlFor="national-id">
-                            {language === "en" ? "National ID Number (Tanzania NIDA)" : "Nambari ya Kitambulisho cha Taifa (NIDA Tanzania)"}
+                        <div className="space-y-1.5">
+                          <Label htmlFor="national-id" className="text-xs sm:text-sm">
+                            {language === "en" ? "National ID (NIDA)" : "NIDA"}
                           </Label>
                           <Input
                             id="national-id"
                             type="text"
-                            placeholder={language === "en" ? "Enter your NIDA number" : "Weka nambari yako ya NIDA"}
+                            placeholder={language === "en" ? "NIDA number" : "Nambari ya NIDA"}
                             value={formData.nationalIdNumber}
                             onChange={(e) => setFormData({ ...formData, nationalIdNumber: e.target.value })}
+                            className="h-9 sm:h-10 text-sm"
                           />
-                          <p className="text-xs text-muted-foreground">
-                            {language === "en" 
-                              ? "This helps prevent duplicate accounts and ensures authenticity"
-                              : "Hii inasaidia kuzuia akaunti za kujirudia na kuhakikisha uhalisi"}
-                          </p>
                         </div>
 
-                        <div className="relative">
-                          <div className="absolute inset-0 flex items-center">
-                            <span className="w-full border-t" />
-                          </div>
-                          <div className="relative flex justify-center text-xs uppercase">
-                            <span className="bg-blue-50 dark:bg-blue-950 px-2 text-muted-foreground">
-                              {language === "en" ? "Or" : "Au"}
-                            </span>
-                          </div>
+                        <div className="text-center text-xs text-muted-foreground">
+                          {language === "en" ? "— OR —" : "— AU —"}
                         </div>
 
-                        <div className="space-y-2">
-                          <Label>
-                            {language === "en" 
-                              ? "Upload Government-Issued ID (Alternative)" 
-                              : "Pakia Kitambulisho kilichotolewa na Serikali (Mbadala)"}
+                        <div className="space-y-1.5">
+                          <Label className="text-xs sm:text-sm">
+                            {language === "en" ? "Upload ID Document" : "Pakia Kitambulisho"}
                           </Label>
-                          <div className="border-2 border-dashed rounded-lg p-4 text-center">
-                            <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                            <p className="text-sm text-muted-foreground mb-2">
-                              {language === "en" 
-                                ? "Passport, Driver's License, Voter's Card, NIDA Application Receipt, School Documentation, or Birth Certificate"
-                                : "Pasipoti, Leseni ya Kuendesha, Kadi ya Kupiga Kura, Risiti ya Maombi ya NIDA, Hati za Shule, au Cheti cha Kuzaliwa"}
-                            </p>
+                          <div className="border-2 border-dashed rounded-lg p-3 text-center">
+                            <Upload className="h-6 w-6 mx-auto mb-1 text-muted-foreground" />
                             <Input
                               type="file"
                               accept="image/*,.pdf"
@@ -437,82 +427,63 @@ export default function SignUpPage() {
                               id="id-document-upload"
                             />
                             <Label htmlFor="id-document-upload" className="cursor-pointer">
-                              <Button type="button" variant="outline" size="sm" asChild>
+                              <Button type="button" variant="outline" size="sm" asChild className="text-xs">
                                 <span>
                                   {formData.idDocument 
-                                    ? (language === "en" ? `File: ${formData.idDocument.name}` : `Faili: ${formData.idDocument.name}`)
-                                    : (language === "en" ? "Choose File (Max 5MB)" : "Chagua Faili (Max 5MB)")}
+                                    ? formData.idDocument.name.substring(0, 20) + "..."
+                                    : (language === "en" ? "Choose File" : "Chagua Faili")}
                                 </span>
                               </Button>
                             </Label>
                           </div>
-                          <p className="text-xs text-muted-foreground">
-                            {language === "en" 
-                              ? "Accounts using alternative documents will be manually verified by admin before approval"
-                              : "Akaunti zinazotumia hati mbadala zitathibitishwa na msimamizi kabla ya kuidhinishwa"}
-                          </p>
                         </div>
-
-                        <Alert className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950">
-                          <AlertCircle className="h-4 w-4 text-yellow-600" />
-                          <AlertDescription className="text-yellow-800 dark:text-yellow-200 text-sm">
-                            {language === "en"
-                              ? "Providing a National ID Number ensures faster verification. Alternative documents require manual review."
-                              : "Kutoa Nambari ya Kitambulisho cha Taifa kunahakikisha uthibitisho wa haraka. Hati mbadala zinahitaji ukaguzi wa mkono."}
-                          </AlertDescription>
-                        </Alert>
                       </div>
                     )}
 
+                    {/* Shop Verification Section - Mobile Optimized */}
                     {formData.userType === "shop" && (
-                      <div className="space-y-4 p-4 border-2 border-green-200 dark:border-green-800 rounded-lg bg-green-50 dark:bg-green-950">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Store className="h-5 w-5 text-green-600" />
-                          <h3 className="font-semibold text-green-900 dark:text-green-100">
-                            {language === "en" ? "Shop Verification Requirements" : "Mahitaji ya Uthibitisho wa Duka"}
+                      <div className="space-y-3 p-3 border-2 border-green-200 dark:border-green-800 rounded-lg bg-green-50 dark:bg-green-950">
+                        <div className="flex items-center gap-2">
+                          <Store className="h-4 w-4 text-green-600 flex-shrink-0" />
+                          <h3 className="text-xs sm:text-sm font-semibold text-green-900 dark:text-green-100">
+                            {language === "en" ? "Shop Verification" : "Uthibitisho wa Duka"}
                           </h3>
                         </div>
                         
-                        <div className="space-y-2">
-                          <Label htmlFor="business-registration">
-                            {language === "en" ? "Business Registration Number (BRELA)" : "Nambari ya Usajili wa Biashara (BRELA)"}
+                        <div className="space-y-1.5">
+                          <Label htmlFor="business-registration" className="text-xs sm:text-sm">
+                            {language === "en" ? "BRELA Number" : "Nambari ya BRELA"}
                           </Label>
                           <Input
                             id="business-registration"
                             type="text"
-                            placeholder={language === "en" ? "Enter BRELA number" : "Weka nambari ya BRELA"}
+                            placeholder={language === "en" ? "Business registration" : "Usajili wa biashara"}
                             value={formData.businessRegistrationNumber || ""}
                             onChange={(e) => setFormData({ ...formData, businessRegistrationNumber: e.target.value })}
+                            className="h-9 sm:h-10 text-sm"
                           />
-                          <p className="text-xs text-muted-foreground">
-                            {language === "en" 
-                              ? "BRELA registration helps prevent duplicate shops and ensures business authenticity"
-                              : "Usajili wa BRELA husaidia kuzuia maduka ya kujirudia na kuhakikisha uhalisi wa biashara"}
-                          </p>
                         </div>
 
-                        <div className="space-y-2">
-                          <Label htmlFor="physical-address">
-                            {language === "en" ? "Physical Address" : "Anwani ya Kimwili"}
+                        <div className="space-y-1.5">
+                          <Label htmlFor="physical-address" className="text-xs sm:text-sm">
+                            {language === "en" ? "Address" : "Anwani"}
                           </Label>
                           <Input
                             id="physical-address"
                             type="text"
-                            placeholder={language === "en" ? "e.g., Nyerere Rd, Kinondoni, Dar es Salaam" : "mfano, Barabara ya Nyerere, Kinondoni, Dar es Salaam"}
+                            placeholder={language === "en" ? "Shop location" : "Mahali pa duka"}
                             value={formData.physicalAddress || ""}
                             onChange={(e) => setFormData({ ...formData, physicalAddress: e.target.value })}
+                            className="h-9 sm:h-10 text-sm"
                           />
                         </div>
 
-                        <div className="space-y-2">
-                          <Label>{language === "en" ? "Storefront Photo (Required)" : "Picha ya Duka (Inahitajika)"}</Label>
-                          <div className="border-2 border-dashed rounded-lg p-4 text-center">
-                            <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                            <p className="text-sm text-muted-foreground mb-2">
-                              {language === "en" 
-                                ? "Upload a clear photo of your shop with visible signage"
-                                : "Pakia picha wazi ya duka lako lenye alama inayoonekana"}
-                            </p>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs sm:text-sm">
+                            {language === "en" ? "Storefront Photo" : "Picha ya Duka"}
+                          </Label>
+                          <div className="border-2 border-dashed rounded-lg p-3 text-center">
+                            <Upload className="h-6 w-6 mx-auto mb-1 text-muted-foreground" />
                             <Input
                               type="file"
                               accept="image/*"
@@ -521,26 +492,23 @@ export default function SignUpPage() {
                               id="storefront-photo-upload"
                             />
                             <Label htmlFor="storefront-photo-upload" className="cursor-pointer">
-                              <Button type="button" variant="outline" size="sm" asChild>
+                              <Button type="button" variant="outline" size="sm" asChild className="text-xs">
                                 <span>
                                   {formData.storefrontPhoto 
-                                    ? (language === "en" ? `Photo: ${formData.storefrontPhoto.name}` : `Picha: ${formData.storefrontPhoto.name}`)
-                                    : (language === "en" ? "Choose Photo (Max 5MB)" : "Chagua Picha (Max 5MB)")}
+                                    ? formData.storefrontPhoto.name.substring(0, 20) + "..."
+                                    : (language === "en" ? "Choose Photo" : "Chagua Picha")}
                                 </span>
                               </Button>
                             </Label>
                           </div>
                         </div>
 
-                        <div className="space-y-2">
-                          <Label>{language === "en" ? "Business License or TIN Certificate (Optional)" : "Leseni ya Biashara au Cheti cha TIN (Si lazima)"}</Label>
-                          <div className="border-2 border-dashed rounded-lg p-4 text-center">
-                            <FileText className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                            <p className="text-sm text-muted-foreground mb-2">
-                              {language === "en" 
-                                ? "Upload business license or TIN certificate for faster verification"
-                                : "Pakia leseni ya biashara au cheti cha TIN kwa uthibitisho wa haraka"}
-                            </p>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs sm:text-sm">
+                            {language === "en" ? "Business License (Optional)" : "Leseni (Si lazima)"}
+                          </Label>
+                          <div className="border-2 border-dashed rounded-lg p-3 text-center">
+                            <FileText className="h-6 w-6 mx-auto mb-1 text-muted-foreground" />
                             <Input
                               type="file"
                               accept="image/*,.pdf"
@@ -558,41 +526,32 @@ export default function SignUpPage() {
                               id="business-license-upload"
                             />
                             <Label htmlFor="business-license-upload" className="cursor-pointer">
-                              <Button type="button" variant="outline" size="sm" asChild>
+                              <Button type="button" variant="outline" size="sm" asChild className="text-xs">
                                 <span>
                                   {formData.businessLicense 
-                                    ? (language === "en" ? `File: ${formData.businessLicense.name}` : `Faili: ${formData.businessLicense.name}`)
-                                    : (language === "en" ? "Choose File (Max 5MB)" : "Chagua Faili (Max 5MB)")}
+                                    ? formData.businessLicense.name.substring(0, 20) + "..."
+                                    : (language === "en" ? "Choose File" : "Chagua Faili")}
                                 </span>
                               </Button>
                             </Label>
                           </div>
                         </div>
-
-                        <Alert className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950">
-                          <AlertCircle className="h-4 w-4 text-yellow-600" />
-                          <AlertDescription className="text-yellow-800 dark:text-yellow-200 text-sm">
-                            {language === "en"
-                              ? "All shops are visible by default but require admin verification to display the 'Verified by Smart Fundi' badge and full credentials."
-                              : "Maduka yote yanaonekana kwa default lakini yanahitaji uthibitisho wa msimamizi kuonyesha alama ya 'Imethibitishwa na Smart Fundi' na vyeti kamili."}
-                          </AlertDescription>
-                        </Alert>
                       </div>
                     )}
 
-                    <Button type="submit" className="w-full" disabled={loading}>
+                    <Button type="submit" className="w-full h-10 sm:h-11 text-sm sm:text-base" disabled={loading}>
                       {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                       {language === "en" ? "Create Account" : "Fungua Akaunti"}
                     </Button>
                   </form>
 
-                  <div className="relative">
+                  <div className="relative my-3 sm:my-4">
                     <div className="absolute inset-0 flex items-center">
                       <span className="w-full border-t" />
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
                       <span className="bg-background px-2 text-muted-foreground">
-                        {language === "en" ? "Or continue with" : "Au endelea na"}
+                        {language === "en" ? "Or" : "Au"}
                       </span>
                     </div>
                   </div>
@@ -600,52 +559,41 @@ export default function SignUpPage() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full"
+                    className="w-full h-10 sm:h-11 text-sm"
                     onClick={handleGoogleSignUp}
                     disabled={loading}
                   >
                     <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-                      <path
-                        fill="currentColor"
-                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                      />
-                      <path
-                        fill="currentColor"
-                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                      />
-                      <path
-                        fill="currentColor"
-                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                      />
-                      <path
-                        fill="currentColor"
-                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                      />
+                      <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                      <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                      <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                      <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                     </svg>
-                    {language === "en" ? "Sign up with Google" : "Jisajili na Google"}
+                    {language === "en" ? "Google" : "Google"}
                   </Button>
                 </TabsContent>
 
-                <TabsContent value="magic" className="space-y-4">
+                <TabsContent value="magic" className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
                   {magicLinkSent ? (
                     <Alert className="border-green-200 bg-green-50 dark:bg-green-950">
-                      <CheckCircle2 className="h-4 w-4 text-green-600" />
-                      <AlertDescription className="text-green-800 dark:text-green-200">
+                      <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0" />
+                      <AlertDescription className="text-xs sm:text-sm text-green-800 dark:text-green-200 ml-2">
                         {language === "en"
-                          ? "Magic link sent! Check your email and click the link to complete registration."
-                          : "Kiungo cha ajabu kimetumwa! Angalia barua pepe yako na bonyeza kiungo ili kukamilisha usajili."}
+                          ? "Magic link sent! Check your email."
+                          : "Kiungo kimetumwa! Angalia barua pepe."}
                       </AlertDescription>
                     </Alert>
                   ) : (
-                    <form onSubmit={handleMagicLinkSubmit} className="space-y-4">
-                      <div className="space-y-3">
-                        <Label className="text-base font-semibold">
+                    <form onSubmit={handleMagicLinkSubmit} className="space-y-3 sm:space-y-4">
+                      {/* User Type for Magic Link */}
+                      <div className="space-y-2">
+                        <Label className="text-xs sm:text-sm font-semibold">
                           {language === "en" ? "I am a..." : "Mimi ni..."}
                         </Label>
                         <RadioGroup
                           value={magicUserType}
                           onValueChange={(value: "customer" | "fundi" | "shop") => setMagicUserType(value)}
-                          className="grid gap-3"
+                          className="grid grid-cols-3 gap-2"
                         >
                           {userTypes.map((type) => {
                             const Icon = type.icon;
@@ -658,13 +606,10 @@ export default function SignUpPage() {
                                 />
                                 <Label
                                   htmlFor={`magic-${type.value}`}
-                                  className="flex items-center gap-4 rounded-lg border-2 border-muted bg-background p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-blue-600 peer-data-[state=checked]:bg-blue-50 dark:peer-data-[state=checked]:bg-blue-950 cursor-pointer transition-all"
+                                  className="flex flex-col items-center gap-1 rounded-lg border-2 border-muted bg-background p-2 sm:p-3 hover:bg-accent peer-data-[state=checked]:border-blue-600 peer-data-[state=checked]:bg-blue-50 dark:peer-data-[state=checked]:bg-blue-950 cursor-pointer transition-all text-center"
                                 >
-                                  <Icon className="h-6 w-6 flex-shrink-0" />
-                                  <div className="flex-1">
-                                    <p className="font-medium">{type.label}</p>
-                                    <p className="text-sm text-muted-foreground">{type.description}</p>
-                                  </div>
+                                  <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+                                  <span className="text-xs sm:text-sm font-medium">{type.label}</span>
                                 </Label>
                               </div>
                             );
@@ -672,9 +617,9 @@ export default function SignUpPage() {
                         </RadioGroup>
                       </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor="magic-signup-email">
-                          {language === "en" ? "Email Address" : "Barua pepe"}
+                      <div className="space-y-1.5">
+                        <Label htmlFor="magic-signup-email" className="text-xs sm:text-sm">
+                          {language === "en" ? "Email" : "Barua pepe"}
                         </Label>
                         <div className="relative">
                           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -684,29 +629,29 @@ export default function SignUpPage() {
                             placeholder={language === "en" ? "your@email.com" : "email@yako.com"}
                             value={magicEmail}
                             onChange={(e) => setMagicEmail(e.target.value)}
-                            className="pl-10"
+                            className="pl-10 h-9 sm:h-11 text-sm"
                             required
                           />
                         </div>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-xs text-muted-foreground">
                           {language === "en"
-                            ? "We'll send you a magic link to create your account without a password"
-                            : "Tutakutumia kiungo cha ajabu cha kuunda akaunti bila nywila"}
+                            ? "We'll send a magic link to create your account"
+                            : "Tutakutumia kiungo cha kuunda akaunti"}
                         </p>
                       </div>
 
-                      <Button type="submit" className="w-full" disabled={loading}>
+                      <Button type="submit" className="w-full h-10 sm:h-11 text-sm" disabled={loading}>
                         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        {language === "en" ? "Send Magic Link" : "Tuma Kiungo cha Ajabu"}
+                        {language === "en" ? "Send Magic Link" : "Tuma Kiungo"}
                       </Button>
                     </form>
                   )}
                 </TabsContent>
               </Tabs>
 
-              <div className="mt-6 text-center text-sm">
+              <div className="mt-4 text-center text-xs sm:text-sm">
                 <span className="text-muted-foreground">
-                  {language === "en" ? "Already have an account? " : "Tayari una akaunti? "}
+                  {language === "en" ? "Have an account? " : "Una akaunti? "}
                 </span>
                 <Link href="/auth/signin" className="text-blue-600 hover:underline font-medium">
                   {language === "en" ? "Sign in" : "Ingia"}
@@ -714,12 +659,12 @@ export default function SignUpPage() {
               </div>
 
               {(formData.userType === "fundi" || formData.userType === "shop") && (
-                <Alert className="mt-4 border-blue-200 bg-blue-50 dark:bg-blue-950">
-                  <AlertCircle className="h-4 w-4 text-blue-600" />
-                  <AlertDescription className="text-blue-800 dark:text-blue-200 text-sm">
+                <Alert className="mt-3 sm:mt-4 border-blue-200 bg-blue-50 dark:bg-blue-950">
+                  <AlertCircle className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                  <AlertDescription className="text-xs text-blue-800 dark:text-blue-200 ml-2">
                     {language === "en"
-                      ? `${formData.userType === "fundi" ? "Fundi" : "Shop"} accounts require admin verification before appearing in search results. You'll receive an email once verified.`
-                      : `Akaunti za ${formData.userType === "fundi" ? "mafundi" : "maduka"} zinahitaji kuthibitishwa na msimamizi kabla ya kuonekana katika matokeo ya utafutaji. Utapokea barua pepe baada ya kuthibitishwa.`}
+                      ? `${formData.userType === "fundi" ? "Fundi" : "Shop"} accounts need admin verification.`
+                      : `Akaunti za ${formData.userType === "fundi" ? "mafundi" : "maduka"} zinahitaji uthibitisho.`}
                   </AlertDescription>
                 </Alert>
               )}

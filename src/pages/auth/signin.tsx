@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
@@ -32,8 +31,9 @@ export default function SignInPage() {
     try {
       await signIn(emailPassword.email, emailPassword.password);
       router.push("/");
-    } catch (err: any) {
-      setError(err.message || "Sign in failed. Please try again.");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Sign in failed. Please try again.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -45,8 +45,9 @@ export default function SignInPage() {
 
     try {
       await signInWithGoogle();
-    } catch (err: any) {
-      setError(err.message || "Google sign in failed. Please try again.");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Google sign in failed. Please try again.";
+      setError(errorMessage);
       setLoading(false);
     }
   };
@@ -60,8 +61,9 @@ export default function SignInPage() {
     try {
       await sendMagicLink(magicEmail);
       setMagicLinkSent(true);
-    } catch (err: any) {
-      setError(err.message || "Failed to send magic link. Please try again.");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to send magic link. Please try again.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -73,62 +75,63 @@ export default function SignInPage() {
     <>
       <Head>
         <title>{metaTitle}</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50 dark:from-gray-950 dark:to-gray-900 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50 dark:from-gray-950 dark:to-gray-900 flex items-center justify-center p-3 sm:p-4">
         <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            <Link href="/" className="inline-flex items-center gap-2 mb-4">
-              <div className="bg-blue-600 p-3 rounded-lg">
-                <Wrench className="h-8 w-8 text-white" />
+          {/* Logo Section - Mobile Optimized */}
+          <div className="text-center mb-6 sm:mb-8">
+            <Link href="/" className="inline-flex items-center gap-2 mb-3 sm:mb-4">
+              <div className="bg-blue-600 p-2 sm:p-3 rounded-lg">
+                <Wrench className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
               </div>
-              <span className="font-bold text-2xl">
+              <span className="font-bold text-xl sm:text-2xl">
                 <span className="text-blue-600">SMART</span>{" "}
                 <span className="text-orange-500">FUNDI</span>
               </span>
             </Link>
-            <h1 className="text-3xl font-bold mt-4">
+            <h1 className="text-2xl sm:text-3xl font-bold mt-3 sm:mt-4">
               {language === "en" ? "Welcome Back" : "Karibu Tena"}
             </h1>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2">
               {language === "en" ? "Sign in to your account" : "Ingia kwenye akaunti yako"}
             </p>
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>
+          <Card className="shadow-lg border-0 sm:border">
+            <CardHeader className="px-4 sm:px-6 pb-2 sm:pb-4">
+              <CardTitle className="text-lg sm:text-xl">
                 {language === "en" ? "Sign In" : "Ingia"}
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-xs sm:text-sm">
                 {language === "en" 
                   ? "Choose your preferred sign in method" 
                   : "Chagua njia unayopendelea ya kuingia"}
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-4 sm:px-6">
               {error && (
-                <Alert variant="destructive" className="mb-4">
+                <Alert variant="destructive" className="mb-4 text-sm">
                   <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
+                  <AlertDescription className="text-xs sm:text-sm">{error}</AlertDescription>
                 </Alert>
               )}
 
               <Tabs defaultValue="email" className="space-y-4">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="email">
+                <TabsList className="grid w-full grid-cols-2 h-10 sm:h-11">
+                  <TabsTrigger value="email" className="text-xs sm:text-sm">
                     {language === "en" ? "Email" : "Barua pepe"}
                   </TabsTrigger>
-                  <TabsTrigger value="magic">
+                  <TabsTrigger value="magic" className="text-xs sm:text-sm">
                     {language === "en" ? "Magic Link" : "Kiungo cha Ajabu"}
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="email" className="space-y-4">
-                  <form onSubmit={handleEmailPasswordSignIn} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="email">
+                <TabsContent value="email" className="space-y-3 sm:space-y-4">
+                  <form onSubmit={handleEmailPasswordSignIn} className="space-y-3 sm:space-y-4">
+                    <div className="space-y-1.5 sm:space-y-2">
+                      <Label htmlFor="email" className="text-sm">
                         {language === "en" ? "Email" : "Barua pepe"}
                       </Label>
                       <div className="relative">
@@ -139,14 +142,14 @@ export default function SignInPage() {
                           placeholder={language === "en" ? "your@email.com" : "email@yako.com"}
                           value={emailPassword.email}
                           onChange={(e) => setEmailPassword({ ...emailPassword, email: e.target.value })}
-                          className="pl-10"
+                          className="pl-10 h-10 sm:h-11 text-sm sm:text-base"
                           required
                         />
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="password">
+                    <div className="space-y-1.5 sm:space-y-2">
+                      <Label htmlFor="password" className="text-sm">
                         {language === "en" ? "Password" : "Nywila"}
                       </Label>
                       <div className="relative">
@@ -157,19 +160,19 @@ export default function SignInPage() {
                           placeholder={language === "en" ? "Enter your password" : "Weka nywila yako"}
                           value={emailPassword.password}
                           onChange={(e) => setEmailPassword({ ...emailPassword, password: e.target.value })}
-                          className="pl-10"
+                          className="pl-10 h-10 sm:h-11 text-sm sm:text-base"
                           required
                         />
                       </div>
                     </div>
 
-                    <Button type="submit" className="w-full" disabled={loading}>
+                    <Button type="submit" className="w-full h-10 sm:h-11 text-sm sm:text-base" disabled={loading}>
                       {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                       {language === "en" ? "Sign In" : "Ingia"}
                     </Button>
                   </form>
 
-                  <div className="relative">
+                  <div className="relative my-4">
                     <div className="absolute inset-0 flex items-center">
                       <span className="w-full border-t" />
                     </div>
@@ -183,7 +186,7 @@ export default function SignInPage() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full"
+                    className="w-full h-10 sm:h-11 text-sm sm:text-base"
                     onClick={handleGoogleSignIn}
                     disabled={loading}
                   >
@@ -209,20 +212,20 @@ export default function SignInPage() {
                   </Button>
                 </TabsContent>
 
-                <TabsContent value="magic" className="space-y-4">
+                <TabsContent value="magic" className="space-y-3 sm:space-y-4">
                   {magicLinkSent ? (
                     <Alert className="border-green-200 bg-green-50 dark:bg-green-950">
                       <CheckCircle2 className="h-4 w-4 text-green-600" />
-                      <AlertDescription className="text-green-800 dark:text-green-200">
+                      <AlertDescription className="text-xs sm:text-sm text-green-800 dark:text-green-200">
                         {language === "en"
                           ? "Magic link sent! Check your email and click the link to sign in."
                           : "Kiungo cha ajabu kimetumwa! Angalia barua pepe yako na bonyeza kiungo ili kuingia."}
                       </AlertDescription>
                     </Alert>
                   ) : (
-                    <form onSubmit={handleMagicLinkSubmit} className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="magic-email">
+                    <form onSubmit={handleMagicLinkSubmit} className="space-y-3 sm:space-y-4">
+                      <div className="space-y-1.5 sm:space-y-2">
+                        <Label htmlFor="magic-email" className="text-sm">
                           {language === "en" ? "Email Address" : "Barua pepe"}
                         </Label>
                         <div className="relative">
@@ -233,18 +236,18 @@ export default function SignInPage() {
                             placeholder={language === "en" ? "your@email.com" : "email@yako.com"}
                             value={magicEmail}
                             onChange={(e) => setMagicEmail(e.target.value)}
-                            className="pl-10"
+                            className="pl-10 h-10 sm:h-11 text-sm sm:text-base"
                             required
                           />
                         </div>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-xs sm:text-sm text-muted-foreground">
                           {language === "en"
                             ? "We'll send you a magic link to sign in without a password"
                             : "Tutakutumia kiungo cha ajabu cha kuingia bila nywila"}
                         </p>
                       </div>
 
-                      <Button type="submit" className="w-full" disabled={loading}>
+                      <Button type="submit" className="w-full h-10 sm:h-11 text-sm sm:text-base" disabled={loading}>
                         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         {language === "en" ? "Send Magic Link" : "Tuma Kiungo cha Ajabu"}
                       </Button>
@@ -253,7 +256,7 @@ export default function SignInPage() {
                 </TabsContent>
               </Tabs>
 
-              <div className="mt-6 text-center text-sm">
+              <div className="mt-4 sm:mt-6 text-center text-xs sm:text-sm">
                 <span className="text-muted-foreground">
                   {language === "en" ? "Don't have an account? " : "Huna akaunti? "}
                 </span>
