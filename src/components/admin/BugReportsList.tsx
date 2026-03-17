@@ -1,123 +1,153 @@
-
 import { useState } from "react";
-import { BugReport, formatDate } from "@/lib/adminData";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertCircle, CheckCircle2, Clock } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { Bug, CheckCircle, Clock, AlertTriangle, Eye, Trash2 } from "lucide-react";
 
-interface BugReportsListProps {
-  reports: BugReport[];
-  onResolve: (bugId: string) => void;
+interface BugReport {
+  id: string;
+  title: string;
+  description: string;
+  reporter: string;
+  status: "open" | "in_progress" | "resolved";
+  priority: "low" | "medium" | "high" | "critical";
+  createdAt: string;
+  category: string;
 }
 
-export function BugReportsList({ reports, onResolve }: BugReportsListProps) {
-  const [filter, setFilter] = useState<"all" | "open" | "in-progress" | "resolved">("all");
+interface BugReportsListProps {
+  reports?: BugReport[];
+  onResolve?: (id: string) => void;
+  onDelete?: (id: string) => void;
+}
 
-  const filteredReports = filter === "all" 
-    ? reports 
-    : reports.filter(r => r.status === filter);
+export function BugReportsList({ reports, onResolve, onDelete }: BugReportsListProps) {
+  const { language } = useLanguage();
+  const [filter, setFilter] = useState<"all" | "open" | "in_progress" | "resolved">("all");
 
-  const getPriorityColor = (priority: string) => {
-    switch(priority) {
-      case "high": return "destructive";
-      case "medium": return "default";
-      case "low": return "secondary";
-      default: return "default";
+  const defaultReports: BugReport[] = [
+    {
+      id: "1",
+      title: "Payment confirmation not showing",
+      description: "After M-Pesa payment, confirmation message doesn't appear",
+      reporter: "John Makamba",
+      status: "open",
+      priority: "high",
+      createdAt: "2026-03-16",
+      category: "Payments"
+    },
+    {
+      id: "2",
+      title: "Profile photo upload fails on slow connection",
+      description: "When uploading profile photo on 3G, the upload times out",
+      reporter: "Maria Joseph",
+      status: "in_progress",
+      priority: "medium",
+      createdAt: "2026-03-15",
+      category: "Upload"
+    },
+    {
+      id: "3",
+      title: "Search results not updating",
+      description: "City filter in search doesn't work correctly",
+      reporter: "Grace Mwita",
+      status: "resolved",
+      priority: "low",
+      createdAt: "2026-03-14",
+      category: "Search"
     }
+  ];
+
+  const bugReports = reports || defaultReports;
+  const filteredReports = filter === "all" ? bugReports : bugReports.filter(r => r.status === filter);
+
+  const getStatusBadge = (status: BugReport["status"]) => {
+    const config = {
+      open: { variant: "destructive" as const, icon: AlertTriangle, label: language === "sw" ? "Wazi" : "Open" },
+      in_progress: { variant: "secondary" as const, icon: Clock, label: language === "sw" ? "Inashughulikiwa" : "In Progress" },
+      resolved: { variant: "default" as const, icon: CheckCircle, label: language === "sw" ? "Imetatuliwa" : "Resolved" }
+    };
+    const { variant, icon: Icon, label } = config[status];
+    return (
+      <Badge variant={variant} className="flex items-center gap-1">
+        <Icon className="w-3 h-3" />
+        {label}
+      </Badge>
+    );
   };
 
-  const getStatusIcon = (status: string) => {
-    switch(status) {
-      case "resolved": return <CheckCircle2 className="h-4 w-4 text-green-600" />;
-      case "in-progress": return <Clock className="h-4 w-4 text-yellow-600" />;
-      default: return <AlertCircle className="h-4 w-4 text-red-600" />;
-    }
+  const getPriorityColor = (priority: BugReport["priority"]) => {
+    const colors = {
+      low: "text-green-600",
+      medium: "text-yellow-600",
+      high: "text-orange-600",
+      critical: "text-red-600"
+    };
+    return colors[priority];
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex gap-2 flex-wrap">
-        <Button
-          variant={filter === "all" ? "default" : "outline"}
-          size="sm"
-          onClick={() => setFilter("all")}
-        >
-          All ({reports.length})
-        </Button>
-        <Button
-          variant={filter === "open" ? "default" : "outline"}
-          size="sm"
-          onClick={() => setFilter("open")}
-        >
-          Open ({reports.filter(r => r.status === "open").length})
-        </Button>
-        <Button
-          variant={filter === "in-progress" ? "default" : "outline"}
-          size="sm"
-          onClick={() => setFilter("in-progress")}
-        >
-          In Progress ({reports.filter(r => r.status === "in-progress").length})
-        </Button>
-        <Button
-          variant={filter === "resolved" ? "default" : "outline"}
-          size="sm"
-          onClick={() => setFilter("resolved")}
-        >
-          Resolved ({reports.filter(r => r.status === "resolved").length})
-        </Button>
-      </div>
-
-      <div className="space-y-3">
-        {filteredReports.map((report) => (
-          <Card key={report.id} className="overflow-hidden">
-            <CardHeader className="pb-3">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 space-y-1">
-                  <div className="flex items-center gap-2">
-                    {getStatusIcon(report.status)}
-                    <CardTitle className="text-base">{report.title}</CardTitle>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <span>{report.userName}</span>
-                    <span>•</span>
-                    <span>{formatDate(report.createdAt)}</span>
-                  </div>
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="flex items-center justify-between">
+          <span className="flex items-center gap-2">
+            <Bug className="w-5 h-5 text-red-500" />
+            {language === "sw" ? "Ripoti za Hitilafu" : "Bug Reports"}
+          </span>
+          <Badge variant="outline">{bugReports.filter(r => r.status === "open").length} {language === "sw" ? "wazi" : "open"}</Badge>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex gap-2 mb-4">
+          {(["all", "open", "in_progress", "resolved"] as const).map((f) => (
+            <Button
+              key={f}
+              variant={filter === f ? "default" : "outline"}
+              size="sm"
+              onClick={() => setFilter(f)}
+            >
+              {f === "all" ? (language === "sw" ? "Zote" : "All") :
+               f === "open" ? (language === "sw" ? "Wazi" : "Open") :
+               f === "in_progress" ? (language === "sw" ? "Inashughulikiwa" : "In Progress") :
+               (language === "sw" ? "Imetatuliwa" : "Resolved")}
+            </Button>
+          ))}
+        </div>
+        <div className="space-y-3">
+          {filteredReports.map((report) => (
+            <div key={report.id} className="p-3 border rounded-lg">
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <div>
+                  <h4 className="font-medium">{report.title}</h4>
+                  <p className="text-sm text-muted-foreground">{report.description}</p>
+                </div>
+                {getStatusBadge(report.status)}
+              </div>
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <div className="flex items-center gap-3">
+                  <span className={`font-medium ${getPriorityColor(report.priority)}`}>
+                    {report.priority.toUpperCase()}
+                  </span>
+                  <span>{report.category}</span>
+                  <span>{report.reporter}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge variant={getPriorityColor(report.priority)}>
-                    {report.priority}
-                  </Badge>
-                  <Badge variant="outline">{report.category}</Badge>
+                  <span>{report.createdAt}</span>
+                  {report.status !== "resolved" && (
+                    <Button size="sm" variant="ghost" onClick={() => onResolve?.(report.id)}>
+                      <CheckCircle className="w-4 h-4" />
+                    </Button>
+                  )}
+                  <Button size="sm" variant="ghost" className="text-destructive" onClick={() => onDelete?.(report.id)}>
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <p className="text-sm text-muted-foreground">{report.description}</p>
-              {report.status !== "resolved" && (
-                <Button
-                  size="sm"
-                  onClick={() => onResolve(report.id)}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  Mark as Resolved
-                </Button>
-              )}
-              {report.status === "resolved" && report.resolvedAt && (
-                <div className="text-xs text-green-600">
-                  Resolved on {formatDate(report.resolvedAt)}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-
-        {filteredReports.length === 0 && (
-          <div className="text-center py-12 text-muted-foreground">
-            No {filter !== "all" ? filter : ""} bug reports found
-          </div>
-        )}
-      </div>
-    </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

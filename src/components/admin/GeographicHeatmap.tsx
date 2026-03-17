@@ -1,77 +1,63 @@
-
-import { GeographicData } from "@/lib/adminData";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { MapPin } from "lucide-react";
 
+interface CityData {
+  city: string;
+  users: number;
+  fundis: number;
+  shops: number;
+}
+
 interface GeographicHeatmapProps {
-  data: GeographicData[];
+  data?: CityData[];
 }
 
 export function GeographicHeatmap({ data }: GeographicHeatmapProps) {
-  const maxSignups = Math.max(...data.map(d => d.signups));
-  
-  const getHeatColor = (signups: number) => {
-    const intensity = signups / maxSignups;
-    if (intensity > 0.7) return "bg-blue-600";
-    if (intensity > 0.4) return "bg-blue-500";
-    if (intensity > 0.2) return "bg-blue-400";
-    return "bg-blue-300";
-  };
+  const { language } = useLanguage();
 
-  const getHeatSize = (signups: number) => {
-    const intensity = signups / maxSignups;
-    if (intensity > 0.7) return "h-16 w-16";
-    if (intensity > 0.4) return "h-12 w-12";
-    if (intensity > 0.2) return "h-10 w-10";
-    return "h-8 w-8";
-  };
+  const defaultData: CityData[] = [
+    { city: "Dar es Salaam", users: 2450, fundis: 180, shops: 28 },
+    { city: "Arusha", users: 680, fundis: 45, shops: 8 },
+    { city: "Mwanza", users: 520, fundis: 35, shops: 6 },
+    { city: "Dodoma", users: 380, fundis: 25, shops: 4 },
+    { city: "Mbeya", users: 290, fundis: 18, shops: 3 },
+    { city: "Morogoro", users: 220, fundis: 15, shops: 2 },
+  ];
 
-  const sortedData = [...data].sort((a, b) => b.signups - a.signups);
+  const chartData = data || defaultData;
+  const maxUsers = Math.max(...chartData.map(d => d.users));
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {sortedData.map((location) => (
-          <div
-            key={location.city}
-            className="flex items-center gap-4 p-4 bg-background border rounded-lg hover:bg-accent transition-colors"
-          >
-            <div className={`${getHeatColor(location.signups)} ${getHeatSize(location.signups)} rounded-full flex items-center justify-center transition-all`}>
-              <MapPin className="h-6 w-6 text-white" />
-            </div>
-            <div className="flex-1">
-              <h4 className="font-semibold text-lg">{location.city}</h4>
-              <p className="text-sm text-muted-foreground">
-                {location.signups.toLocaleString()} sign-ups
-              </p>
-            </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-blue-600">
-                {((location.signups / data.reduce((sum, d) => sum + d.signups, 0)) * 100).toFixed(1)}%
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-lg flex items-center gap-2">
+          <MapPin className="w-5 h-5 text-red-500" />
+          {language === "sw" ? "Usambazaji wa Kijiografia" : "Geographic Distribution"}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-3">
+          {chartData.map((city, index) => (
+            <div key={index} className="space-y-1">
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-medium">{city.city}</span>
+                <span className="text-muted-foreground">{city.users.toLocaleString()} {language === "sw" ? "watumiaji" : "users"}</span>
               </div>
-              <p className="text-xs text-muted-foreground">of total</p>
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-blue-500 to-green-500 rounded-full transition-all duration-500"
+                  style={{ width: `${(city.users / maxUsers) * 100}%` }}
+                />
+              </div>
+              <div className="flex gap-4 text-xs text-muted-foreground">
+                <span>{city.fundis} {language === "sw" ? "mafundi" : "fundis"}</span>
+                <span>{city.shops} {language === "sw" ? "maduka" : "shops"}</span>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="flex items-center gap-4 justify-center pt-4 border-t">
-        <div className="flex items-center gap-2">
-          <div className="h-4 w-4 rounded bg-blue-600"></div>
-          <span className="text-xs text-muted-foreground">High Activity</span>
+          ))}
         </div>
-        <div className="flex items-center gap-2">
-          <div className="h-4 w-4 rounded bg-blue-500"></div>
-          <span className="text-xs text-muted-foreground">Medium</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="h-4 w-4 rounded bg-blue-400"></div>
-          <span className="text-xs text-muted-foreground">Low</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="h-4 w-4 rounded bg-blue-300"></div>
-          <span className="text-xs text-muted-foreground">Very Low</span>
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
