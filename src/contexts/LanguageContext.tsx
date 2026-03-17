@@ -21,11 +21,29 @@ const translations: Record<string, Record<Language, string>> = {
   "nav.messages": { en: "Messages", sw: "Ujumbe" },
   "nav.howToPay": { en: "How to Pay", sw: "Jinsi ya Kulipa" },
   
-  // Bottom Navigation Tabs
+  // Bottom Navigation Tabs - Customer
   "nav.tab.home": { en: "Home", sw: "Nyumbani" },
   "nav.tab.search": { en: "Search", sw: "Tafuta" },
-  "nav.tab.events": { en: "Events", sw: "Matukio" },
+  "nav.tab.messages": { en: "Messages", sw: "Ujumbe" },
+  "nav.tab.ai": { en: "AI Assistant", sw: "Msaada wa AI" },
   "nav.tab.profile": { en: "Profile", sw: "Wasifu" },
+  
+  // Bottom Navigation Tabs - Fundi
+  "nav.tab.dashboard": { en: "Dashboard", sw: "Dashibodi" },
+  "nav.tab.jobs": { en: "Jobs", sw: "Kazi" },
+  "nav.tab.earnings": { en: "Earnings", sw: "Mapato" },
+  
+  // Bottom Navigation Tabs - Shop Owner
+  "nav.tab.products": { en: "Products", sw: "Bidhaa" },
+  "nav.tab.orders": { en: "Orders", sw: "Maagizo" },
+  
+  // Bottom Navigation Tabs - Admin
+  "nav.tab.users": { en: "Users", sw: "Watumiaji" },
+  "nav.tab.payments": { en: "Payments", sw: "Malipo" },
+  "nav.tab.reports": { en: "Reports", sw: "Ripoti" },
+  "nav.tab.settings": { en: "Settings", sw: "Mipangilio" },
+  
+  "nav.tab.events": { en: "Events", sw: "Matukio" },
   "nav.tab.login": { en: "Login", sw: "Ingia" },
   
   // Splash & Welcome
