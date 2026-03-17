@@ -281,7 +281,7 @@
    - Deep blue (#1A3C6E) for active state
    - 5 tabs, 20% width each
    - Fixed at bottom, 65px height
-   - Icons: 22px, centered above labels
+   - Icons: 24px inline SVGs, centered above labels
    ============================================ */
 
 .sf-bottom-nav {
@@ -320,7 +320,7 @@
   height: 100%;
   color: #FFFFFF;
   text-decoration: none;
-  gap: 2px;
+  gap: 4px;
   padding: 8px 4px;
 }
 
@@ -328,7 +328,6 @@
   color: #1A3C6E;
 }
 
-.sf-nav-link.sf-nav-active .sf-nav-icon,
 .sf-nav-link.sf-nav-active .sf-nav-label {
   color: #1A3C6E;
 }
@@ -337,13 +336,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: inherit;
+  width: 24px;
+  height: 24px;
 }
 
-.sf-nav-icon ion-icon {
-  font-size: 22px;
-  width: 22px;
-  height: 22px;
+.sf-nav-icon svg {
+  width: 24px;
+  height: 24px;
 }
 
 .sf-nav-label {
@@ -356,10 +355,10 @@
 
 /* Responsive adjustments for smaller screens */
 @media (max-width: 360px) {
-  .sf-nav-icon ion-icon {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
+  .sf-nav-icon,
+  .sf-nav-icon svg {
+    width: 22px;
+    height: 22px;
   }
   
   .sf-nav-label {
@@ -370,17 +369,15 @@
 /* ============================================
    FLOATING ELEMENTS - PREVENT NAV OVERLAP
    ============================================
-   Ensure floating buttons/avatars don't overlap
-   the bottom navigation bar
+   Move floating buttons ABOVE the nav bar
    ============================================ */
 
 .floating-avatar,
-.floating-button,
-[class*="fixed"][class*="bottom"] {
+.floating-button {
   bottom: calc(65px + 16px + env(safe-area-inset-bottom, 0px)) !important;
 }
 
-/* Exclude the navigation bar itself from the rule */
+/* Ensure nav bar stays at true bottom */
 .sf-bottom-nav {
   bottom: 0 !important;
 }

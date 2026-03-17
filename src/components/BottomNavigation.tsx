@@ -15,23 +15,162 @@ import { useRouter } from "next/router";
  * Orange background (#F5A623)
  * White icons/labels, deep blue (#1A3C6E) when active
  * Bar height: 65px
- * Icons: 22px, centered above labels
+ * Icons: 24px inline SVGs
  */
 
 interface NavTab {
   id: string;
   label: string;
-  icon: string;
   href: string;
 }
 
 const tabs: NavTab[] = [
-  { id: "home", label: "Nyumbani", icon: "home-outline", href: "/" },
-  { id: "search", label: "Tafuta", icon: "search-outline", href: "/search" },
-  { id: "events", label: "Matukio", icon: "calendar-outline", href: "/events" },
-  { id: "profile", label: "Wasifu", icon: "person-outline", href: "/profile" },
-  { id: "login", label: "Ingia", icon: "log-in-outline", href: "/auth/signin" },
+  { id: "home", label: "Nyumbani", href: "/" },
+  { id: "search", label: "Tafuta", href: "/search" },
+  { id: "events", label: "Matukio", href: "/events" },
+  { id: "profile", label: "Wasifu", href: "/profile" },
+  { id: "login", label: "Ingia", href: "/auth/signin" },
 ];
+
+// Inline SVG icons - 24x24px
+function HomeIcon({ color }: { color: string }) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path 
+        d="M3 9.5L12 3L21 9.5V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9.5Z" 
+        stroke={color} 
+        strokeWidth="2" 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+      />
+      <path 
+        d="M9 22V12H15V22" 
+        stroke={color} 
+        strokeWidth="2" 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function SearchIcon({ color }: { color: string }) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle 
+        cx="11" 
+        cy="11" 
+        r="7" 
+        stroke={color} 
+        strokeWidth="2"
+      />
+      <path 
+        d="M21 21L16.5 16.5" 
+        stroke={color} 
+        strokeWidth="2" 
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function CalendarIcon({ color }: { color: string }) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect 
+        x="3" 
+        y="4" 
+        width="18" 
+        height="18" 
+        rx="2" 
+        stroke={color} 
+        strokeWidth="2"
+      />
+      <path 
+        d="M16 2V6" 
+        stroke={color} 
+        strokeWidth="2" 
+        strokeLinecap="round"
+      />
+      <path 
+        d="M8 2V6" 
+        stroke={color} 
+        strokeWidth="2" 
+        strokeLinecap="round"
+      />
+      <path 
+        d="M3 10H21" 
+        stroke={color} 
+        strokeWidth="2"
+      />
+    </svg>
+  );
+}
+
+function PersonIcon({ color }: { color: string }) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle 
+        cx="12" 
+        cy="7" 
+        r="4" 
+        stroke={color} 
+        strokeWidth="2"
+      />
+      <path 
+        d="M4 21V19C4 16.7909 5.79086 15 8 15H16C18.2091 15 20 16.7909 20 19V21" 
+        stroke={color} 
+        strokeWidth="2" 
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function LoginIcon({ color }: { color: string }) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path 
+        d="M15 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H15" 
+        stroke={color} 
+        strokeWidth="2" 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+      />
+      <path 
+        d="M10 17L15 12L10 7" 
+        stroke={color} 
+        strokeWidth="2" 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+      />
+      <path 
+        d="M15 12H3" 
+        stroke={color} 
+        strokeWidth="2" 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function getIcon(tabId: string, color: string) {
+  switch (tabId) {
+    case "home":
+      return <HomeIcon color={color} />;
+    case "search":
+      return <SearchIcon color={color} />;
+    case "events":
+      return <CalendarIcon color={color} />;
+    case "profile":
+      return <PersonIcon color={color} />;
+    case "login":
+      return <LoginIcon color={color} />;
+    default:
+      return <HomeIcon color={color} />;
+  }
+}
 
 export function BottomNavigation() {
   const [mounted, setMounted] = useState(false);
@@ -68,6 +207,7 @@ export function BottomNavigation() {
       <ul className="sf-nav-list">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
+          const iconColor = isActive ? "#1A3C6E" : "#FFFFFF";
           
           return (
             <li key={tab.id} className="sf-nav-item">
@@ -77,7 +217,7 @@ export function BottomNavigation() {
                 aria-current={isActive ? "page" : undefined}
               >
                 <span className="sf-nav-icon">
-                  <ion-icon name={tab.icon}></ion-icon>
+                  {getIcon(tab.id, iconColor)}
                 </span>
                 <span className="sf-nav-label">{tab.label}</span>
               </Link>
