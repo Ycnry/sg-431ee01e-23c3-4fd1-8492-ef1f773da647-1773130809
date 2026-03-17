@@ -13,7 +13,8 @@ import { useRouter } from "next/router";
  * - Ingia (login icon)
  * 
  * Orange background (#F5A623)
- * White icons/labels, deep blue (#1A3C6E) when active
+ * White icons/labels for inactive tabs
+ * Active tab: icon lifts up into deep blue (#1A3C6E) circle bubble
  * Bar height: 65px
  * Icons: 24px inline SVGs
  */
@@ -22,14 +23,15 @@ interface NavTab {
   id: string;
   label: string;
   href: string;
+  index: number;
 }
 
 const tabs: NavTab[] = [
-  { id: "home", label: "Nyumbani", href: "/" },
-  { id: "search", label: "Tafuta", href: "/search" },
-  { id: "events", label: "Matukio", href: "/events" },
-  { id: "profile", label: "Wasifu", href: "/profile" },
-  { id: "login", label: "Ingia", href: "/auth/signin" },
+  { id: "home", label: "Nyumbani", href: "/", index: 0 },
+  { id: "search", label: "Tafuta", href: "/search", index: 1 },
+  { id: "events", label: "Matukio", href: "/events", index: 2 },
+  { id: "profile", label: "Wasifu", href: "/profile", index: 3 },
+  { id: "login", label: "Ingia", href: "/auth/signin", index: 4 },
 ];
 
 // Inline SVG icons - 24x24px
@@ -193,6 +195,7 @@ export function BottomNavigation() {
   };
 
   const activeTab = getActiveTab();
+  const activeIndex = tabs.findIndex(tab => tab.id === activeTab);
 
   if (!mounted) {
     return null;
@@ -204,10 +207,22 @@ export function BottomNavigation() {
       role="navigation"
       aria-label="Main navigation"
     >
+      {/* Floating bubble indicator */}
+      <div 
+        className="sf-bubble"
+        style={{
+          transform: `translateX(calc(20vw * ${activeIndex} + 10vw - 35px))`,
+        }}
+      >
+        <div className="sf-bubble-circle">
+          {getIcon(activeTab, "#FFFFFF")}
+        </div>
+      </div>
+
       <ul className="sf-nav-list">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
-          const iconColor = isActive ? "#1A3C6E" : "#FFFFFF";
+          const iconColor = "#FFFFFF";
           
           return (
             <li key={tab.id} className="sf-nav-item">
@@ -216,7 +231,7 @@ export function BottomNavigation() {
                 className={`sf-nav-link ${isActive ? "sf-nav-active" : ""}`}
                 aria-current={isActive ? "page" : undefined}
               >
-                <span className="sf-nav-icon">
+                <span className={`sf-nav-icon ${isActive ? "sf-nav-icon-hidden" : ""}`}>
                   {getIcon(tab.id, iconColor)}
                 </span>
                 <span className="sf-nav-label">{tab.label}</span>
