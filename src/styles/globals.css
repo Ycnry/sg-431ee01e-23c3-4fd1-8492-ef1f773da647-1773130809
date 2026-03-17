@@ -142,6 +142,7 @@
     overflow-x: hidden;
     min-height: 100vh;
     min-height: 100dvh;
+    padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px));
   }
   
   /* Prevent text selection on buttons for better mobile UX */

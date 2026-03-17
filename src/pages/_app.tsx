@@ -6,6 +6,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "@/components/ui/toaster";
 import { initializeMockSubscriptions, initializeSampleMediaMessages } from "@/lib/mockData";
 import { useEffect } from "react";
+import { BottomNavigation } from "@/components/BottomNavigation";
 
 export default function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
@@ -18,6 +19,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <LanguageProvider>
         <AuthProvider>
           <Component {...pageProps} />
+          <BottomNavigation />
           <Toaster />
         </AuthProvider>
       </LanguageProvider>
