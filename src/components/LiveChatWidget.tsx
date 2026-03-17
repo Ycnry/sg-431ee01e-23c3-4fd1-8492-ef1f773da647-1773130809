@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { MessageCircle, X, Send, Minimize2, Phone } from "lucide-react";
+import { X, Send, Minimize2, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -16,6 +16,25 @@ interface ChatMessage {
 
 interface LiveChatWidgetProps {
   position?: "bottom-right" | "bottom-left";
+}
+
+// Custom MessageCircle SVG icon to avoid any icon library issues
+function MessageCircleIcon({ className }: { className?: string }) {
+  return (
+    <svg 
+      className={className}
+      width="24" 
+      height="24" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+    >
+      <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+    </svg>
+  );
 }
 
 export function LiveChatWidget({ position = "bottom-right" }: LiveChatWidgetProps) {
@@ -163,20 +182,30 @@ export function LiveChatWidget({ position = "bottom-right" }: LiveChatWidgetProp
     setTimeout(() => handleSendMessage(), 100);
   };
 
-  const positionClasses = position === "bottom-right" 
-    ? "right-3 sm:right-4" 
-    : "left-3 sm:left-4";
+  // FIXED: Position classes - always on the RIGHT side, never left
+  // This prevents overlap with the Nyumbani tab on the left
+  const positionClasses = "right-4";
 
-  // Floating button when closed
+  // FIXED: Bottom positioning - always 96px (24 * 4) above viewport bottom
+  // This ensures it's always above the 65px navigation bar with safe spacing
+  const bottomPosition = "bottom-24"; // 96px - well above the 65px nav bar
+
+  // Floating button when chat is closed
   if (!isOpen) {
     return (
-      <div className={`fixed bottom-20 sm:bottom-4 ${positionClasses} z-40`}>
+      <div 
+        className={`fixed ${bottomPosition} ${positionClasses} z-40`}
+        style={{ 
+          bottom: "calc(65px + 24px + env(safe-area-inset-bottom))" 
+        }}
+      >
         <Button
           size="lg"
           onClick={() => setIsOpen(true)}
-          className="rounded-full h-12 w-12 sm:h-14 sm:w-14 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 relative"
+          className="rounded-full h-14 w-14 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 relative"
+          aria-label={t("title")}
         >
-          <MessageCircle className="h-5 w-5 sm:h-6 sm:w-6" />
+          <MessageCircleIcon className="h-6 w-6" />
           {unreadCount > 0 && (
             <Badge className="absolute -top-1 -right-1 bg-red-500 text-white px-1.5 text-xs animate-pulse">
               {unreadCount}
@@ -187,18 +216,24 @@ export function LiveChatWidget({ position = "bottom-right" }: LiveChatWidgetProp
     );
   }
 
+  // Chat window when open
   return (
-    <div className={`fixed bottom-20 sm:bottom-4 ${positionClasses} z-40`}>
+    <div 
+      className={`fixed ${positionClasses} z-40`}
+      style={{ 
+        bottom: "calc(65px + 16px + env(safe-area-inset-bottom))" 
+      }}
+    >
       <Card
-        className={`w-[calc(100vw-24px)] sm:w-80 md:w-96 shadow-2xl border transition-all duration-300 ${
-          isMinimized ? "h-14" : "h-[60vh] sm:h-[500px] max-h-[70vh]"
+        className={`w-[calc(100vw-32px)] sm:w-80 md:w-96 shadow-2xl border transition-all duration-300 ${
+          isMinimized ? "h-14" : "h-[50vh] sm:h-[450px] max-h-[60vh]"
         }`}
       >
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-3 rounded-t-lg flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-2 min-w-0">
             <div className="relative flex-shrink-0">
-              <MessageCircle className="h-5 w-5" />
+              <MessageCircleIcon className="h-5 w-5" />
               <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 bg-green-400 rounded-full" />
             </div>
             <div className="min-w-0">
@@ -212,6 +247,7 @@ export function LiveChatWidget({ position = "bottom-right" }: LiveChatWidgetProp
               size="icon"
               onClick={() => setIsMinimized(!isMinimized)}
               className="h-7 w-7 sm:h-8 sm:w-8 text-white hover:bg-white/20"
+              aria-label={t("minimize")}
             >
               <Minimize2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
@@ -220,6 +256,7 @@ export function LiveChatWidget({ position = "bottom-right" }: LiveChatWidgetProp
               size="icon"
               onClick={() => setIsOpen(false)}
               className="h-7 w-7 sm:h-8 sm:w-8 text-white hover:bg-white/20"
+              aria-label={t("close")}
             >
               <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
@@ -320,6 +357,7 @@ export function LiveChatWidget({ position = "bottom-right" }: LiveChatWidgetProp
                   disabled={!inputMessage.trim()}
                   size="icon"
                   className="bg-blue-600 hover:bg-blue-700 h-9 w-9 flex-shrink-0"
+                  aria-label={t("send")}
                 >
                   <Send className="h-4 w-4" />
                 </Button>
