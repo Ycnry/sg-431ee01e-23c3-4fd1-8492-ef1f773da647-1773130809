@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type TabKey = "home" | "search" | "events" | "profile" | "login";
 
@@ -8,15 +9,15 @@ interface NavTab {
   key: TabKey;
   href: string;
   icon: string;
-  label: string;
+  labelKey: string;
 }
 
 const tabs: NavTab[] = [
-  { key: "home", href: "/", icon: "home-outline", label: "Nyumbani" },
-  { key: "search", href: "/search", icon: "search-outline", label: "Tafuta" },
-  { key: "events", href: "/events", icon: "calendar-outline", label: "Matukio" },
-  { key: "profile", href: "/profile", icon: "person-outline", label: "Wasifu" },
-  { key: "login", href: "/auth/signin", icon: "log-in-outline", label: "Ingia" },
+  { key: "home", href: "/", icon: "home-outline", labelKey: "nav.tab.home" },
+  { key: "search", href: "/search", icon: "search-outline", labelKey: "nav.tab.search" },
+  { key: "events", href: "/events", icon: "calendar-outline", labelKey: "nav.tab.events" },
+  { key: "profile", href: "/profile", icon: "person-outline", labelKey: "nav.tab.profile" },
+  { key: "login", href: "/auth/signin", icon: "log-in-outline", labelKey: "nav.tab.login" },
 ];
 
 function isActivePath(pathname: string, href: string) {
@@ -46,9 +47,11 @@ function ensureIoniconsLoaded() {
 
 export function BottomNavigation() {
   const router = useRouter();
+  const { t } = useLanguage();
+  const [mounted, setMounted] = useState(false);
 
   const activeIndex = useMemo(() => {
-    const found = tabs.findIndex((t) => isActivePath(router.pathname, t.href));
+    const found = tabs.findIndex((tab) => isActivePath(router.pathname, tab.href));
     return found < 0 ? 0 : found;
   }, [router.pathname]);
 
@@ -56,6 +59,7 @@ export function BottomNavigation() {
 
   useEffect(() => {
     ensureIoniconsLoaded();
+    setMounted(true);
   }, []);
 
   useEffect(() => {
@@ -63,7 +67,15 @@ export function BottomNavigation() {
   }, [activeIndex]);
 
   return (
-    <nav className="navigation" aria-label="Primary">
+    <nav
+      className="navigation"
+      style={{
+        opacity: mounted ? 1 : 0,
+        pointerEvents: mounted ? "all" : "none",
+        transition: "opacity 0.3s ease",
+      }}
+      aria-label="Primary"
+    >
       <ul>
         {tabs.map((tab, idx) => {
           const isActive = idx === active;
@@ -80,7 +92,7 @@ export function BottomNavigation() {
                 <span className="icon" aria-hidden="true">
                   <ion-icon name={tab.icon} />
                 </span>
-                <span className="text">{tab.label}</span>
+                <span className="text">{t(tab.labelKey)}</span>
               </Link>
             </li>
           );

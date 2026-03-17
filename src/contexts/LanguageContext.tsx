@@ -21,6 +21,13 @@ const translations: Record<string, Record<Language, string>> = {
   "nav.messages": { en: "Messages", sw: "Ujumbe" },
   "nav.howToPay": { en: "How to Pay", sw: "Jinsi ya Kulipa" },
   
+  // Bottom Navigation Tabs
+  "nav.tab.home": { en: "Home", sw: "Nyumbani" },
+  "nav.tab.search": { en: "Search", sw: "Tafuta" },
+  "nav.tab.events": { en: "Events", sw: "Matukio" },
+  "nav.tab.profile": { en: "Profile", sw: "Wasifu" },
+  "nav.tab.login": { en: "Login", sw: "Ingia" },
+  
   // Splash & Welcome
   "splash.tagline": { en: "Connecting You to Skilled Technicians", sw: "Kukuunganisha na Mafundi Hodari" },
   "welcome.title": { en: "Welcome", sw: "Karibu" },
