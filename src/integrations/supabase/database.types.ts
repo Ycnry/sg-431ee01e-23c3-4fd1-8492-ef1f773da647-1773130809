@@ -434,14 +434,13 @@ export type Database = {
       log_validation_failure: {
         Args: {
           p_endpoint: string
-          p_error_message: string
-          p_input_data: Json
+          p_error_type: string
+          p_field_name: string
           p_ip_address: string
-          p_severity?: string
+          p_request_data?: Json
           p_user_id: string
-          p_validation_type: string
         }
-        Returns: string
+        Returns: undefined
       }
     }
     Enums: {

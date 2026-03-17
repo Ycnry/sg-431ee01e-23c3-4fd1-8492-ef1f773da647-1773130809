@@ -25,9 +25,12 @@ export const VODACOM_API_SECRET = process.env.VODACOM_API_SECRET || "";
 export const VODACOM_SHORTCODE = process.env.VODACOM_SHORTCODE || "";
 export const VODACOM_PASSKEY = process.env.VODACOM_PASSKEY || "";
 
-// Support
-export const SUPPORT_PHONE = process.env.SUPPORT_PHONE || "+255123456789";
+// Support - Default values (can be overridden via admin dashboard)
+export const DEFAULT_SUPPORT_PHONE = "+255123456789";
 export const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || "support@smartfundi.co.tz";
+
+// In-memory storage for support hotline (in production, use database)
+let currentSupportHotline: string = DEFAULT_SUPPORT_PHONE;
 
 // Rate Limiting Configuration (requests per window)
 export const RATE_LIMITS = {
@@ -117,6 +120,77 @@ export const FILE_LIMITS = {
     allowedTypes: ["application/pdf", "image/jpeg", "image/png"],
   },
 } as const;
+
+// =====================================================
+// SUPPORT HOTLINE FUNCTIONS
+// =====================================================
+
+/**
+ * Get the current support hotline number
+ * Returns the configured support phone number
+ */
+export function getSupportHotline(): string {
+  return currentSupportHotline || DEFAULT_SUPPORT_PHONE;
+}
+
+/**
+ * Update the support hotline number (admin only)
+ * In production, this should persist to database
+ */
+export function updateSupportHotline(newNumber: string): boolean {
+  // Validate Tanzanian phone format
+  const tanzanianPhoneRegex = /^\+255[67]\d{8}$/;
+  if (!tanzanianPhoneRegex.test(newNumber)) {
+    return false;
+  }
+  currentSupportHotline = newNumber;
+  return true;
+}
+
+/**
+ * Format a phone number for display
+ * Converts +255XXXXXXXXX to +255 XXX XXX XXX format
+ */
+export function formatPhoneNumber(phone: string): string {
+  if (!phone) return "";
+  
+  // Remove all non-digit characters except +
+  const cleaned = phone.replace(/[^\d+]/g, "");
+  
+  // Check if it's a Tanzanian number
+  if (cleaned.startsWith("+255") && cleaned.length === 13) {
+    const countryCode = cleaned.slice(0, 4); // +255
+    const part1 = cleaned.slice(4, 7);
+    const part2 = cleaned.slice(7, 10);
+    const part3 = cleaned.slice(10, 13);
+    return `${countryCode} ${part1} ${part2} ${part3}`;
+  }
+  
+  // Return as-is if not matching expected format
+  return phone;
+}
+
+/**
+ * Initiate a phone call to the support hotline
+ * Returns the tel: URL for the phone call
+ */
+export function callSupportHotline(): string {
+  const hotline = getSupportHotline();
+  return `tel:${hotline}`;
+}
+
+/**
+ * Get WhatsApp link for support
+ */
+export function getWhatsAppSupportLink(message?: string): string {
+  const hotline = getSupportHotline().replace("+", "");
+  const encodedMessage = message ? encodeURIComponent(message) : "";
+  return `https://wa.me/${hotline}${encodedMessage ? `?text=${encodedMessage}` : ""}`;
+}
+
+// =====================================================
+// UTILITY FUNCTIONS
+// =====================================================
 
 /**
  * Get environment variable with fallback

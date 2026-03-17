@@ -217,7 +217,7 @@ export default function AdminDashboardPage() {
   };
 
   const handleSaveHotline = () => {
-    const success = updateSupportHotline(supportHotline, adminName);
+    const success = updateSupportHotline(supportHotline);
     if (success) {
       setHotlineSaved(true);
       setTimeout(() => setHotlineSaved(false), 3000);
