@@ -13,6 +13,7 @@ export interface User {
   phone?: string;
   photo?: string;
   createdAt: string;
+  user_type?: "customer" | "fundi" | "shop" | "admin";
 }
 
 export interface Fundi extends Omit<User, "photo"> {
