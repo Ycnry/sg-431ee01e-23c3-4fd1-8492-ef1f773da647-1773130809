@@ -2,9 +2,10 @@
 // Types are generated from the Supabase database schema using the Supabase CLI.
  
 
-import type { Database as DB } from './database.types';
+import type { Database as DB, Json } from './database.types';
 
 export type Database = DB;
+export type { Json };
 
 // Re-export commonly used types for convenience
 export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row'];
