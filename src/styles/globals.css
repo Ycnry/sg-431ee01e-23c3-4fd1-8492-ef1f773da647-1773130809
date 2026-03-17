@@ -139,7 +139,7 @@
     overflow-x: hidden;
     min-height: 100vh;
     min-height: 100dvh;
-    padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)); /* PREVENT CONTENT OVERLAP */
+    padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)); /* PRESERVED: Content padding for nav bar */
   }
   
   /* Prevent text selection on buttons for better mobile UX */
@@ -230,197 +230,47 @@
   }
 }
 
-/* Magic Navigation Menu - Bottom Nav with Green Indicator */
-.magic-navigation {
+/* ============================================
+   BOTTOM NAVIGATION - RESET STATE
+   ============================================
+   All previous navigation styles have been removed.
+   Ready for fresh implementation.
+   
+   Mobile requirements preserved:
+   - Fixed at bottom (to be implemented)
+   - Works on 320px–430px screens
+   - Content has padding-bottom: 70px (see body styles above)
+   - No overflow, no horizontal scroll
+   ============================================ */
+
+.bottom-nav-reset {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   width: 100%;
   height: 70px;
-  background: #1E293B; /* SMART FUNDI DARK THEME - NOT GREEN/BLUE */
-  border-radius: 12px 12px 0 0;
-  box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.3);
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
   z-index: 1000;
-  overflow: visible;
-}
-
-.magic-navigation ul {
   display: flex;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  position: relative;
-}
-
-.magic-navigation ul li {
-  position: relative;
-  list-style: none;
-  width: 20%;
-  height: 70px;
-  z-index: 1;
-  display: flex;
-  justify-content: center;
   align-items: center;
-}
-
-.magic-navigation ul li a {
-  position: relative;
-  display: flex;
   justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  width: 100%;
+}
+
+.dark .bottom-nav-reset {
+  background: #1e293b;
+  border-top-color: #334155;
+}
+
+.bottom-nav-placeholder {
+  color: #64748b;
+  font-size: 0.875rem;
   text-align: center;
-  font-weight: 500;
-  text-decoration: none;
 }
 
-.magic-navigation ul li a .nav-icon {
-  position: relative;
-  display: block;
-  line-height: 75px;
-  font-size: 1.5em;
-  text-align: center;
-  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  color: #CBD5E1;
-}
-
-.magic-navigation ul li.active a .nav-icon {
-  transform: translateY(-25px);
-  color: #FFFFFF;
-}
-
-.magic-navigation ul li a .nav-text {
-  position: absolute;
-  color: #CBD5E1;
-  font-weight: 500;
-  font-size: 0.75em;
-  letter-spacing: 0.05em;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-.magic-navigation ul li.active a .nav-text {
-  opacity: 1;
-  transform: translateY(10px);
-  color: #FFFFFF;
-}
-
-/* GREEN INDICATOR ONLY - NOT BAR BACKGROUND */
-.magic-navigation ul .indicator {
-  position: absolute;
-  top: -40%;
-  width: 70px;
-  height: 70px;
-  background: #29fd53; /* GREEN ONLY HERE */
-  border-radius: 50%;
-  border: 4px solid #0F172A;
-  box-shadow: 0 0 12px rgba(41, 253, 83, 0.6); /* GLOW EFFECT */
-  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  will-change: transform;
-  z-index: 0;
-}
-
-.magic-navigation ul .indicator::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: -22px;
-  width: 20px;
-  height: 20px;
-  background: transparent;
-  border-top-right-radius: 20px;
-  box-shadow: 1px -10px 0 0 #1E293B; /* MATCH BAR BACKGROUND */
-}
-
-.magic-navigation ul .indicator::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  right: -22px;
-  width: 20px;
-  height: 20px;
-  background: transparent;
-  border-top-left-radius: 20px;
-  box-shadow: -1px -10px 0 0 #1E293B; /* MATCH BAR BACKGROUND */
-}
-
-/* Indicator positioning for each tab */
-.magic-navigation ul li:nth-child(1).active ~ .indicator {
-  transform: translateX(calc((100% / 5) * 0 + (100% / 5 / 2) - 35px));
-}
-
-.magic-navigation ul li:nth-child(2).active ~ .indicator {
-  transform: translateX(calc((100% / 5) * 1 + (100% / 5 / 2) - 35px));
-}
-
-.magic-navigation ul li:nth-child(3).active ~ .indicator {
-  transform: translateX(calc((100% / 5) * 2 + (100% / 5 / 2) - 35px));
-}
-
-.magic-navigation ul li:nth-child(4).active ~ .indicator {
-  transform: translateX(calc((100% / 5) * 3 + (100% / 5 / 2) - 35px));
-}
-
-.magic-navigation ul li:nth-child(5).active ~ .indicator {
-  transform: translateX(calc((100% / 5) * 4 + (100% / 5 / 2) - 35px));
-}
-
-/* Responsive adjustments for small screens */
-@media (max-width: 390px) {
-  .magic-navigation {
-    height: 65px;
-  }
-  
-  .magic-navigation ul li {
-    height: 65px;
-  }
-  
-  .magic-navigation ul li a .nav-icon {
-    font-size: 1.35em;
-  }
-  
-  .magic-navigation ul .indicator {
-    width: 65px;
-    height: 65px;
-  }
-  
-  .magic-navigation ul li:nth-child(1).active ~ .indicator {
-    transform: translateX(calc((100% / 5) * 0 + (100% / 5 / 2) - 32.5px));
-  }
-  
-  .magic-navigation ul li:nth-child(2).active ~ .indicator {
-    transform: translateX(calc((100% / 5) * 1 + (100% / 5 / 2) - 32.5px));
-  }
-  
-  .magic-navigation ul li:nth-child(3).active ~ .indicator {
-    transform: translateX(calc((100% / 5) * 2 + (100% / 5 / 2) - 32.5px));
-  }
-  
-  .magic-navigation ul li:nth-child(4).active ~ .indicator {
-    transform: translateX(calc((100% / 5) * 3 + (100% / 5 / 2) - 32.5px));
-  }
-  
-  .magic-navigation ul li:nth-child(5).active ~ .indicator {
-    transform: translateX(calc((100% / 5) * 4 + (100% / 5 / 2) - 32.5px));
-  }
-}
-
-/* High contrast for accessibility */
-@media (prefers-contrast: high) {
-  .magic-navigation ul li a .nav-icon,
-  .magic-navigation ul li a .nav-text {
-    color: #F8FAFC;
-  }
-  
-  .magic-navigation ul .indicator {
-    border-width: 6px;
-    box-shadow: 0 0 16px rgba(41, 253, 83, 0.8);
-  }
+.dark .bottom-nav-placeholder {
+  color: #94a3b8;
 }
 
 /* Hide scrollbar but keep functionality */
