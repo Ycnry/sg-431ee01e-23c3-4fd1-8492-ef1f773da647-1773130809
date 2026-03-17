@@ -194,9 +194,9 @@ export function LiveChatWidget({ position = "bottom-right" }: LiveChatWidgetProp
   if (!isOpen) {
     return (
       <div 
-        className={`fixed ${bottomPosition} ${positionClasses} z-40`}
+        className="fixed right-4 z-40"
         style={{ 
-          bottom: "calc(65px + 24px + env(safe-area-inset-bottom))" 
+          bottom: "80px"
         }}
       >
         <Button
@@ -219,9 +219,9 @@ export function LiveChatWidget({ position = "bottom-right" }: LiveChatWidgetProp
   // Chat window when open
   return (
     <div 
-      className={`fixed ${positionClasses} z-40`}
+      className="fixed right-4 z-40"
       style={{ 
-        bottom: "calc(65px + 16px + env(safe-area-inset-bottom))" 
+        bottom: "80px"
       }}
     >
       <Card

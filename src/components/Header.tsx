@@ -67,47 +67,13 @@ export function Header() {
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-1">
-            {navLinks.map((link) => {
-              const Icon = link.icon;
-              return (
-                <Link key={link.href} href={link.href}>
-                  <Button
-                    variant={isActive(link.href) ? "default" : "ghost"}
-                    size="sm"
-                    className="gap-2"
-                  >
-                    <Icon className="h-4 w-4" />
-                    {link.label}
-                  </Button>
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Right side actions */}
+          {/* Right side actions - Logo, Language, Theme, Menu only */}
           <div className="flex items-center gap-1 sm:gap-2">
-            <div className="hidden sm:flex items-center gap-1">
+            {/* Language and Theme toggles */}
+            <div className="flex items-center gap-1">
               <LanguageToggle />
               <ThemeSwitch />
             </div>
-
-            {/* Desktop Auth */}
-            {!isAuthenticated ? (
-              <div className="hidden lg:flex items-center gap-2">
-                <Link href="/auth/signin">
-                  <Button variant="ghost" size="sm">
-                    {language === "en" ? "Sign In" : "Ingia"}
-                  </Button>
-                </Link>
-                <Link href="/auth/signup">
-                  <Button size="sm">
-                    {language === "en" ? "Sign Up" : "Jisajili"}
-                  </Button>
-                </Link>
-              </div>
-            ) : null}
 
             {/* Mobile Menu Button */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
