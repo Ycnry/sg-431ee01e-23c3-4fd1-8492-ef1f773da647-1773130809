@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
-import { IonIcon } from "@ionic/react";
-import { calendarOutline, homeOutline, logInOutline, personOutline, searchOutline } from "ionicons/icons";
 
 type TabKey = "home" | "search" | "events" | "profile" | "login";
 
@@ -14,16 +12,36 @@ interface NavTab {
 }
 
 const tabs: NavTab[] = [
-  { key: "home", href: "/", icon: homeOutline, label: "Nyumbani" },
-  { key: "search", href: "/search", icon: searchOutline, label: "Tafuta" },
-  { key: "events", href: "/events", icon: calendarOutline, label: "Matukio" },
-  { key: "profile", href: "/profile", icon: personOutline, label: "Wasifu" },
-  { key: "login", href: "/auth/signin", icon: logInOutline, label: "Ingia" },
+  { key: "home", href: "/", icon: "home-outline", label: "Nyumbani" },
+  { key: "search", href: "/search", icon: "search-outline", label: "Tafuta" },
+  { key: "events", href: "/events", icon: "calendar-outline", label: "Matukio" },
+  { key: "profile", href: "/profile", icon: "person-outline", label: "Wasifu" },
+  { key: "login", href: "/auth/signin", icon: "log-in-outline", label: "Ingia" },
 ];
 
 function isActivePath(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
   return pathname.startsWith(href);
+}
+
+function ensureIoniconsLoaded() {
+  if (typeof window === "undefined") return;
+  if (customElements.get("ion-icon")) return;
+
+  const existing = document.querySelector('script[data-ionicons="true"]');
+  if (existing) return;
+
+  const script = document.createElement("script");
+  script.type = "module";
+  script.src = "https://unpkg.com/ionicons@7.2.2/dist/ionicons/ionicons.esm.js";
+  script.setAttribute("data-ionicons", "true");
+  document.head.appendChild(script);
+
+  const nomodule = document.createElement("script");
+  nomodule.noModule = true;
+  nomodule.src = "https://unpkg.com/ionicons@7.2.2/dist/ionicons/ionicons.js";
+  nomodule.setAttribute("data-ionicons", "true");
+  document.head.appendChild(nomodule);
 }
 
 export function BottomNavigation() {
@@ -35,6 +53,10 @@ export function BottomNavigation() {
   }, [router.pathname]);
 
   const [active, setActive] = useState(activeIndex);
+
+  useEffect(() => {
+    ensureIoniconsLoaded();
+  }, []);
 
   useEffect(() => {
     setActive(activeIndex);
@@ -56,7 +78,7 @@ export function BottomNavigation() {
                 aria-current={isActive ? "page" : undefined}
               >
                 <span className="icon" aria-hidden="true">
-                  <IonIcon icon={tab.icon} />
+                  <ion-icon name={tab.icon} />
                 </span>
                 <span className="text">{tab.label}</span>
               </Link>
