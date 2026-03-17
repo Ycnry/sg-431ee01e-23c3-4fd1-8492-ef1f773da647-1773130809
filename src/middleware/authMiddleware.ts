@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { verifyAccessToken, type AuthUser } from "@/lib/auth";
 import { createRateLimiter, getClientIp, createIdentifier } from "@/lib/rateLimit";
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 
 // =====================================================
 // EXTENDED REQUEST TYPE
@@ -93,7 +94,7 @@ export function withAuth(handler: NextApiHandler, options: MiddlewareOptions = {
         req.url || "",
         "admin_access_denied",
         "role",
-        { attempted_role: authReq.user?.role }
+        { attempted_role: authReq.user?.role } as Json
       );
 
       return res.status(403).json({
@@ -132,7 +133,7 @@ async function logSecurityEvent(
   endpoint: string,
   errorType: string,
   fieldName: string,
-  requestData?: Record<string, unknown>
+  requestData?: Json
 ): Promise<void> {
   try {
     await supabase.rpc("log_validation_failure", {
@@ -141,7 +142,7 @@ async function logSecurityEvent(
       p_field_name: fieldName,
       p_error_type: errorType,
       p_ip_address: ipAddress,
-      p_request_data: requestData || null,
+      p_request_data: requestData ?? null,
     });
   } catch (err) {
     console.error("Failed to log security event:", err);
@@ -172,7 +173,7 @@ export function withValidation<T>(
         req.url || "",
         "validation_failure",
         validationError.errors?.[0]?.path.join(".") || "unknown",
-        { errors: validationError.errors }
+        { errors: validationError.errors } as Json
       );
 
       return res.status(400).json({
