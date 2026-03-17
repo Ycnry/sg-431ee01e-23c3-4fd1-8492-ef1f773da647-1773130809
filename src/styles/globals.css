@@ -47,16 +47,6 @@
   .animate-float {
     animation: float 3s ease-in-out infinite;
   }
-
-  .magic-pill-shadow {
-    box-shadow: var(--magic-nav-shadow);
-  }
-
-  .magic-wave {
-    background: radial-gradient(ellipse at center, rgba(26, 60, 110, 0.45) 0%, rgba(26, 60, 110, 0.2) 35%, rgba(26, 60, 110, 0) 70%);
-    filter: blur(10px);
-    transform-origin: center;
-  }
 }
 
 @layer base {
@@ -94,12 +84,6 @@
     --sidebar-accent-foreground: 222 47% 11%;
     --sidebar-border: 214 32% 91%;
     --sidebar-ring: 217 91% 60%;
-
-    --bottom-nav-height: 64px;
-
-    --magic-blue: #1A3C6E;
-    --magic-orange: #F5A623;
-    --magic-nav-shadow: 0 12px 34px rgba(16, 24, 40, 0.18), 0 4px 14px rgba(16, 24, 40, 0.12);
   }
 
   .dark {
@@ -155,7 +139,7 @@
     overflow-x: hidden;
     min-height: 100vh;
     min-height: 100dvh;
-    padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
   }
   
   /* Prevent text selection on buttons for better mobile UX */
@@ -212,11 +196,6 @@
     }
   }
   
-  /* Mobile bottom navigation spacer */
-  .pb-bottom-nav {
-    padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 1rem);
-  }
-  
   /* Mobile card styles */
   .mobile-card {
     @apply rounded-lg border bg-card p-4 shadow-sm;
@@ -251,138 +230,6 @@
   }
 }
 
-/* Magic Navigation Menu (Full-Width, Centered, GPU-Accelerated) */
-.navigation {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
-  z-index: 90;
-  width: 100%;
-  max-width: 100vw;
-  height: 70px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0 max(1rem, env(safe-area-inset-left)) 0 max(1rem, env(safe-area-inset-right));
-}
-
-.navigation::before {
-  content: '';
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(400px, calc(100% - 2rem));
-  height: 70px;
-  background: #F5A623;
-  border-radius: 9999px;
-  box-shadow: 0 12px 34px rgba(16, 24, 40, 0.18), 0 4px 14px rgba(16, 24, 40, 0.12);
-}
-
-.navigation ul {
-  display: flex;
-  width: min(400px, calc(100% - 2rem));
-  height: 70px;
-  padding: 0;
-  margin: 0;
-  list-style: none;
-  position: relative;
-  justify-content: space-between;
-}
-
-.navigation ul li {
-  position: relative;
-  width: 20%;
-  height: 70px;
-  z-index: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.navigation ul li a {
-  position: relative;
-  display: flex;
-  width: 100%;
-  height: 100%;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  text-align: center;
-  font-weight: 600;
-  color: white;
-  text-decoration: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.navigation ul li a .icon {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  line-height: 75px;
-  font-size: 1.75rem;
-  color: rgba(255, 255, 255, 0.95);
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform;
-}
-
-.navigation ul li.active a .icon {
-  transform: translateY(-32px);
-}
-
-.navigation ul li a .text {
-  position: absolute;
-  color: rgba(255, 255, 255, 0.95);
-  font-size: 0.65rem;
-  letter-spacing: 0.02em;
-  opacity: 0;
-  transform: translateY(18px);
-  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: opacity, transform;
-  font-weight: 600;
-}
-
-.navigation ul li.active a .text {
-  opacity: 1;
-  transform: translateY(10px);
-}
-
-.indicator {
-  position: absolute;
-  top: -50%;
-  width: 70px;
-  height: 70px;
-  background: #1A3C6E;
-  border-radius: 50%;
-  border: 6px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 18px 36px rgba(26, 60, 110, 0.35);
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform;
-  left: 0;
-}
-
-.navigation ul li:nth-child(1).active ~ .indicator {
-  transform: translateX(calc((100% / 5) * 0 + (100% / 5 / 2) - 35px));
-}
-.navigation ul li:nth-child(2).active ~ .indicator {
-  transform: translateX(calc((100% / 5) * 1 + (100% / 5 / 2) - 35px));
-}
-.navigation ul li:nth-child(3).active ~ .indicator {
-  transform: translateX(calc((100% / 5) * 2 + (100% / 5 / 2) - 35px));
-}
-.navigation ul li:nth-child(4).active ~ .indicator {
-  transform: translateX(calc((100% / 5) * 3 + (100% / 5 / 2) - 35px));
-}
-.navigation ul li:nth-child(5).active ~ .indicator {
-  transform: translateX(calc((100% / 5) * 4 + (100% / 5 / 2) - 35px));
-}
-
-/* Keep content above nav */
-body {
-  padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px) + 28px);
-}
-
 /* Hide scrollbar but keep functionality */
 .scrollbar-hide {
   -ms-overflow-style: none;
@@ -391,22 +238,6 @@ body {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
-}
-
-/* Animation for bottom nav */
-@keyframes slideUp {
-  from {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.animate-slide-up {
-  animation: slideUp 0.3s ease-out forwards;
 }
 
 /* Floating animation for featured badges */
@@ -478,22 +309,4 @@ body {
   background: linear-gradient(90deg, hsl(var(--accent)), hsl(var(--primary)), hsl(var(--accent)));
   background-size: 200% 200%;
   animation: gradientBorder 3s ease infinite;
-}
-
-@keyframes magicWavePulse {
-  0% {
-    transform: scaleX(0.65) scaleY(0.85);
-    opacity: 0.0;
-  }
-  20% {
-    opacity: 0.95;
-  }
-  60% {
-    transform: scaleX(1.25) scaleY(1.15);
-    opacity: 0.55;
-  }
-  100% {
-    transform: scaleX(1.6) scaleY(1.0);
-    opacity: 0.0;
-  }
 }

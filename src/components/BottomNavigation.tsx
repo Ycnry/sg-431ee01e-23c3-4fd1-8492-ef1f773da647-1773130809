@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useMemo, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 type TabKey = "home" | "search" | "events" | "profile" | "login";
@@ -25,80 +24,32 @@ function isActivePath(pathname: string, href: string) {
   return pathname.startsWith(href);
 }
 
-function ensureIoniconsLoaded() {
-  if (typeof window === "undefined") return;
-  if (customElements.get("ion-icon")) return;
-
-  const existing = document.querySelector('script[data-ionicons="true"]');
-  if (existing) return;
-
-  const script = document.createElement("script");
-  script.type = "module";
-  script.src = "https://unpkg.com/ionicons@7.2.2/dist/ionicons/ionicons.esm.js";
-  script.setAttribute("data-ionicons", "true");
-  document.head.appendChild(script);
-
-  const nomodule = document.createElement("script");
-  nomodule.noModule = true;
-  nomodule.src = "https://unpkg.com/ionicons@7.2.2/dist/ionicons/ionicons.js";
-  nomodule.setAttribute("data-ionicons", "true");
-  document.head.appendChild(nomodule);
-}
-
 export function BottomNavigation() {
   const router = useRouter();
   const { t } = useLanguage();
-  const [mounted, setMounted] = useState(false);
-
-  const activeIndex = useMemo(() => {
-    const found = tabs.findIndex((tab) => isActivePath(router.pathname, tab.href));
-    return found < 0 ? 0 : found;
-  }, [router.pathname]);
-
-  const [active, setActive] = useState(activeIndex);
-
-  useEffect(() => {
-    ensureIoniconsLoaded();
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    setActive(activeIndex);
-  }, [activeIndex]);
 
   return (
-    <nav
-      className="navigation"
-      style={{
-        opacity: mounted ? 1 : 0,
-        pointerEvents: mounted ? "all" : "none",
-        transition: "opacity 0.3s ease",
-      }}
-      aria-label="Primary"
-    >
-      <ul>
-        {tabs.map((tab, idx) => {
-          const isActive = idx === active;
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 dark:bg-gray-900 dark:border-gray-800 safe-bottom z-50">
+      <div className="flex items-center justify-around h-16 max-w-screen-xl mx-auto">
+        {tabs.map((tab) => {
+          const isActive = isActivePath(router.pathname, tab.href);
 
           return (
-            <li key={tab.key} className={isActive ? "active" : ""}>
-              <Link
-                href={tab.href}
-                onClick={() => {
-                  setActive(idx);
-                }}
-                aria-current={isActive ? "page" : undefined}
-              >
-                <span className="icon" aria-hidden="true">
-                  <ion-icon name={tab.icon} />
-                </span>
-                <span className="text">{t(tab.labelKey)}</span>
-              </Link>
-            </li>
+            <Link
+              key={tab.key}
+              href={tab.href}
+              className={`flex flex-col items-center justify-center flex-1 h-full space-y-1 transition-colors ${
+                isActive
+                  ? "text-primary"
+                  : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+              }`}
+            >
+              <ion-icon name={tab.icon} style={{ fontSize: "24px" }} />
+              <span className="text-xs font-medium">{t(tab.labelKey)}</span>
+            </Link>
           );
         })}
-        <div className="indicator" aria-hidden="true" />
-      </ul>
+      </div>
     </nav>
   );
 }
