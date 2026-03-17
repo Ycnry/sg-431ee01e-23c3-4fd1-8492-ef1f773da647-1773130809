@@ -5,18 +5,19 @@ import { useRouter } from "next/router";
 /**
  * BottomNavigation - Smart Fundi
  * 
- * 5 equally spaced tabs (20% each):
+ * 5 equally spaced tabs (flex: 1 each):
  * - Nyumbani (home icon)
  * - Tafuta (search icon)
  * - Matukio (calendar icon)
  * - Wasifu (person icon)
  * - Ingia (login icon)
  * 
- * Orange background (#F5A623)
- * White icons/labels for inactive tabs
+ * Orange background (#F5A623) with curved notch
+ * White icons/labels for all tabs (always visible)
  * Active tab: icon lifts up into deep blue (#1A3C6E) circle bubble
  * Bar height: 65px
  * Icons: 24px inline SVGs
+ * Labels: 12px, always visible
  */
 
 interface NavTab {
@@ -174,6 +175,27 @@ function getIcon(tabId: string, color: string) {
   }
 }
 
+// Curved notch SVG component
+function CurvedNotch() {
+  return (
+    <svg 
+      className="sf-notch-svg"
+      width="90" 
+      height="25" 
+      viewBox="0 0 90 25" 
+      fill="none" 
+      xmlns="http://www.w3.org/2000/svg"
+      preserveAspectRatio="none"
+    >
+      {/* Curved notch path - smooth upward curve */}
+      <path 
+        d="M0 25 L0 20 Q0 0 20 0 L70 0 Q90 0 90 20 L90 25 Z" 
+        fill="#F5A623"
+      />
+    </svg>
+  );
+}
+
 export function BottomNavigation() {
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
@@ -201,17 +223,31 @@ export function BottomNavigation() {
     return null;
   }
 
+  // Calculate the center position for each tab (each tab is 20% width)
+  // Tab center = (index * 20%) + 10% = percentage from left edge to tab center
+  // We need to position the bubble and notch centered on each tab
+
   return (
     <nav
       className="sf-bottom-nav"
       role="navigation"
       aria-label="Main navigation"
     >
+      {/* Curved notch background that slides with the bubble */}
+      <div 
+        className="sf-notch-container"
+        style={{
+          transform: `translateX(calc(${activeIndex} * 20vw + 10vw - 45px))`,
+        }}
+      >
+        <CurvedNotch />
+      </div>
+
       {/* Floating bubble indicator */}
       <div 
         className="sf-bubble"
         style={{
-          transform: `translateX(calc(20vw * ${activeIndex} + 10vw - 35px))`,
+          transform: `translateX(calc(${activeIndex} * 20vw + 10vw - 35px))`,
         }}
       >
         <div className="sf-bubble-circle">
@@ -219,22 +255,22 @@ export function BottomNavigation() {
         </div>
       </div>
 
+      {/* Navigation tabs */}
       <ul className="sf-nav-list">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
-          const iconColor = "#FFFFFF";
           
           return (
             <li key={tab.id} className="sf-nav-item">
               <Link
                 href={tab.href}
-                className={`sf-nav-link ${isActive ? "sf-nav-active" : ""}`}
+                className="sf-nav-link"
                 aria-current={isActive ? "page" : undefined}
               >
                 <span 
                   className={`sf-nav-icon ${isActive ? "sf-nav-icon-active" : "sf-nav-icon-inactive"}`}
                 >
-                  {getIcon(tab.id, iconColor)}
+                  {getIcon(tab.id, "#FFFFFF")}
                 </span>
                 <span className="sf-nav-label">{tab.label}</span>
               </Link>

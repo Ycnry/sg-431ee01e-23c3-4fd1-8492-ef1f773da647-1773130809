@@ -276,13 +276,14 @@
 /* ============================================
    SMART FUNDI BOTTOM NAVIGATION
    ============================================
-   - Orange background (#F5A623)
-   - White icons and labels (inactive)
+   - Orange background (#F5A623) with curved notch
+   - White icons and labels (always visible)
    - Active tab: icon in floating deep blue bubble
-   - 5 tabs, 20% width each
+   - 5 tabs, flex: 1 each for equal width
    - Fixed at bottom, 65px height
    - Icons: 24px inline SVGs
-   - Bubble: 70x70px deep blue circle with border
+   - Labels: 12px, always visible in white
+   - Curved notch slides with bubble
    ============================================ */
 
 .sf-bottom-nav {
@@ -299,6 +300,25 @@
   overflow: visible;
 }
 
+/* Curved notch container - slides with bubble */
+.sf-notch-container {
+  position: absolute;
+  top: -20px;
+  left: 0;
+  width: 90px;
+  height: 25px;
+  pointer-events: none;
+  z-index: 999;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.sf-notch-svg {
+  width: 90px;
+  height: 25px;
+  display: block;
+}
+
 .sf-nav-list {
   display: flex;
   width: 100%;
@@ -310,8 +330,11 @@
 }
 
 .sf-nav-item {
-  width: 20%;
+  flex: 1;
   height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sf-nav-link {
@@ -338,26 +361,18 @@
   justify-content: center;
   width: 24px;
   height: 24px;
-  /* Smooth lift/drop animation for icons */
   transition: transform 0.4s ease, opacity 0.3s ease;
   will-change: transform, opacity;
 }
 
 .sf-nav-icon-active {
-  /* Lift the icon up when active */
-  transform: translateY(-28px);
+  transform: translateY(-30px);
   opacity: 0;
 }
 
 .sf-nav-icon-inactive {
-  /* Default position for inactive icons */
   transform: translateY(0);
   opacity: 1;
-}
-
-.sf-nav-icon-hidden {
-  opacity: 0;
-  transform: translateY(-28px);
 }
 
 .sf-nav-icon svg {
@@ -366,11 +381,12 @@
 }
 
 .sf-nav-label {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   text-align: center;
   line-height: 1.2;
   color: #FFFFFF;
+  white-space: nowrap;
 }
 
 /* ============================================
@@ -379,15 +395,13 @@
 
 .sf-bubble {
   position: absolute;
-  bottom: 20px;
+  bottom: 22px;
   left: 0;
   width: 70px;
   height: 70px;
   pointer-events: none;
   z-index: 1001;
-  /* Smooth horizontal sliding animation */
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  /* GPU acceleration for smooth mobile performance */
   will-change: transform;
 }
 
@@ -417,13 +431,13 @@
   }
   
   .sf-nav-label {
-    font-size: 10px;
+    font-size: 11px;
   }
   
   .sf-bubble {
     width: 60px;
     height: 60px;
-    bottom: 18px;
+    bottom: 20px;
   }
   
   .sf-bubble-circle {
@@ -434,6 +448,16 @@
   .sf-bubble-circle svg {
     width: 24px;
     height: 24px;
+  }
+  
+  .sf-notch-container {
+    width: 80px;
+    top: -18px;
+  }
+  
+  .sf-notch-svg {
+    width: 80px;
+    height: 22px;
   }
 }
 
