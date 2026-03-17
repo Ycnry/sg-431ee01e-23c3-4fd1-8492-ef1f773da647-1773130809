@@ -47,6 +47,10 @@
   .animate-float {
     animation: float 3s ease-in-out infinite;
   }
+
+  .magic-pill-shadow {
+    box-shadow: var(--magic-nav-shadow);
+  }
 }
 
 @layer base {
@@ -84,9 +88,11 @@
     --sidebar-accent-foreground: 222 47% 11%;
     --sidebar-border: 214 32% 91%;
     --sidebar-ring: 217 91% 60%;
-    
-    /* Bottom nav height for content padding */
+
     --bottom-nav-height: 64px;
+
+    --magic-blue: #1A3C6E;
+    --magic-nav-shadow: 0 10px 30px rgba(16, 24, 40, 0.14), 0 3px 10px rgba(16, 24, 40, 0.08);
   }
 
   .dark {

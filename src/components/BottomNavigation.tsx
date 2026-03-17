@@ -1,82 +1,125 @@
-import { useRouter } from "next/router";
 import Link from "next/link";
-import { Home, Search, Calendar, MessageSquare, User } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/router";
+import { Calendar, Home, Search, User } from "lucide-react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-interface NavItem {
+type TabKey = "home" | "search" | "events" | "profile" | "login";
+
+interface NavTab {
+  key: TabKey;
   href: string;
-  icon: typeof Home;
-  labelEn: string;
-  labelSw: string;
-  requiresAuth?: boolean;
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
 }
 
-const navItems: NavItem[] = [
-  { href: "/", icon: Home, labelEn: "Home", labelSw: "Nyumbani" },
-  { href: "/search", icon: Search, labelEn: "Search", labelSw: "Tafuta" },
-  { href: "/events", icon: Calendar, labelEn: "Events", labelSw: "Matukio" },
-  { href: "/messages", icon: MessageSquare, labelEn: "Messages", labelSw: "Ujumbe", requiresAuth: true },
-  { href: "/profile", icon: User, labelEn: "Profile", labelSw: "Wasifu" },
+const tabs: NavTab[] = [
+  { key: "home", href: "/", icon: Home, label: "Nyumbani" },
+  { key: "search", href: "/search", icon: Search, label: "Tafuta" },
+  { key: "events", href: "/events", icon: Calendar, label: "Matukio" },
+  { key: "profile", href: "/profile", icon: User, label: "Wasifu" },
+  { key: "login", href: "/auth/signin", icon: User, label: "Ingia" },
 ];
+
+function isActivePath(pathname: string, href: string) {
+  if (href === "/") return pathname === "/";
+  return pathname.startsWith(href);
+}
 
 export function BottomNavigation() {
   const router = useRouter();
-  const { language } = useLanguage();
-  const { isAuthenticated } = useAuth();
+  const activeIndex = Math.max(
+    0,
+    tabs.findIndex((t) => isActivePath(router.pathname, t.href))
+  );
 
-  const isActive = (href: string) => {
-    if (href === "/") {
-      return router.pathname === "/";
-    }
-    return router.pathname.startsWith(href);
-  };
-
-  const filteredItems = navItems.filter(item => {
-    if (item.requiresAuth && !isAuthenticated) {
-      return false;
-    }
-    return true;
-  });
-
-  // Add login item if not authenticated
-  const displayItems = isAuthenticated 
-    ? filteredItems 
-    : [...filteredItems.filter(i => !i.requiresAuth), { href: "/auth/signin", icon: User, labelEn: "Login", labelSw: "Ingia" }];
+  const ActiveIcon = tabs[activeIndex]?.icon ?? Home;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-[60] bg-background/95 backdrop-blur-lg border-t border-border safe-bottom animate-slide-up">
-      <div className="mx-auto flex max-w-3xl items-center justify-around h-16 px-2">
-        {displayItems.map((item) => {
-          const Icon = item.icon;
-          const active = isActive(item.href);
-          const label = language === "en" ? item.labelEn : item.labelSw;
-          
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "relative flex flex-col items-center justify-center flex-1 h-full px-1 py-2 transition-colors touch-target",
-                active 
-                  ? "text-primary" 
-                  : "text-muted-foreground hover:text-foreground"
-              )}
+    <nav
+      aria-label="Primary"
+      className={cn(
+        "fixed inset-x-0 bottom-0 z-[80] pointer-events-none",
+        "pb-[calc(env(safe-area-inset-bottom,0px)+12px)]"
+      )}
+    >
+      <div className="mx-auto max-w-[520px] px-3">
+        <div className="relative pointer-events-auto">
+          <div
+            className={cn(
+              "relative w-full rounded-full bg-white/95 backdrop-blur-xl",
+              "border border-black/5 magic-pill-shadow",
+              "px-2 py-2"
+            )}
+          >
+            <div className="grid grid-cols-5 items-end">
+              {tabs.map((tab, index) => {
+                const Icon = tab.icon;
+                const active = index === activeIndex;
+
+                return (
+                  <Link
+                    key={tab.key}
+                    href={tab.href}
+                    className={cn(
+                      "group relative flex flex-col items-center justify-end",
+                      "px-1 pt-6 pb-1 touch-target select-none",
+                      "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[color:var(--magic-blue)] rounded-2xl"
+                    )}
+                    aria-current={active ? "page" : undefined}
+                  >
+                    <div className="relative h-7 w-7">
+                      {!active && (
+                        <Icon
+                          className={cn(
+                            "h-7 w-7 text-zinc-400 transition-colors",
+                            "group-hover:text-zinc-600"
+                          )}
+                        />
+                      )}
+                    </div>
+
+                    <span
+                      className={cn(
+                        "mt-1 text-[10px] leading-tight font-medium transition-colors",
+                        active ? "text-[color:var(--magic-blue)]" : "text-zinc-500 group-hover:text-zinc-700"
+                      )}
+                    >
+                      {tab.label}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+
+            <motion.div
+              className="absolute left-0 top-0 h-full w-full"
+              aria-hidden="true"
+              initial={false}
+              animate={{ x: `${activeIndex * 20}%` }}
+              transition={{ type: "spring", stiffness: 500, damping: 40 }}
+              style={{ pointerEvents: "none" }}
             >
-              <Icon className={cn("h-5 w-5 mb-1 transition-transform", active && "text-primary")} />
-              <span className={cn(
-                "text-[10px] font-medium truncate max-w-full",
-                active && "text-primary"
-              )}>
-                {label}
-              </span>
-              {active && (
-                <div className="absolute bottom-1 w-1 h-1 rounded-full bg-primary" />
-              )}
-            </Link>
-          );
-        })}
+              <div className="relative h-full w-1/5">
+                <motion.div
+                  layoutId="magic-active-bubble"
+                  className={cn(
+                    "absolute left-1/2 -top-5 -translate-x-1/2",
+                    "h-12 w-12 rounded-full",
+                    "bg-[color:var(--magic-blue)]",
+                    "shadow-[0_14px_28px_rgba(26,60,110,0.25)]",
+                    "flex items-center justify-center"
+                  )}
+                  transition={{ type: "spring", stiffness: 600, damping: 40 }}
+                >
+                  <ActiveIcon className="h-6 w-6 text-white" />
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
+
+          <div className="h-1" />
+        </div>
       </div>
     </nav>
   );
