@@ -51,6 +51,12 @@
   .magic-pill-shadow {
     box-shadow: var(--magic-nav-shadow);
   }
+
+  .magic-wave {
+    background: radial-gradient(ellipse at center, rgba(26, 60, 110, 0.45) 0%, rgba(26, 60, 110, 0.2) 35%, rgba(26, 60, 110, 0) 70%);
+    filter: blur(10px);
+    transform-origin: center;
+  }
 }
 
 @layer base {
@@ -92,7 +98,8 @@
     --bottom-nav-height: 64px;
 
     --magic-blue: #1A3C6E;
-    --magic-nav-shadow: 0 10px 30px rgba(16, 24, 40, 0.14), 0 3px 10px rgba(16, 24, 40, 0.08);
+    --magic-orange: #F5A623;
+    --magic-nav-shadow: 0 12px 34px rgba(16, 24, 40, 0.18), 0 4px 14px rgba(16, 24, 40, 0.12);
   }
 
   .dark {
@@ -339,4 +346,22 @@
   background: linear-gradient(90deg, hsl(var(--accent)), hsl(var(--primary)), hsl(var(--accent)));
   background-size: 200% 200%;
   animation: gradientBorder 3s ease infinite;
+}
+
+@keyframes magicWavePulse {
+  0% {
+    transform: scaleX(0.65) scaleY(0.85);
+    opacity: 0.0;
+  }
+  20% {
+    opacity: 0.95;
+  }
+  60% {
+    transform: scaleX(1.25) scaleY(1.15);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scaleX(1.6) scaleY(1.0);
+    opacity: 0.0;
+  }
 }
