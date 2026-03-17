@@ -1,9 +1,8 @@
-
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -15,12 +14,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Menu, Search, Wrench, Store, Calendar, MessageSquare, User, LogOut, HelpCircle, Wallet } from "lucide-react";
+import { Menu, Search, Store, Calendar, MessageSquare, User, LogOut, HelpCircle, Wrench, X } from "lucide-react";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { ThemeSwitch } from "@/components/ThemeSwitch";
 
 export function Header() {
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
   const { user, isAuthenticated, signOut } = useAuth();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -46,31 +45,37 @@ export function Header() {
 
   const handleSignOut = async () => {
     await signOut();
+    setMobileMenuOpen(false);
+  };
+
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
   };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="flex items-center gap-2">
-              <div className="bg-blue-600 p-2 rounded-lg">
-                <Wrench className="h-5 w-5 text-white" />
-              </div>
-              <span className="font-bold text-xl">
-                <span className="text-blue-600">SMART</span>{" "}
-                <span className="text-orange-500">FUNDI</span>
-              </span>
+      <div className="container">
+        <div className="flex h-14 sm:h-16 items-center justify-between gap-2">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <div className="bg-primary p-1.5 sm:p-2 rounded-lg">
+              <Wrench className="h-4 w-4 sm:h-5 sm:w-5 text-primary-foreground" />
             </div>
+            <span className="font-bold text-base sm:text-xl">
+              <span className="text-primary">SMART</span>{" "}
+              <span className="text-orange-500">FUNDI</span>
+            </span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-1">
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => {
               const Icon = link.icon;
               return (
                 <Link key={link.href} href={link.href}>
                   <Button
                     variant={isActive(link.href) ? "default" : "ghost"}
+                    size="sm"
                     className="gap-2"
                   >
                     <Icon className="h-4 w-4" />
@@ -86,6 +91,7 @@ export function Header() {
                 <Link key={link.href} href={link.href}>
                   <Button
                     variant={isActive(link.href) ? "default" : "ghost"}
+                    size="sm"
                     className="gap-2"
                   >
                     <Icon className="h-4 w-4" />
@@ -96,31 +102,35 @@ export function Header() {
             })}
           </nav>
 
-          <div className="flex items-center gap-2">
-            <LanguageToggle />
-            <ThemeSwitch />
+          {/* Right side actions */}
+          <div className="flex items-center gap-1 sm:gap-2">
+            <div className="hidden sm:flex items-center gap-1">
+              <LanguageToggle />
+              <ThemeSwitch />
+            </div>
 
+            {/* Desktop Auth */}
             {!isAuthenticated ? (
-              <div className="hidden md:flex items-center gap-2">
+              <div className="hidden lg:flex items-center gap-2">
                 <Link href="/auth/signin">
-                  <Button variant="ghost">
+                  <Button variant="ghost" size="sm">
                     {language === "en" ? "Sign In" : "Ingia"}
                   </Button>
                 </Link>
                 <Link href="/auth/signup">
-                  <Button>
+                  <Button size="sm">
                     {language === "en" ? "Sign Up" : "Jisajili"}
                   </Button>
                 </Link>
               </div>
             ) : (
-              <div className="hidden md:flex items-center gap-2">
+              <div className="hidden lg:flex items-center">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                      <Avatar className="h-10 w-10">
+                    <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                      <Avatar className="h-9 w-9">
                         <AvatarImage src={user?.photo} alt={user?.name} />
-                        <AvatarFallback className="bg-blue-100 text-blue-700">
+                        <AvatarFallback className="bg-primary/10 text-primary text-sm">
                           {user?.name?.charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
@@ -149,7 +159,7 @@ export function Header() {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+                    <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-destructive">
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>{language === "en" ? "Sign Out" : "Toka"}</span>
                     </DropdownMenuItem>
@@ -158,94 +168,127 @@ export function Header() {
               </div>
             )}
 
+            {/* Mobile Menu Button */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <SheetTrigger asChild className="md:hidden">
-                <Button variant="ghost" size="icon">
+              <SheetTrigger asChild className="lg:hidden">
+                <Button variant="ghost" size="icon" className="h-9 w-9">
                   <Menu className="h-5 w-5" />
                   <span className="sr-only">Toggle menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-                <nav className="flex flex-col gap-4 mt-8">
-                  {navLinks.map((link) => {
-                    const Icon = link.icon;
-                    return (
-                      <Link key={link.href} href={link.href}>
-                        <Button
-                          variant={isActive(link.href) ? "default" : "ghost"}
-                          className="w-full justify-start gap-2"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          <Icon className="h-4 w-4" />
-                          {link.label}
-                        </Button>
-                      </Link>
-                    );
-                  })}
+              <SheetContent side="right" className="w-[85vw] max-w-[320px] p-0">
+                <SheetHeader className="p-4 border-b">
+                  <div className="flex items-center justify-between">
+                    <SheetTitle className="flex items-center gap-2">
+                      <div className="bg-primary p-1.5 rounded-lg">
+                        <Wrench className="h-4 w-4 text-primary-foreground" />
+                      </div>
+                      <span className="font-bold">
+                        <span className="text-primary">SMART</span>{" "}
+                        <span className="text-orange-500">FUNDI</span>
+                      </span>
+                    </SheetTitle>
+                  </div>
+                </SheetHeader>
+                
+                <div className="flex flex-col h-[calc(100%-65px)] overflow-y-auto">
+                  {/* User Info (if authenticated) */}
+                  {isAuthenticated && user && (
+                    <div className="p-4 border-b bg-muted/50">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-12 w-12">
+                          <AvatarImage src={user.photo} alt={user.name} />
+                          <AvatarFallback className="bg-primary/10 text-primary">
+                            {user.name?.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium truncate">{user.name}</p>
+                          <p className="text-sm text-muted-foreground truncate">{user.email}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
-                  {isAuthenticated && (
-                    <>
-                      <div className="border-t my-2"></div>
-                      {authenticatedLinks.map((link) => {
+                  {/* Navigation Links */}
+                  <nav className="flex-1 p-2">
+                    <div className="space-y-1">
+                      {navLinks.map((link) => {
                         const Icon = link.icon;
                         return (
-                          <Link key={link.href} href={link.href}>
+                          <Link key={link.href} href={link.href} onClick={closeMobileMenu}>
                             <Button
-                              variant={isActive(link.href) ? "default" : "ghost"}
-                              className="w-full justify-start gap-2"
-                              onClick={() => setMobileMenuOpen(false)}
+                              variant={isActive(link.href) ? "secondary" : "ghost"}
+                              className="w-full justify-start gap-3 h-12 text-base"
                             >
-                              <Icon className="h-4 w-4" />
+                              <Icon className="h-5 w-5" />
                               {link.label}
                             </Button>
                           </Link>
                         );
                       })}
-                    </>
-                  )}
 
-                  <div className="border-t my-2"></div>
+                      {isAuthenticated && (
+                        <>
+                          <div className="my-2 border-t" />
+                          {authenticatedLinks.map((link) => {
+                            const Icon = link.icon;
+                            return (
+                              <Link key={link.href} href={link.href} onClick={closeMobileMenu}>
+                                <Button
+                                  variant={isActive(link.href) ? "secondary" : "ghost"}
+                                  className="w-full justify-start gap-3 h-12 text-base"
+                                >
+                                  <Icon className="h-5 w-5" />
+                                  {link.label}
+                                </Button>
+                              </Link>
+                            );
+                          })}
+                        </>
+                      )}
+                    </div>
+                  </nav>
 
-                  {!isAuthenticated ? (
-                    <>
-                      <Link href="/auth/signin">
-                        <Button
-                          variant="ghost"
-                          className="w-full justify-start"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          {language === "en" ? "Sign In" : "Ingia"}
-                        </Button>
-                      </Link>
-                      <Link href="/auth/signup">
-                        <Button
-                          className="w-full justify-start"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          {language === "en" ? "Sign Up" : "Jisajili"}
-                        </Button>
-                      </Link>
-                    </>
-                  ) : (
-                    <>
-                      <div className="px-4 py-2">
-                        <p className="text-sm font-medium">{user?.name}</p>
-                        <p className="text-xs text-muted-foreground">{user?.email}</p>
+                  {/* Settings & Auth */}
+                  <div className="border-t p-4 space-y-3">
+                    {/* Theme & Language toggles */}
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm text-muted-foreground">
+                        {language === "en" ? "Settings" : "Mipangilio"}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <LanguageToggle />
+                        <ThemeSwitch />
                       </div>
+                    </div>
+
+                    {/* Auth Buttons */}
+                    {!isAuthenticated ? (
+                      <div className="grid grid-cols-2 gap-2 pt-2">
+                        <Link href="/auth/signin" onClick={closeMobileMenu}>
+                          <Button variant="outline" className="w-full h-11">
+                            {language === "en" ? "Sign In" : "Ingia"}
+                          </Button>
+                        </Link>
+                        <Link href="/auth/signup" onClick={closeMobileMenu}>
+                          <Button className="w-full h-11">
+                            {language === "en" ? "Sign Up" : "Jisajili"}
+                          </Button>
+                        </Link>
+                      </div>
+                    ) : (
                       <Button
-                        variant="ghost"
-                        className="w-full justify-start gap-2 text-red-600"
-                        onClick={() => {
-                          setMobileMenuOpen(false);
-                          handleSignOut();
-                        }}
+                        variant="outline"
+                        className="w-full h-11 text-destructive border-destructive/30 hover:bg-destructive/10"
+                        onClick={handleSignOut}
                       >
-                        <LogOut className="h-4 w-4" />
+                        <LogOut className="mr-2 h-4 w-4" />
                         {language === "en" ? "Sign Out" : "Toka"}
                       </Button>
-                    </>
-                  )}
-                </nav>
+                    )}
+                  </div>
+                </div>
               </SheetContent>
             </Sheet>
           </div>
