@@ -1,219 +1,324 @@
-import Head from "next/head";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import Head from "next/head";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { Header } from "@/components/Header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Users, 
-  Wrench, 
-  Store, 
-  TrendingUp, 
-  LogOut,
-  BarChart3,
-  Globe,
-  MessageSquare,
-  AlertTriangle,
-  FileText,
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Switch } from "@/components/ui/switch";
+import { Progress } from "@/components/ui/progress";
+import { updateSupportHotline, getSupportHotline } from "@/lib/settings";
+import {
+  LayoutDashboard,
+  Users,
+  Store,
+  Briefcase,
+  Calendar,
+  DollarSign,
+  TrendingUp,
+  TrendingDown,
+  Shield,
+  Settings,
+  Bell,
+  Search,
+  Filter,
   CheckCircle,
   XCircle,
-  Settings,
-  AlertCircle,
-  MapPinned,
-  Phone
+  Clock,
+  Eye,
+  Ban,
+  UserCheck,
+  AlertTriangle,
+  FileText,
+  BarChart3,
+  PieChart,
+  Activity,
+  Globe,
+  MessageSquare,
+  CreditCard,
+  Sparkles,
+  ChevronRight,
+  Plus,
+  Edit,
+  Trash2,
+  Download,
+  RefreshCw,
+  Phone,
+  Mail,
+  MapPin,
+  Star,
+  Flag,
+  Lock,
+  Unlock,
+  UserX,
+  Building2
 } from "lucide-react";
-import { SubscriptionChart } from "@/components/admin/SubscriptionChart";
-import { LanguageChart } from "@/components/admin/LanguageChart";
-import { GeographicHeatmap } from "@/components/admin/GeographicHeatmap";
-import { BugReportsList } from "@/components/admin/BugReportsList";
-import {
-  mockUserStats,
-  mockGeographicData,
-  mockLanguageStats,
-  mockBugReports,
-  mockRevenueData,
-  formatTZS,
-  BugReport
-} from "@/lib/adminData";
-import {
-  getSupportHotline,
-  updateSupportHotline,
-  formatPhoneNumber
-} from "@/lib/settings";
 
-interface PendingVerification {
-  id: string;
-  name: string;
-  email: string;
-  specialty: string;
-  city: string;
-  phone: string;
-  idDocumentUrl: string;
-  documentType: string;
-  submittedDate: string;
-  requiresManualVerification: boolean;
-  verificationStatus: "pending" | "approved" | "rejected";
-}
-
-export default function AdminDashboardPage() {
-  const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [bugReports, setBugReports] = useState<BugReport[]>(mockBugReports);
-  const [adminName, setAdminName] = useState("Admin");
-  const [supportHotline, setSupportHotline] = useState("");
-  const [hotlineSaved, setHotlineSaved] = useState(false);
-  const [pendingVerifications, setPendingVerifications] = useState<PendingVerification[]>([
-    {
-      id: "fundi-pending-1",
-      name: "David Msangi",
-      email: "david.msangi@example.com",
-      specialty: "Electrician",
-      city: "Dar es Salaam",
-      phone: "+255 765 432 109",
-      idDocumentUrl: "/uploads/image_133049d0-ae3e-47c2-adcd-3558f0428311.png",
-      documentType: "Passport",
-      submittedDate: "2025-11-10",
-      requiresManualVerification: true,
-      verificationStatus: "pending",
-    },
-    {
-      id: "fundi-pending-2",
-      name: "Grace Mwakasege",
-      email: "grace.mwakasege@example.com",
-      specialty: "Plumber",
-      city: "Arusha",
-      phone: "+255 742 876 543",
-      idDocumentUrl: "/uploads/image_4a24922e-ef18-4310-aabe-2608c6229396.png",
-      documentType: "Driver's License",
-      submittedDate: "2025-11-11",
-      requiresManualVerification: true,
-      verificationStatus: "pending",
-    },
-  ]);
-
-  interface PendingShopVerification {
-    id: string;
-    shopName: string;
-    email: string;
-    city: string;
-    phone: string;
-    businessRegistrationNumber?: string;
-    physicalAddress?: string;
-    storefrontPhotoUrl?: string;
-    businessLicenseUrl?: string;
-    tinCertificateUrl?: string;
-    submittedDate: string;
-    verificationStatus: "pending" | "approved" | "rejected";
-    scamReports: number;
+// Mock data for admin dashboard
+const mockPendingApprovals = [
+  {
+    id: "1",
+    type: "fundi",
+    name: "Juma Hassan",
+    email: "juma@example.com",
+    phone: "+255 712 345 678",
+    specialty: "Electrician",
+    city: "Dar es Salaam",
+    submittedAt: "2026-03-16",
+    documents: ["ID Card", "Certificate"],
+    avatar: ""
+  },
+  {
+    id: "2",
+    type: "fundi",
+    name: "Maria Joseph",
+    email: "maria@example.com",
+    phone: "+255 754 321 098",
+    specialty: "Plumber",
+    city: "Arusha",
+    submittedAt: "2026-03-15",
+    documents: ["ID Card"],
+    avatar: ""
+  },
+  {
+    id: "3",
+    type: "shop",
+    name: "Kariakoo Hardware",
+    email: "info@kariakoo.co.tz",
+    phone: "+255 222 123 456",
+    specialty: "Hardware Store",
+    city: "Dar es Salaam",
+    submittedAt: "2026-03-14",
+    documents: ["Business License", "TIN Certificate"],
+    avatar: ""
   }
+];
 
-  const [pendingShopVerifications, setPendingShopVerifications] = useState<PendingShopVerification[]>([
-    {
-      id: "shop-pending-1",
-      shopName: "Mwanza Tools & Hardware",
-      email: "mwanza.tools@example.com",
-      city: "Mwanza",
-      phone: "+255 745 123 456",
-      businessRegistrationNumber: "BRELA-98765432",
-      physicalAddress: "Station Rd, Mwanza",
-      storefrontPhotoUrl: "/uploads/shop3-storefront.jpg",
-      submittedDate: "2025-11-12",
-      verificationStatus: "pending",
-      scamReports: 0,
-    },
-  ]);
+const mockUsers = [
+  {
+    id: "1",
+    name: "John Makamba",
+    email: "john@example.com",
+    phone: "+255 789 456 123",
+    role: "customer",
+    status: "active",
+    joinedAt: "2026-01-15",
+    lastActive: "2026-03-17",
+    avatar: ""
+  },
+  {
+    id: "2",
+    name: "Juma Hassan",
+    email: "juma@example.com",
+    phone: "+255 712 345 678",
+    role: "fundi",
+    status: "active",
+    joinedAt: "2026-02-01",
+    lastActive: "2026-03-17",
+    subscriptionStatus: "active",
+    avatar: ""
+  },
+  {
+    id: "3",
+    name: "Kariakoo Hardware",
+    email: "info@kariakoo.co.tz",
+    phone: "+255 222 123 456",
+    role: "shop",
+    status: "active",
+    joinedAt: "2026-02-15",
+    lastActive: "2026-03-16",
+    subscriptionStatus: "active",
+    avatar: ""
+  },
+  {
+    id: "4",
+    name: "Grace Mwita",
+    email: "grace@example.com",
+    phone: "+255 765 432 109",
+    role: "customer",
+    status: "suspended",
+    joinedAt: "2026-03-01",
+    lastActive: "2026-03-10",
+    avatar: ""
+  }
+];
+
+const mockEvents = [
+  {
+    id: "1",
+    title: "Electrical Safety Workshop",
+    organizer: "VETA Dar es Salaam",
+    date: "2026-03-25",
+    location: "VETA Campus, Dar",
+    status: "approved",
+    fee: 25000,
+    expectedAttendees: 50
+  },
+  {
+    id: "2",
+    title: "Plumbing Certification Course",
+    organizer: "Tanzania Skills Foundation",
+    date: "2026-04-10",
+    location: "Arusha Technical College",
+    status: "pending",
+    fee: 25000,
+    expectedAttendees: 30
+  }
+];
+
+const mockRevenue = {
+  today: 125000,
+  thisWeek: 875000,
+  thisMonth: 3500000,
+  lastMonth: 2800000,
+  subscriptions: {
+    fundi: { active: 245, revenue: 1225000 },
+    shop: { active: 42, revenue: 630000 }
+  },
+  promotions: {
+    listings: 156,
+    revenue: 234000
+  },
+  events: {
+    approved: 8,
+    revenue: 200000
+  }
+};
+
+const mockSecurityLogs = [
+  {
+    id: "1",
+    type: "rate_limit",
+    ip: "192.168.1.100",
+    endpoint: "/api/auth/login",
+    timestamp: "2026-03-17 10:30:00",
+    details: "5 failed login attempts"
+  },
+  {
+    id: "2",
+    type: "validation_failure",
+    ip: "192.168.1.105",
+    endpoint: "/api/auth/signup",
+    timestamp: "2026-03-17 09:15:00",
+    details: "Invalid phone format"
+  },
+  {
+    id: "3",
+    type: "suspicious_activity",
+    ip: "10.0.0.50",
+    endpoint: "/api/payments/mpesa",
+    timestamp: "2026-03-16 22:45:00",
+    details: "Multiple payment attempts"
+  }
+];
+
+const mockReports = [
+  {
+    id: "1",
+    reportedUser: "Fake Electrician",
+    reportedBy: "John Makamba",
+    reason: "Fraudulent profile",
+    status: "pending",
+    date: "2026-03-16"
+  },
+  {
+    id: "2",
+    reportedUser: "Spam Shop",
+    reportedBy: "Maria Joseph",
+    reason: "Spam messages",
+    status: "resolved",
+    date: "2026-03-14"
+  }
+];
+
+export default function AdminDashboard() {
+  const router = useRouter();
+  const { language } = useLanguage();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const [activeTab, setActiveTab] = useState("overview");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [userFilter, setUserFilter] = useState("all");
+  const [selectedApproval, setSelectedApproval] = useState<typeof mockPendingApprovals[0] | null>(null);
+  const [supportHotline, setSupportHotline] = useState(getSupportHotline());
+  const [hotlineSaved, setHotlineSaved] = useState(false);
 
   useEffect(() => {
-    const adminData = localStorage.getItem("smartfundi_admin");
-    if (adminData) {
-      try {
-        const parsed = JSON.parse(adminData);
-        if (parsed.role === "admin") {
-          setIsAuthenticated(true);
-          setAdminName(parsed.name || "Admin");
-        } else {
-          router.push("/admin/login");
-        }
-      } catch {
-        router.push("/admin/login");
-      }
-    } else {
+    if (!authLoading && !isAuthenticated) {
       router.push("/admin/login");
     }
+  }, [authLoading, isAuthenticated, router]);
 
-    // Load support hotline from settings
-    setSupportHotline(getSupportHotline());
-
-    setLoading(false);
-  }, [router]);
-
-  const handleLogout = () => {
-    localStorage.removeItem("smartfundi_admin");
-    router.push("/admin/login");
+  const formatCurrency = (amount: number, currency: "TZS" | "USD" = "TZS") => {
+    if (currency === "USD") {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        minimumFractionDigits: 0
+      }).format(amount / 2500); // Approximate TZS to USD
+    }
+    return new Intl.NumberFormat("sw-TZ", {
+      style: "currency",
+      currency: "TZS",
+      minimumFractionDigits: 0
+    }).format(amount);
   };
 
-  const handleResolveBug = (bugId: string) => {
-    setBugReports(prev => 
-      prev.map(bug => 
-        bug.id === bugId 
-          ? { ...bug, status: "resolved" as const, resolvedAt: new Date().toISOString() }
-          : bug
-      )
+  const getStatusBadge = (status: string) => {
+    const statusConfig: Record<string, { variant: "default" | "secondary" | "destructive" | "outline"; label: string; labelSw: string }> = {
+      active: { variant: "default", label: "Active", labelSw: "Hai" },
+      pending: { variant: "secondary", label: "Pending", labelSw: "Inasubiri" },
+      approved: { variant: "default", label: "Approved", labelSw: "Imeidhinishwa" },
+      rejected: { variant: "destructive", label: "Rejected", labelSw: "Imekataliwa" },
+      suspended: { variant: "destructive", label: "Suspended", labelSw: "Imesimamishwa" },
+      resolved: { variant: "outline", label: "Resolved", labelSw: "Imetatuliwa" }
+    };
+    const config = statusConfig[status] || statusConfig.pending;
+    return (
+      <Badge variant={config.variant}>
+        {language === "sw" ? config.labelSw : config.label}
+      </Badge>
     );
   };
 
-  const handleApproveVerification = (fundiId: string) => {
-    setPendingVerifications(prev =>
-      prev.map(fundi =>
-        fundi.id === fundiId
-          ? { ...fundi, verificationStatus: "approved" }
-          : fundi
-      )
+  const getRoleBadge = (role: string) => {
+    const roleConfig: Record<string, { color: string; label: string; labelSw: string; icon: React.ReactNode }> = {
+      customer: { color: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300", label: "Customer", labelSw: "Mteja", icon: <Users className="w-3 h-3" /> },
+      fundi: { color: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300", label: "Fundi", labelSw: "Fundi", icon: <Briefcase className="w-3 h-3" /> },
+      shop: { color: "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300", label: "Shop", labelSw: "Duka", icon: <Store className="w-3 h-3" /> },
+      admin: { color: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300", label: "Admin", labelSw: "Msimamizi", icon: <Shield className="w-3 h-3" /> }
+    };
+    const config = roleConfig[role] || roleConfig.customer;
+    return (
+      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${config.color}`}>
+        {config.icon}
+        {language === "sw" ? config.labelSw : config.label}
+      </span>
     );
-    console.log(`Approved fundi: ${fundiId}`);
   };
 
-  const handleRejectVerification = (fundiId: string) => {
-    setPendingVerifications(prev =>
-      prev.map(fundi =>
-        fundi.id === fundiId
-          ? { ...fundi, verificationStatus: "rejected" }
-          : fundi
-      )
-    );
-    console.log(`Rejected fundi: ${fundiId}`);
+  const handleApprove = (id: string) => {
+    console.log("Approving:", id);
+    // API call to approve user
   };
 
-  const handleApproveShopVerification = (shopId: string) => {
-    setPendingShopVerifications(prev =>
-      prev.map(shop =>
-        shop.id === shopId
-          ? { ...shop, verificationStatus: "approved" }
-          : shop
-      )
-    );
-    console.log(`Approved shop: ${shopId}`);
+  const handleReject = (id: string) => {
+    console.log("Rejecting:", id);
+    // API call to reject user
   };
 
-  const handleRejectShopVerification = (shopId: string) => {
-    setPendingShopVerifications(prev =>
-      prev.map(shop =>
-        shop.id === shopId
-          ? { ...shop, verificationStatus: "rejected" }
-          : shop
-      )
-    );
-    console.log(`Rejected shop: ${shopId}`);
-  };
-
-  const handleVerifyBySMS = (shopId: string, phone: string) => {
-    const smsMessage = "Smart Fundi: Tuma 'NIMETHIBITISHWA' kwa namba hii ili usajili wako uhalalishwe.";
-    console.log(`Sending SMS verification to ${phone}: ${smsMessage}`);
-    alert(`SMS verification sent to ${phone}. Shop owner should reply 'NIMETHIBITISHWA' to complete verification.`);
+  const handleSuspend = (id: string) => {
+    console.log("Suspending:", id);
+    // API call to suspend user
   };
 
   const handleSaveHotline = () => {
@@ -224,760 +329,841 @@ export default function AdminDashboardPage() {
     }
   };
 
-  if (loading) {
+  const filteredUsers = mockUsers.filter(u => {
+    const matchesSearch = u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         u.email.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFilter = userFilter === "all" || u.role === userFilter || u.status === userFilter;
+    return matchesSearch && matchesFilter;
+  });
+
+  const revenueGrowth = Math.round(((mockRevenue.thisMonth - mockRevenue.lastMonth) / mockRevenue.lastMonth) * 100);
+
+  if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="text-muted-foreground">Verifying credentials...</p>
-        </div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
-  if (!isAuthenticated) {
-    return null;
-  }
-
-  const totalRevenue = mockRevenueData.reduce((sum, item) => sum + item.revenue, 0);
-  const openBugs = bugReports.filter(b => b.status === "open").length;
-  const inProgressBugs = bugReports.filter(b => b.status === "in-progress").length;
-  const pendingVerificationsCount = pendingVerifications.filter(v => v.verificationStatus === "pending").length;
-
   return (
     <>
       <Head>
-        <title>Admin Dashboard - Smart Fundi</title>
-        <meta name="description" content="Admin analytics and management dashboard" />
-        <meta name="robots" content="noindex, nofollow" />
+        <title>{language === "sw" ? "Dashibodi ya Msimamizi - Smart Fundi" : "Admin Dashboard - Smart Fundi"}</title>
       </Head>
-
-      <div className="min-h-screen bg-gradient-to-br from-blue-50/50 to-orange-50/50 dark:from-gray-950 dark:to-gray-900">
-        <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="bg-blue-600 p-2 rounded-lg">
-                <BarChart3 className="h-6 w-6 text-white" />
+      
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Header />
+        
+        <main className="container mx-auto px-4 py-6 max-w-7xl">
+          {/* Admin Header */}
+          <div className="mb-6">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Shield className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-xl font-bold">Smart Fundi Admin</h1>
-                <p className="text-sm text-muted-foreground">Welcome back, {adminName}</p>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {language === "sw" ? "Dashibodi ya Msimamizi" : "Admin Dashboard"}
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  {language === "sw" ? "Simamia Smart Fundi" : "Manage Smart Fundi Platform"}
+                </p>
               </div>
             </div>
-            <Button 
-              variant="outline" 
-              onClick={handleLogout}
-              className="gap-2"
-            >
-              <LogOut className="h-4 w-4" />
-              Logout
-            </Button>
           </div>
-        </div>
 
-        <div className="container mx-auto px-4 py-8 space-y-8">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-blue-100">
-                  Total Customers
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-3xl font-bold">
-                    {mockUserStats.totalCustomers.toLocaleString()}
-                  </div>
-                  <Users className="h-8 w-8 text-blue-100" />
-                </div>
-                <p className="text-xs text-blue-100 mt-2">
-                  +{mockUserStats.newUsersThisMonth} this month
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white border-0">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-orange-100">
-                  Total Fundis
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-3xl font-bold">
-                    {mockUserStats.totalFundis.toLocaleString()}
-                  </div>
-                  <Wrench className="h-8 w-8 text-orange-100" />
-                </div>
-                <p className="text-xs text-orange-100 mt-2">
-                  Verified technicians
-                </p>
-              </CardContent>
-            </Card>
-
+          {/* Quick Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white border-0">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-green-100">
-                  Total Shops
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+              <CardContent className="p-4">
                 <div className="flex items-center justify-between">
-                  <div className="text-3xl font-bold">
-                    {mockUserStats.totalShops.toLocaleString()}
+                  <div>
+                    <p className="text-green-100 text-sm">
+                      {language === "sw" ? "Mapato Mwezi Huu" : "This Month Revenue"}
+                    </p>
+                    <p className="text-2xl font-bold">{formatCurrency(mockRevenue.thisMonth)}</p>
+                    <div className="flex items-center gap-1 mt-1">
+                      {revenueGrowth > 0 ? (
+                        <TrendingUp className="w-4 h-4 text-green-200" />
+                      ) : (
+                        <TrendingDown className="w-4 h-4 text-red-200" />
+                      )}
+                      <span className="text-xs text-green-100">{revenueGrowth > 0 ? "+" : ""}{revenueGrowth}%</span>
+                    </div>
                   </div>
-                  <Store className="h-8 w-8 text-green-100" />
+                  <DollarSign className="w-10 h-10 text-green-200" />
                 </div>
-                <p className="text-xs text-green-100 mt-2">
-                  Hardware & supply stores
-                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-blue-100 text-sm">
+                      {language === "sw" ? "Mafundi Hai" : "Active Fundis"}
+                    </p>
+                    <p className="text-2xl font-bold">{mockRevenue.subscriptions.fundi.active}</p>
+                    <p className="text-xs text-blue-100 mt-1">
+                      {formatCurrency(mockRevenue.subscriptions.fundi.revenue)}
+                    </p>
+                  </div>
+                  <Briefcase className="w-10 h-10 text-blue-200" />
+                </div>
               </CardContent>
             </Card>
 
             <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-purple-100">
-                  Total Revenue
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+              <CardContent className="p-4">
                 <div className="flex items-center justify-between">
-                  <div className="text-2xl font-bold">
-                    {formatTZS(totalRevenue)}
+                  <div>
+                    <p className="text-purple-100 text-sm">
+                      {language === "sw" ? "Maduka Hai" : "Active Shops"}
+                    </p>
+                    <p className="text-2xl font-bold">{mockRevenue.subscriptions.shop.active}</p>
+                    <p className="text-xs text-purple-100 mt-1">
+                      {formatCurrency(mockRevenue.subscriptions.shop.revenue)}
+                    </p>
                   </div>
-                  <TrendingUp className="h-8 w-8 text-purple-100" />
+                  <Store className="w-10 h-10 text-purple-200" />
                 </div>
-                <p className="text-xs text-purple-100 mt-2">
-                  Last 6 months
-                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-orange-500 to-red-500 text-white border-0">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-orange-100 text-sm">
+                      {language === "sw" ? "Inasubiri Idhini" : "Pending Approvals"}
+                    </p>
+                    <p className="text-2xl font-bold">{mockPendingApprovals.length}</p>
+                    <p className="text-xs text-orange-100 mt-1">
+                      {language === "sw" ? "Inahitaji hatua" : "Requires action"}
+                    </p>
+                  </div>
+                  <Clock className="w-10 h-10 text-orange-200" />
+                </div>
               </CardContent>
             </Card>
           </div>
 
-          <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-6 lg:w-auto">
-              <TabsTrigger value="overview" className="gap-2">
-                <BarChart3 className="h-4 w-4" />
-                <span className="hidden sm:inline">Overview</span>
+          {/* Main Content Tabs */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+            <TabsList className="grid grid-cols-3 md:grid-cols-6 lg:w-[800px]">
+              <TabsTrigger value="overview" className="text-xs md:text-sm">
+                <LayoutDashboard className="w-4 h-4 mr-1 hidden md:inline" />
+                {language === "sw" ? "Muhtasari" : "Overview"}
               </TabsTrigger>
-              <TabsTrigger value="geographic" className="gap-2">
-                <Globe className="h-4 w-4" />
-                <span className="hidden sm:inline">Geographic</span>
-              </TabsTrigger>
-              <TabsTrigger value="language" className="gap-2">
-                <MessageSquare className="h-4 w-4" />
-                <span className="hidden sm:inline">Language</span>
-              </TabsTrigger>
-              <TabsTrigger value="verifications" className="gap-2">
-                <FileText className="h-4 w-4" />
-                <span className="hidden sm:inline">Verifications</span>
-                {pendingVerificationsCount > 0 && (
-                  <span className="ml-1 bg-orange-500 text-white text-xs rounded-full px-1.5 py-0.5">
-                    {pendingVerificationsCount}
-                  </span>
+              <TabsTrigger value="approvals" className="text-xs md:text-sm">
+                <UserCheck className="w-4 h-4 mr-1 hidden md:inline" />
+                {language === "sw" ? "Idhini" : "Approvals"}
+                {mockPendingApprovals.length > 0 && (
+                  <Badge variant="destructive" className="ml-1 h-5 w-5 p-0 text-xs">
+                    {mockPendingApprovals.length}
+                  </Badge>
                 )}
               </TabsTrigger>
-              <TabsTrigger value="shop-verifications" className="gap-2">
-                <Store className="h-4 w-4" />
-                <span className="hidden sm:inline">Shop Verifications</span>
+              <TabsTrigger value="users" className="text-xs md:text-sm">
+                <Users className="w-4 h-4 mr-1 hidden md:inline" />
+                {language === "sw" ? "Watumiaji" : "Users"}
               </TabsTrigger>
-              <TabsTrigger value="bugs" className="gap-2">
-                <AlertTriangle className="h-4 w-4" />
-                <span className="hidden sm:inline">Bugs</span>
-                {openBugs > 0 && (
-                  <span className="ml-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">
-                    {openBugs}
-                  </span>
-                )}
+              <TabsTrigger value="events" className="text-xs md:text-sm">
+                <Calendar className="w-4 h-4 mr-1 hidden md:inline" />
+                {language === "sw" ? "Matukio" : "Events"}
               </TabsTrigger>
-              <TabsTrigger value="settings" className="gap-2">
-                <Settings className="h-4 w-4" />
-                <span className="hidden sm:inline">Settings</span>
+              <TabsTrigger value="security" className="text-xs md:text-sm">
+                <Shield className="w-4 h-4 mr-1 hidden md:inline" />
+                {language === "sw" ? "Usalama" : "Security"}
+              </TabsTrigger>
+              <TabsTrigger value="settings" className="text-xs md:text-sm">
+                <Settings className="w-4 h-4 mr-1 hidden md:inline" />
+                {language === "sw" ? "Mipangilio" : "Settings"}
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="overview" className="space-y-6">
-              <div className="grid gap-6 md:grid-cols-2">
+            {/* Overview Tab */}
+            <TabsContent value="overview" className="space-y-4">
+              <div className="grid md:grid-cols-2 gap-4">
+                {/* Revenue Breakdown */}
                 <Card>
-                  <CardHeader>
-                    <CardTitle>Subscription Status</CardTitle>
-                    <CardDescription>
-                      Active vs. expired subscriptions breakdown
-                    </CardDescription>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <BarChart3 className="w-5 h-5 text-green-500" />
+                      {language === "sw" ? "Mgawanyo wa Mapato" : "Revenue Breakdown"}
+                    </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="h-[300px] flex items-center justify-center">
-                      <div className="w-full max-w-sm">
-                        <SubscriptionChart 
-                          active={mockUserStats.activeSubscriptions}
-                          expired={mockUserStats.expiredSubscriptions}
-                        />
+                  <CardContent className="space-y-4">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                          <span className="text-sm">{language === "sw" ? "Usajili wa Mafundi" : "Fundi Subscriptions"}</span>
+                        </div>
+                        <span className="font-medium">{formatCurrency(mockRevenue.subscriptions.fundi.revenue)}</span>
                       </div>
+                      <Progress value={35} className="h-2" />
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                          <span className="text-sm">{language === "sw" ? "Usajili wa Maduka" : "Shop Subscriptions"}</span>
+                        </div>
+                        <span className="font-medium">{formatCurrency(mockRevenue.subscriptions.shop.revenue)}</span>
+                      </div>
+                      <Progress value={18} className="h-2" />
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                          <span className="text-sm">{language === "sw" ? "Matangazo" : "Promotions"}</span>
+                        </div>
+                        <span className="font-medium">{formatCurrency(mockRevenue.promotions.revenue)}</span>
+                      </div>
+                      <Progress value={7} className="h-2" />
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                          <span className="text-sm">{language === "sw" ? "Matukio" : "Events"}</span>
+                        </div>
+                        <span className="font-medium">{formatCurrency(mockRevenue.events.revenue)}</span>
+                      </div>
+                      <Progress value={6} className="h-2" />
                     </div>
-                    <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t">
-                      <div className="space-y-1">
-                        <p className="text-sm text-muted-foreground">Active</p>
-                        <p className="text-2xl font-bold text-blue-600">
-                          {mockUserStats.activeSubscriptions}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {((mockUserStats.activeSubscriptions / (mockUserStats.activeSubscriptions + mockUserStats.expiredSubscriptions)) * 100).toFixed(1)}%
-                        </p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-sm text-muted-foreground">Expired</p>
-                        <p className="text-2xl font-bold text-red-600">
-                          {mockUserStats.expiredSubscriptions}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {((mockUserStats.expiredSubscriptions / (mockUserStats.activeSubscriptions + mockUserStats.expiredSubscriptions)) * 100).toFixed(1)}%
-                        </p>
+                    
+                    <div className="pt-4 border-t">
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold">{language === "sw" ? "Jumla" : "Total"}</span>
+                        <div className="text-right">
+                          <p className="font-bold text-lg">{formatCurrency(mockRevenue.thisMonth)}</p>
+                          <p className="text-sm text-muted-foreground">≈ {formatCurrency(mockRevenue.thisMonth, "USD")}</p>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
+                {/* Recent Activity */}
                 <Card>
-                  <CardHeader>
-                    <CardTitle>User Distribution</CardTitle>
-                    <CardDescription>
-                      Breakdown by user type
-                    </CardDescription>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Activity className="w-5 h-5 text-blue-500" />
+                      {language === "sw" ? "Shughuli za Hivi Karibuni" : "Recent Activity"}
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="flex items-center gap-2">
-                            <Users className="h-4 w-4 text-blue-600" />
-                            Customers
-                          </span>
-                          <span className="font-semibold">{mockUserStats.totalCustomers.toLocaleString()}</span>
+                    <div className="space-y-3">
+                      {mockPendingApprovals.slice(0, 3).map((approval) => (
+                        <div key={approval.id} className="flex items-center gap-3 p-2 bg-muted/50 rounded-lg">
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage src={approval.avatar} />
+                            <AvatarFallback>
+                              {approval.type === "shop" ? <Store className="w-5 h-5" /> : approval.name.split(" ").map(n => n[0]).join("")}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium truncate">{approval.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {language === "sw" ? "Maombi mapya ya" : "New"} {approval.type} {language === "sw" ? "" : "application"}
+                            </p>
+                          </div>
+                          <Badge variant="secondary">
+                            <Clock className="w-3 h-3 mr-1" />
+                            {language === "sw" ? "Mpya" : "New"}
+                          </Badge>
                         </div>
-                        <div className="h-3 bg-secondary rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-blue-600 transition-all"
-                            style={{ width: `${(mockUserStats.totalCustomers / (mockUserStats.totalCustomers + mockUserStats.totalFundis + mockUserStats.totalShops)) * 100}%` }}
-                          ></div>
+                      ))}
+                      
+                      {mockSecurityLogs.slice(0, 2).map((log) => (
+                        <div key={log.id} className="flex items-center gap-3 p-2 bg-red-50 dark:bg-red-950/20 rounded-lg">
+                          <div className="p-2 bg-red-100 dark:bg-red-900 rounded-full">
+                            <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm">{log.type.replace("_", " ")}</p>
+                            <p className="text-xs text-muted-foreground">{log.details}</p>
+                          </div>
+                          <span className="text-xs text-muted-foreground">{log.timestamp.split(" ")[1]}</span>
                         </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="flex items-center gap-2">
-                            <Wrench className="h-4 w-4 text-orange-600" />
-                            Fundis
-                          </span>
-                          <span className="font-semibold">{mockUserStats.totalFundis.toLocaleString()}</span>
-                        </div>
-                        <div className="h-3 bg-secondary rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-orange-600 transition-all"
-                            style={{ width: `${(mockUserStats.totalFundis / (mockUserStats.totalCustomers + mockUserStats.totalFundis + mockUserStats.totalShops)) * 100}%` }}
-                          ></div>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="flex items-center gap-2">
-                            <Store className="h-4 w-4 text-green-600" />
-                            Shops
-                          </span>
-                          <span className="font-semibold">{mockUserStats.totalShops.toLocaleString()}</span>
-                        </div>
-                        <div className="h-3 bg-secondary rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-green-600 transition-all"
-                            style={{ width: `${(mockUserStats.totalShops / (mockUserStats.totalCustomers + mockUserStats.totalFundis + mockUserStats.totalShops)) * 100}%` }}
-                          ></div>
-                        </div>
-                      </div>
+                      ))}
                     </div>
+                    <Button variant="ghost" className="w-full mt-3" onClick={() => setActiveTab("approvals")}>
+                      {language === "sw" ? "Tazama Zote" : "View All"}
+                      <ChevronRight className="w-4 h-4 ml-1" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
 
-                    <div className="mt-6 pt-6 border-t">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Total Users</span>
-                        <span className="text-2xl font-bold">
-                          {(mockUserStats.totalCustomers + mockUserStats.totalFundis + mockUserStats.totalShops).toLocaleString()}
-                        </span>
+              {/* Platform Stats */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Globe className="w-5 h-5 text-purple-500" />
+                    {language === "sw" ? "Takwimu za Jukwaa" : "Platform Statistics"}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="text-center p-4 bg-muted/50 rounded-lg">
+                      <p className="text-3xl font-bold text-primary">{mockUsers.filter(u => u.role === "customer").length}</p>
+                      <p className="text-sm text-muted-foreground">{language === "sw" ? "Wateja" : "Customers"}</p>
+                    </div>
+                    <div className="text-center p-4 bg-muted/50 rounded-lg">
+                      <p className="text-3xl font-bold text-green-600">{mockRevenue.subscriptions.fundi.active}</p>
+                      <p className="text-sm text-muted-foreground">{language === "sw" ? "Mafundi" : "Fundis"}</p>
+                    </div>
+                    <div className="text-center p-4 bg-muted/50 rounded-lg">
+                      <p className="text-3xl font-bold text-purple-600">{mockRevenue.subscriptions.shop.active}</p>
+                      <p className="text-sm text-muted-foreground">{language === "sw" ? "Maduka" : "Shops"}</p>
+                    </div>
+                    <div className="text-center p-4 bg-muted/50 rounded-lg">
+                      <p className="text-3xl font-bold text-orange-600">{mockRevenue.events.approved}</p>
+                      <p className="text-sm text-muted-foreground">{language === "sw" ? "Matukio" : "Events"}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Approvals Tab */}
+            <TabsContent value="approvals" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <UserCheck className="w-5 h-5" />
+                      {language === "sw" ? "Maombi Yanayosubiri Idhini" : "Pending Approvals"}
+                    </span>
+                    <Badge variant="secondary">{mockPendingApprovals.length}</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {mockPendingApprovals.length === 0 ? (
+                    <div className="text-center py-8">
+                      <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
+                      <p className="text-muted-foreground">
+                        {language === "sw" ? "Hakuna maombi yanayosubiri" : "No pending approvals"}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {mockPendingApprovals.map((approval) => (
+                        <div key={approval.id} className="p-4 border rounded-lg">
+                          <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                            <div className="flex items-start gap-4">
+                              <Avatar className="h-14 w-14">
+                                <AvatarImage src={approval.avatar} />
+                                <AvatarFallback>
+                                  {approval.type === "shop" ? <Store className="w-6 h-6" /> : approval.name.split(" ").map(n => n[0]).join("")}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <div className="flex items-center gap-2 mb-1">
+                                  <h3 className="font-semibold">{approval.name}</h3>
+                                  {getRoleBadge(approval.type)}
+                                </div>
+                                <p className="text-sm text-muted-foreground">{approval.specialty}</p>
+                                <div className="flex flex-wrap gap-3 mt-2 text-sm text-muted-foreground">
+                                  <span className="flex items-center gap-1">
+                                    <Mail className="w-3 h-3" /> {approval.email}
+                                  </span>
+                                  <span className="flex items-center gap-1">
+                                    <Phone className="w-3 h-3" /> {approval.phone}
+                                  </span>
+                                  <span className="flex items-center gap-1">
+                                    <MapPin className="w-3 h-3" /> {approval.city}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2 mt-2">
+                                  <FileText className="w-4 h-4 text-muted-foreground" />
+                                  <span className="text-sm">{approval.documents.join(", ")}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex flex-col gap-2">
+                              <p className="text-xs text-muted-foreground text-right">
+                                {language === "sw" ? "Iliyowasilishwa" : "Submitted"}: {approval.submittedAt}
+                              </p>
+                              <div className="flex gap-2">
+                                <Dialog>
+                                  <DialogTrigger asChild>
+                                    <Button size="sm" variant="outline" onClick={() => setSelectedApproval(approval)}>
+                                      <Eye className="w-4 h-4 mr-1" />
+                                      {language === "sw" ? "Angalia" : "View"}
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent>
+                                    <DialogHeader>
+                                      <DialogTitle>{approval.name}</DialogTitle>
+                                      <DialogDescription>{approval.specialty} - {approval.city}</DialogDescription>
+                                    </DialogHeader>
+                                    <div className="space-y-4">
+                                      <div className="grid grid-cols-2 gap-4 text-sm">
+                                        <div>
+                                          <Label className="text-muted-foreground">{language === "sw" ? "Barua pepe" : "Email"}</Label>
+                                          <p>{approval.email}</p>
+                                        </div>
+                                        <div>
+                                          <Label className="text-muted-foreground">{language === "sw" ? "Simu" : "Phone"}</Label>
+                                          <p>{approval.phone}</p>
+                                        </div>
+                                        <div>
+                                          <Label className="text-muted-foreground">{language === "sw" ? "Nyaraka" : "Documents"}</Label>
+                                          <p>{approval.documents.join(", ")}</p>
+                                        </div>
+                                        <div>
+                                          <Label className="text-muted-foreground">{language === "sw" ? "Tarehe" : "Date"}</Label>
+                                          <p>{approval.submittedAt}</p>
+                                        </div>
+                                      </div>
+                                      <div className="flex gap-2 pt-4">
+                                        <Button className="flex-1" onClick={() => handleApprove(approval.id)}>
+                                          <CheckCircle className="w-4 h-4 mr-2" />
+                                          {language === "sw" ? "Idhinisha" : "Approve"}
+                                        </Button>
+                                        <Button variant="destructive" className="flex-1" onClick={() => handleReject(approval.id)}>
+                                          <XCircle className="w-4 h-4 mr-2" />
+                                          {language === "sw" ? "Kataa" : "Reject"}
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </DialogContent>
+                                </Dialog>
+                                <Button size="sm" onClick={() => handleApprove(approval.id)}>
+                                  <CheckCircle className="w-4 h-4 mr-1" />
+                                  {language === "sw" ? "Idhinisha" : "Approve"}
+                                </Button>
+                                <Button size="sm" variant="destructive" onClick={() => handleReject(approval.id)}>
+                                  <XCircle className="w-4 h-4 mr-1" />
+                                  {language === "sw" ? "Kataa" : "Reject"}
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Users Tab */}
+            <TabsContent value="users" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span>{language === "sw" ? "Usimamizi wa Watumiaji" : "User Management"}</span>
+                    <div className="flex gap-2">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                          placeholder={language === "sw" ? "Tafuta..." : "Search..."}
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="pl-10 w-48"
+                        />
                       </div>
+                      <Select value={userFilter} onValueChange={setUserFilter}>
+                        <SelectTrigger className="w-32">
+                          <Filter className="w-4 h-4 mr-2" />
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">{language === "sw" ? "Wote" : "All"}</SelectItem>
+                          <SelectItem value="customer">{language === "sw" ? "Wateja" : "Customers"}</SelectItem>
+                          <SelectItem value="fundi">{language === "sw" ? "Mafundi" : "Fundis"}</SelectItem>
+                          <SelectItem value="shop">{language === "sw" ? "Maduka" : "Shops"}</SelectItem>
+                          <SelectItem value="active">{language === "sw" ? "Hai" : "Active"}</SelectItem>
+                          <SelectItem value="suspended">{language === "sw" ? "Wamesimamishwa" : "Suspended"}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>{language === "sw" ? "Mtumiaji" : "User"}</TableHead>
+                        <TableHead>{language === "sw" ? "Jukumu" : "Role"}</TableHead>
+                        <TableHead>{language === "sw" ? "Hali" : "Status"}</TableHead>
+                        <TableHead>{language === "sw" ? "Alijiunga" : "Joined"}</TableHead>
+                        <TableHead>{language === "sw" ? "Vitendo" : "Actions"}</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredUsers.map((user) => (
+                        <TableRow key={user.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-3">
+                              <Avatar className="h-10 w-10">
+                                <AvatarImage src={user.avatar} />
+                                <AvatarFallback>
+                                  {user.role === "shop" ? <Store className="w-5 h-5" /> : user.name.split(" ").map(n => n[0]).join("")}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="font-medium">{user.name}</p>
+                                <p className="text-sm text-muted-foreground">{user.email}</p>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>{getRoleBadge(user.role)}</TableCell>
+                          <TableCell>{getStatusBadge(user.status)}</TableCell>
+                          <TableCell className="text-sm text-muted-foreground">{user.joinedAt}</TableCell>
+                          <TableCell>
+                            <div className="flex gap-1">
+                              <Button size="sm" variant="ghost">
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                              {user.status === "active" ? (
+                                <Button size="sm" variant="ghost" className="text-destructive" onClick={() => handleSuspend(user.id)}>
+                                  <Ban className="w-4 h-4" />
+                                </Button>
+                              ) : (
+                                <Button size="sm" variant="ghost" className="text-green-600">
+                                  <Unlock className="w-4 h-4" />
+                                </Button>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Events Tab */}
+            <TabsContent value="events" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span>{language === "sw" ? "Usimamizi wa Matukio" : "Event Management"}</span>
+                    <Button>
+                      <Plus className="w-4 h-4 mr-2" />
+                      {language === "sw" ? "Ongeza Tukio" : "Add Event"}
+                    </Button>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {mockEvents.map((event) => (
+                      <div key={event.id} className="p-4 border rounded-lg">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold">{event.title}</h3>
+                              {getStatusBadge(event.status)}
+                            </div>
+                            <p className="text-sm text-muted-foreground">{event.organizer}</p>
+                            <div className="flex flex-wrap gap-3 mt-2 text-sm text-muted-foreground">
+                              <span className="flex items-center gap-1">
+                                <Calendar className="w-3 h-3" /> {event.date}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <MapPin className="w-3 h-3" /> {event.location}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Users className="w-3 h-3" /> {event.expectedAttendees} {language === "sw" ? "wanaosubiri" : "expected"}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <div className="text-right">
+                              <p className="font-semibold text-primary">{formatCurrency(event.fee)}</p>
+                              <p className="text-xs text-muted-foreground">{language === "sw" ? "Ada" : "Fee"}</p>
+                            </div>
+                            <div className="flex gap-2">
+                              {event.status === "pending" && (
+                                <>
+                                  <Button size="sm" onClick={() => handleApprove(event.id)}>
+                                    <CheckCircle className="w-4 h-4 mr-1" />
+                                    {language === "sw" ? "Idhinisha" : "Approve"}
+                                  </Button>
+                                  <Button size="sm" variant="destructive" onClick={() => handleReject(event.id)}>
+                                    <XCircle className="w-4 h-4 mr-1" />
+                                    {language === "sw" ? "Kataa" : "Reject"}
+                                  </Button>
+                                </>
+                              )}
+                              {event.status === "approved" && (
+                                <Button size="sm" variant="outline">
+                                  <Edit className="w-4 h-4 mr-1" />
+                                  {language === "sw" ? "Hariri" : "Edit"}
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Security Tab */}
+            <TabsContent value="security" className="space-y-4">
+              <div className="grid md:grid-cols-2 gap-4">
+                {/* Security Logs */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Shield className="w-5 h-5 text-red-500" />
+                      {language === "sw" ? "Kumbukumbu za Usalama" : "Security Logs"}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {mockSecurityLogs.map((log) => (
+                        <div key={log.id} className="p-3 bg-muted/50 rounded-lg">
+                          <div className="flex items-start justify-between mb-2">
+                            <Badge variant={log.type === "suspicious_activity" ? "destructive" : "secondary"}>
+                              {log.type.replace("_", " ")}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">{log.timestamp}</span>
+                          </div>
+                          <p className="text-sm">{log.details}</p>
+                          <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                            <span>IP: {log.ip}</span>
+                            <span>{log.endpoint}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <Button variant="outline" className="w-full mt-4">
+                      <Download className="w-4 h-4 mr-2" />
+                      {language === "sw" ? "Pakua Ripoti" : "Export Logs"}
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* User Reports */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Flag className="w-5 h-5 text-orange-500" />
+                      {language === "sw" ? "Ripoti za Watumiaji" : "User Reports"}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {mockReports.map((report) => (
+                        <div key={report.id} className="p-3 bg-muted/50 rounded-lg">
+                          <div className="flex items-start justify-between mb-2">
+                            <div>
+                              <p className="font-medium">{report.reportedUser}</p>
+                              <p className="text-sm text-muted-foreground">{report.reason}</p>
+                            </div>
+                            {getStatusBadge(report.status)}
+                          </div>
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <span>{language === "sw" ? "Iliyoripotiwa na" : "Reported by"}: {report.reportedBy}</span>
+                            <span>{report.date}</span>
+                          </div>
+                          {report.status === "pending" && (
+                            <div className="flex gap-2 mt-3">
+                              <Button size="sm" variant="outline" className="flex-1">
+                                <Eye className="w-4 h-4 mr-1" />
+                                {language === "sw" ? "Chunguza" : "Investigate"}
+                              </Button>
+                              <Button size="sm" variant="destructive">
+                                <UserX className="w-4 h-4 mr-1" />
+                                {language === "sw" ? "Simamisha" : "Suspend"}
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Rate Limit Stats */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Activity className="w-5 h-5 text-blue-500" />
+                    {language === "sw" ? "Takwimu za Kiwango cha Ombi" : "Rate Limit Statistics"}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="text-center p-4 bg-muted/50 rounded-lg">
+                      <p className="text-2xl font-bold text-red-500">23</p>
+                      <p className="text-sm text-muted-foreground">{language === "sw" ? "Majaribio ya Kuingia" : "Login Attempts"}</p>
+                    </div>
+                    <div className="text-center p-4 bg-muted/50 rounded-lg">
+                      <p className="text-2xl font-bold text-orange-500">8</p>
+                      <p className="text-sm text-muted-foreground">{language === "sw" ? "Uthibitishaji Batili" : "Validation Failures"}</p>
+                    </div>
+                    <div className="text-center p-4 bg-muted/50 rounded-lg">
+                      <p className="text-2xl font-bold text-yellow-500">5</p>
+                      <p className="text-sm text-muted-foreground">{language === "sw" ? "IP Zilizozuiwa" : "Blocked IPs"}</p>
+                    </div>
+                    <div className="text-center p-4 bg-muted/50 rounded-lg">
+                      <p className="text-2xl font-bold text-green-500">99.2%</p>
+                      <p className="text-sm text-muted-foreground">{language === "sw" ? "Ombi Halali" : "Valid Requests"}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Settings Tab */}
+            <TabsContent value="settings" className="space-y-4">
+              <div className="grid md:grid-cols-2 gap-4">
+                {/* Support Hotline */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Phone className="w-5 h-5 text-green-500" />
+                      {language === "sw" ? "Namba ya Msaada" : "Support Hotline"}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>{language === "sw" ? "Namba ya Simu" : "Phone Number"}</Label>
+                      <Input
+                        value={supportHotline}
+                        onChange={(e) => setSupportHotline(e.target.value)}
+                        placeholder="+255 XXX XXX XXX"
+                      />
+                    </div>
+                    <Button onClick={handleSaveHotline} disabled={hotlineSaved}>
+                      {hotlineSaved ? (
+                        <>
+                          <CheckCircle className="w-4 h-4 mr-2" />
+                          {language === "sw" ? "Imehifadhiwa!" : "Saved!"}
+                        </>
+                      ) : (
+                        <>
+                          {language === "sw" ? "Hifadhi" : "Save"}
+                        </>
+                      )}
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* Platform Settings */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Settings className="w-5 h-5 text-purple-500" />
+                      {language === "sw" ? "Mipangilio ya Jukwaa" : "Platform Settings"}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">{language === "sw" ? "Usajili Mpya" : "New Registrations"}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {language === "sw" ? "Ruhusu usajili mpya" : "Allow new user registrations"}
+                        </p>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">{language === "sw" ? "Malipo ya M-Pesa" : "M-Pesa Payments"}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {language === "sw" ? "Washa malipo ya M-Pesa" : "Enable M-Pesa payments"}
+                        </p>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">{language === "sw" ? "Hali ya Matengenezo" : "Maintenance Mode"}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {language === "sw" ? "Zima jukwaa kwa matengenezo" : "Disable platform for maintenance"}
+                        </p>
+                      </div>
+                      <Switch />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Subscription Pricing */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <CreditCard className="w-5 h-5 text-blue-500" />
+                      {language === "sw" ? "Bei za Usajili" : "Subscription Pricing"}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>{language === "sw" ? "Usajili wa Fundi (TZS/mwezi)" : "Fundi Subscription (TZS/month)"}</Label>
+                      <Input type="number" defaultValue="5000" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>{language === "sw" ? "Usajili wa Duka (TZS/mwezi)" : "Shop Subscription (TZS/month)"}</Label>
+                      <Input type="number" defaultValue="15000" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>{language === "sw" ? "Tangazo la Siku (TZS)" : "Daily Promotion (TZS)"}</Label>
+                      <Input type="number" defaultValue="1500" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>{language === "sw" ? "Ada ya Tukio (TZS)" : "Event Fee (TZS)"}</Label>
+                      <Input type="number" defaultValue="25000" />
+                    </div>
+                    <Button className="w-full">
+                      {language === "sw" ? "Hifadhi Bei" : "Save Pricing"}
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* Notifications */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Bell className="w-5 h-5 text-orange-500" />
+                      {language === "sw" ? "Arifa za Msimamizi" : "Admin Notifications"}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">{language === "sw" ? "Usajili Mpya" : "New Registrations"}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {language === "sw" ? "Arifa ya usajili mpya" : "Notify on new registrations"}
+                        </p>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">{language === "sw" ? "Arifa za Usalama" : "Security Alerts"}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {language === "sw" ? "Arifa za shughuli za shaka" : "Alert on suspicious activity"}
+                        </p>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">{language === "sw" ? "Ripoti za Watumiaji" : "User Reports"}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {language === "sw" ? "Arifa ya ripoti mpya" : "Notify on new reports"}
+                        </p>
+                      </div>
+                      <Switch defaultChecked />
                     </div>
                   </CardContent>
                 </Card>
               </div>
             </TabsContent>
-
-            <TabsContent value="geographic" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Geographic Distribution</CardTitle>
-                  <CardDescription>
-                    Sign-ups by city across Tanzania
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <GeographicHeatmap data={mockGeographicData} />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="language" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Language Preference</CardTitle>
-                  <CardDescription>
-                    Percentage of users by language preference
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[350px] flex items-center justify-center">
-                    <div className="w-full max-w-sm">
-                      <LanguageChart 
-                        english={mockLanguageStats.english}
-                        swahili={mockLanguageStats.swahili}
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t">
-                    <div className="space-y-1 text-center">
-                      <p className="text-sm text-muted-foreground">English Users</p>
-                      <p className="text-3xl font-bold text-blue-600">
-                        {mockLanguageStats.english}%
-                      </p>
-                      <p className="text-xs text-muted-foreground">Primary language</p>
-                    </div>
-                    <div className="space-y-1 text-center">
-                      <p className="text-sm text-muted-foreground">Swahili Users</p>
-                      <p className="text-3xl font-bold text-orange-600">
-                        {mockLanguageStats.swahili}%
-                      </p>
-                      <p className="text-xs text-muted-foreground">Primary language</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="verifications" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Pending Identity Verifications</CardTitle>
-                  <CardDescription>
-                    Fundi accounts using alternative documents requiring manual review
-                  </CardDescription>
-                  <div className="flex items-center gap-4 text-sm pt-2">
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full bg-orange-600"></div>
-                      <span>{pendingVerificationsCount} Pending</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full bg-green-600"></div>
-                      <span>{pendingVerifications.filter(v => v.verificationStatus === "approved").length} Approved</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full bg-red-600"></div>
-                      <span>{pendingVerifications.filter(v => v.verificationStatus === "rejected").length} Rejected</span>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  {pendingVerifications.length === 0 ? (
-                    <div className="text-center py-12">
-                      <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                      <p className="text-muted-foreground">No pending verifications</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {pendingVerifications.map((fundi) => (
-                        <div
-                          key={fundi.id}
-                          className={`border-2 rounded-lg p-4 ${
-                            fundi.verificationStatus === "pending"
-                              ? "border-orange-200 bg-orange-50 dark:bg-orange-950"
-                              : fundi.verificationStatus === "approved"
-                              ? "border-green-200 bg-green-50 dark:bg-green-950"
-                              : "border-red-200 bg-red-50 dark:bg-red-950"
-                          }`}
-                        >
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-center gap-4">
-                              <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-lg">
-                                <Wrench className="h-6 w-6 text-blue-600" />
-                              </div>
-                              <div>
-                                <h3 className="font-semibold text-lg">{fundi.name}</h3>
-                                <p className="text-sm text-muted-foreground">
-                                  {fundi.specialty} • {fundi.city}
-                                </p>
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  Submitted: {fundi.submittedDate}
-                                </p>
-                              </div>
-                            </div>
-                            <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                              fundi.verificationStatus === "pending"
-                                ? "bg-orange-500 text-white"
-                                : fundi.verificationStatus === "approved"
-                                ? "bg-green-500 text-white"
-                                : "bg-red-500 text-white"
-                            }`}>
-                              {fundi.verificationStatus.toUpperCase()}
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
-                            <div>
-                              <p className="text-muted-foreground">Email</p>
-                              <p className="font-medium">{fundi.email}</p>
-                            </div>
-                            <div>
-                              <p className="text-muted-foreground">Phone</p>
-                              <p className="font-medium">{fundi.phone}</p>
-                            </div>
-                          </div>
-
-                          <div className="mb-4">
-                            <p className="text-sm font-medium mb-2">
-                              Uploaded Document: {fundi.documentType}
-                            </p>
-                            <div className="border-2 border-dashed rounded-lg p-4 bg-white dark:bg-gray-900">
-                              <div className="flex items-center gap-2 text-blue-600">
-                                <FileText className="h-5 w-5" />
-                                <span className="text-sm font-medium">
-                                  {fundi.documentType} Document
-                                </span>
-                              </div>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                Click to view full document
-                              </p>
-                            </div>
-                          </div>
-
-                          <Alert className="mb-4 border-yellow-200 bg-yellow-50 dark:bg-yellow-950">
-                            <AlertTriangle className="h-4 w-4 text-yellow-600" />
-                            <AlertDescription className="text-yellow-800 dark:text-yellow-200 text-sm">
-                              <strong>Action Required:</strong> This fundi provided an alternative government-issued document (Passport, Driver's License, Voter's Card, NIDA Application Receipt, School Documentation, or Birth Certificate) instead of a National ID Number. Please verify the document authenticity before approving.
-                            </AlertDescription>
-                          </Alert>
-
-                          {fundi.verificationStatus === "pending" && (
-                            <div className="flex gap-2">
-                              <Button
-                                className="flex-1 bg-green-600 hover:bg-green-700"
-                                onClick={() => handleApproveVerification(fundi.id)}
-                              >
-                                <CheckCircle className="h-4 w-4 mr-2" />
-                                Approve & Activate
-                              </Button>
-                              <Button
-                                variant="outline"
-                                className="flex-1 border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
-                                onClick={() => handleRejectVerification(fundi.id)}
-                              >
-                                <XCircle className="h-4 w-4 mr-2" />
-                                Reject
-                              </Button>
-                            </div>
-                          )}
-
-                          {fundi.verificationStatus === "approved" && (
-                            <div className="flex items-center gap-2 text-green-600">
-                              <CheckCircle className="h-5 w-5" />
-                              <span className="font-medium">Account Approved & Activated</span>
-                            </div>
-                          )}
-
-                          {fundi.verificationStatus === "rejected" && (
-                            <div className="flex items-center gap-2 text-red-600">
-                              <XCircle className="h-5 w-5" />
-                              <span className="font-medium">Account Rejected - User Notified</span>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="shop-verifications" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Pending Shop Verifications</CardTitle>
-                  <CardDescription>
-                    Shop accounts requiring verification before displaying full credentials
-                  </CardDescription>
-                  <div className="flex items-center gap-4 text-sm pt-2">
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full bg-orange-600"></div>
-                      <span>{pendingShopVerifications.filter(s => s.verificationStatus === "pending").length} Pending</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full bg-green-600"></div>
-                      <span>{pendingShopVerifications.filter(s => s.verificationStatus === "approved").length} Approved</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full bg-red-600"></div>
-                      <span>{pendingShopVerifications.filter(s => s.verificationStatus === "rejected").length} Rejected</span>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  {pendingShopVerifications.length === 0 ? (
-                    <div className="text-center py-12">
-                      <Store className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                      <p className="text-muted-foreground">No pending shop verifications</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {pendingShopVerifications.map((shop) => (
-                        <div
-                          key={shop.id}
-                          className={`border-2 rounded-lg p-4 ${
-                            shop.verificationStatus === "pending"
-                              ? "border-orange-200 bg-orange-50 dark:bg-orange-950"
-                              : shop.verificationStatus === "approved"
-                              ? "border-green-200 bg-green-50 dark:bg-green-950"
-                              : "border-red-200 bg-red-50 dark:bg-red-950"
-                          }`}
-                        >
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-center gap-4">
-                              <div className="bg-green-100 dark:bg-green-900 p-3 rounded-lg">
-                                <Store className="h-6 w-6 text-green-600" />
-                              </div>
-                              <div>
-                                <h3 className="font-semibold text-lg">{shop.shopName}</h3>
-                                <p className="text-sm text-muted-foreground">{shop.city}</p>
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  Submitted: {shop.submittedDate}
-                                </p>
-                              </div>
-                            </div>
-                            <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                              shop.verificationStatus === "pending"
-                                ? "bg-orange-500 text-white"
-                                : shop.verificationStatus === "approved"
-                                ? "bg-green-500 text-white"
-                                : "bg-red-500 text-white"
-                            }`}>
-                              {shop.verificationStatus.toUpperCase()}
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
-                            <div>
-                              <p className="text-muted-foreground">Email</p>
-                              <p className="font-medium">{shop.email}</p>
-                            </div>
-                            <div>
-                              <p className="text-muted-foreground">Phone</p>
-                              <p className="font-medium">{shop.phone}</p>
-                            </div>
-                          </div>
-
-                          {shop.businessRegistrationNumber && (
-                            <div className="flex items-start gap-3 p-3 bg-muted rounded-lg mb-3">
-                              <FileText className="h-5 w-5 text-blue-600 mt-0.5" />
-                              <div className="flex-1">
-                                <p className="font-medium text-sm">Business Registration (BRELA)</p>
-                                <p className="text-sm text-muted-foreground">{shop.businessRegistrationNumber}</p>
-                              </div>
-                            </div>
-                          )}
-
-                          {shop.physicalAddress && (
-                            <div className="flex items-start gap-3 p-3 bg-muted rounded-lg mb-3">
-                              <MapPinned className="h-5 w-5 text-blue-600 mt-0.5" />
-                              <div className="flex-1">
-                                <p className="font-medium text-sm">Physical Address</p>
-                                <p className="text-sm text-muted-foreground">{shop.physicalAddress}</p>
-                              </div>
-                            </div>
-                          )}
-
-                          {(shop.storefrontPhotoUrl || shop.businessLicenseUrl || shop.tinCertificateUrl) && (
-                            <div className="mb-4">
-                              <p className="font-medium text-sm mb-2">Uploaded Documents</p>
-                              <div className="grid grid-cols-3 gap-2">
-                                {shop.storefrontPhotoUrl && (
-                                  <div className="border rounded-lg p-2 text-center">
-                                    <FileText className="h-8 w-8 mx-auto mb-1 text-muted-foreground" />
-                                    <p className="text-xs">Storefront Photo</p>
-                                  </div>
-                                )}
-                                {shop.businessLicenseUrl && (
-                                  <div className="border rounded-lg p-2 text-center">
-                                    <FileText className="h-8 w-8 mx-auto mb-1 text-muted-foreground" />
-                                    <p className="text-xs">Business License</p>
-                                  </div>
-                                )}
-                                {shop.tinCertificateUrl && (
-                                  <div className="border rounded-lg p-2 text-center">
-                                    <FileText className="h-8 w-8 mx-auto mb-1 text-muted-foreground" />
-                                    <p className="text-xs">TIN Certificate</p>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          )}
-
-                          {shop.scamReports >= 2 && (
-                            <Alert className="mb-4 border-red-200 bg-red-50 dark:bg-red-950">
-                              <AlertTriangle className="h-4 w-4 text-red-600" />
-                              <AlertDescription className="text-red-800 dark:text-red-200 text-sm">
-                                <strong>⚠️ Flagged for Review:</strong> This shop has received {shop.scamReports} scam report(s) from customers.
-                              </AlertDescription>
-                            </Alert>
-                          )}
-
-                          {shop.verificationStatus === "pending" && (
-                            <div className="space-y-2">
-                              <div className="grid grid-cols-2 gap-2">
-                                <Button
-                                  className="bg-green-600 hover:bg-green-700"
-                                  onClick={() => handleApproveShopVerification(shop.id)}
-                                >
-                                  <CheckCircle className="h-4 w-4 mr-2" />
-                                  Approve & Activate
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  className="border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
-                                  onClick={() => handleRejectShopVerification(shop.id)}
-                                >
-                                  <XCircle className="h-4 w-4 mr-2" />
-                                  Reject
-                                </Button>
-                              </div>
-                              <Button
-                                variant="outline"
-                                className="w-full"
-                                onClick={() => handleVerifyBySMS(shop.id, shop.phone)}
-                              >
-                                <Phone className="h-4 w-4 mr-2" />
-                                Verify by SMS/Call
-                              </Button>
-                            </div>
-                          )}
-
-                          {shop.verificationStatus === "approved" && (
-                            <div className="flex items-center gap-2 text-green-600">
-                              <CheckCircle className="h-5 w-5" />
-                              <span className="font-medium">Shop Approved & Verified</span>
-                            </div>
-                          )}
-
-                          {shop.verificationStatus === "rejected" && (
-                            <div className="flex items-center gap-2 text-red-600">
-                              <XCircle className="h-5 w-5" />
-                              <span className="font-medium">Shop Rejected - Owner Notified</span>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="bugs" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Bug Reports</CardTitle>
-                  <CardDescription>
-                    User-submitted issues and their status
-                  </CardDescription>
-                  <div className="flex items-center gap-4 text-sm pt-2">
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full bg-red-600"></div>
-                      <span>{openBugs} Open</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full bg-yellow-600"></div>
-                      <span>{inProgressBugs} In Progress</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full bg-green-600"></div>
-                      <span>{bugReports.filter(b => b.status === "resolved").length} Resolved</span>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <BugReportsList 
-                    reports={bugReports}
-                    onResolve={handleResolveBug}
-                  />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="settings" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Customer Support Hotline (Tanzania)</CardTitle>
-                  <CardDescription>
-                    Configure the phone number customers can call for human support
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="hotline">Support Phone Number</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="hotline"
-                        type="tel"
-                        value={supportHotline}
-                        onChange={(e) => setSupportHotline(e.target.value)}
-                        placeholder="+255 XXX XXX XXX"
-                        className="flex-1"
-                      />
-                      <Button onClick={handleSaveHotline} className="gap-2">
-                        <Phone className="h-4 w-4" />
-                        Save
-                      </Button>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      This number is displayed in Help & Support and used when users request human assistance
-                    </p>
-                  </div>
-
-                  {hotlineSaved && (
-                    <Alert className="border-green-200 bg-green-50 dark:bg-green-950">
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                      <AlertDescription className="text-green-800 dark:text-green-200">
-                        Support hotline updated successfully! New number: <strong>{formatPhoneNumber(supportHotline)}</strong>
-                      </AlertDescription>
-                    </Alert>
-                  )}
-
-                  <div className="p-4 border rounded-lg bg-muted/50">
-                    <h4 className="font-medium mb-2 flex items-center gap-2">
-                      <Phone className="h-4 w-4" />
-                      Current Hotline
-                    </h4>
-                    <p className="text-2xl font-bold text-blue-600">
-                      {formatPhoneNumber(supportHotline)}
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Displayed across the app for customer support
-                    </p>
-                  </div>
-
-                  <Alert>
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>
-                      <strong>Note:</strong> This setting is stored locally. In production with Supabase, it would be secured with admin-only database rules.
-                    </AlertDescription>
-                  </Alert>
-                </CardContent>
-              </Card>
-            </TabsContent>
           </Tabs>
-        </div>
+        </main>
       </div>
     </>
   );
