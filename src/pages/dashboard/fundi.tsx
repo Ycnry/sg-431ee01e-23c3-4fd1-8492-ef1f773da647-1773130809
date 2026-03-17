@@ -153,7 +153,7 @@ const mockMessages = [
 export default function FundiDashboard() {
   const router = useRouter();
   const { t, language } = useLanguage();
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
   const [isAvailable, setIsAvailable] = useState(true);
   const [showEditProfile, setShowEditProfile] = useState(false);
