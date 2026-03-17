@@ -6,14 +6,16 @@ import { useRouter } from "next/router";
  * BottomNavigation - Smart Fundi
  * 
  * 5 equally spaced tabs (20% each):
- * - Nyumbani (home)
- * - Tafuta (search)
- * - Matukio (calendar/events)
- * - Wasifu (profile)
- * - Ingia (login)
+ * - Nyumbani (home icon)
+ * - Tafuta (search icon)
+ * - Matukio (calendar icon)
+ * - Wasifu (person icon)
+ * - Ingia (login icon)
  * 
  * Orange background (#F5A623)
  * White icons/labels, deep blue (#1A3C6E) when active
+ * Bar height: 65px
+ * Icons: 22px, centered above labels
  */
 
 interface NavTab {
@@ -39,7 +41,6 @@ export function BottomNavigation() {
     setMounted(true);
   }, []);
 
-  // Determine which tab is active based on current route
   const getActiveTab = (): string => {
     const path = router.pathname;
     
