@@ -338,11 +338,26 @@
   justify-content: center;
   width: 24px;
   height: 24px;
-  transition: opacity 0.3s ease;
+  /* Smooth lift/drop animation for icons */
+  transition: transform 0.4s ease, opacity 0.3s ease;
+  will-change: transform, opacity;
+}
+
+.sf-nav-icon-active {
+  /* Lift the icon up when active */
+  transform: translateY(-28px);
+  opacity: 0;
+}
+
+.sf-nav-icon-inactive {
+  /* Default position for inactive icons */
+  transform: translateY(0);
+  opacity: 1;
 }
 
 .sf-nav-icon-hidden {
   opacity: 0;
+  transform: translateY(-28px);
 }
 
 .sf-nav-icon svg {
@@ -370,7 +385,10 @@
   height: 70px;
   pointer-events: none;
   z-index: 1001;
-  transition: transform 0.5s ease;
+  /* Smooth horizontal sliding animation */
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  /* GPU acceleration for smooth mobile performance */
+  will-change: transform;
 }
 
 .sf-bubble-circle {

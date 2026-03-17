@@ -231,7 +231,9 @@ export function BottomNavigation() {
                 className={`sf-nav-link ${isActive ? "sf-nav-active" : ""}`}
                 aria-current={isActive ? "page" : undefined}
               >
-                <span className={`sf-nav-icon ${isActive ? "sf-nav-icon-hidden" : ""}`}>
+                <span 
+                  className={`sf-nav-icon ${isActive ? "sf-nav-icon-active" : "sf-nav-icon-inactive"}`}
+                >
                   {getIcon(tab.id, iconColor)}
                 </span>
                 <span className="sf-nav-label">{tab.label}</span>
