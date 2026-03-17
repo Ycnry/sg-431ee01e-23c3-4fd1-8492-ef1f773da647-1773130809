@@ -33,6 +33,20 @@
   .card-shadow-mobile {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
+  
+  /* Card hover glow effect */
+  .hover-glow {
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+  
+  .hover-glow:hover {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.15), 0 10px 40px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Floating animation for featured items */
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
 }
 
 @layer base {
@@ -247,4 +261,75 @@
 
 .animate-slide-up {
   animation: slideUp 0.3s ease-out forwards;
+}
+
+/* Floating animation for featured badges */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* Featured card pulse effect */
+@keyframes featuredPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(249, 115, 22, 0);
+  }
+}
+
+.featured-pulse {
+  animation: featuredPulse 2s ease-in-out infinite;
+}
+
+/* Shine effect for cards */
+.shine-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.shine-effect::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transition: left 0.5s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.shine-effect:hover::before {
+  left: 100%;
+}
+
+/* Gradient border animation for featured cards */
+@keyframes gradientBorder {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.gradient-border-animate {
+  background: linear-gradient(90deg, hsl(var(--accent)), hsl(var(--primary)), hsl(var(--accent)));
+  background-size: 200% 200%;
+  animation: gradientBorder 3s ease infinite;
 }
