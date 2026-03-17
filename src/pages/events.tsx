@@ -1,4 +1,3 @@
-
 import Head from "next/head";
 import { Header } from "@/components/Header";
 import { EventCard } from "@/components/EventCard";
