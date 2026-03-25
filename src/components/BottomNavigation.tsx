@@ -1,208 +1,102 @@
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
 /**
  * BottomNavigation - Smart Fundi
  * 
- * 5 equally spaced tabs (flex: 1 each):
- * - Nyumbani (home icon)
- * - Tafuta (search icon)
- * - Matukio (calendar icon)
- * - Wasifu (person icon)
- * - Ingia (login icon)
+ * Simple, clean bottom navigation with 5 tabs:
+ * - Nyumbani (Home)
+ * - Tafuta (Search)
+ * - Matukio (Events)
+ * - Wasifu (Profile)
+ * - Ingia (Login)
  * 
- * Orange background (#F5A623) with curved notch
- * White icons/labels for all tabs (always visible)
- * Active tab: icon lifts up into deep blue (#1A3C6E) circle bubble
- * Bar height: 65px
- * Icons: 24px inline SVGs
- * Labels: 12px, always visible
+ * Plain functional navigation - no custom animations or indicators.
+ * Ready to be restyled from scratch.
  */
 
 interface NavTab {
   id: string;
   label: string;
   href: string;
-  index: number;
 }
 
 const tabs: NavTab[] = [
-  { id: "home", label: "Nyumbani", href: "/", index: 0 },
-  { id: "search", label: "Tafuta", href: "/search", index: 1 },
-  { id: "events", label: "Matukio", href: "/events", index: 2 },
-  { id: "profile", label: "Wasifu", href: "/profile", index: 3 },
-  { id: "login", label: "Ingia", href: "/auth/signin", index: 4 },
+  { id: "home", label: "Nyumbani", href: "/" },
+  { id: "search", label: "Tafuta", href: "/search" },
+  { id: "events", label: "Matukio", href: "/events" },
+  { id: "profile", label: "Wasifu", href: "/profile" },
+  { id: "login", label: "Ingia", href: "/auth/signin" },
 ];
 
-// Inline SVG icons - 24x24px
-function HomeIcon({ color }: { color: string }) {
+// Simple SVG icons - 24x24
+function HomeIcon({ active }: { active: boolean }) {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path 
-        d="M3 9.5L12 3L21 9.5V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9.5Z" 
-        stroke={color} 
-        strokeWidth="2" 
-        strokeLinecap="round" 
-        strokeLinejoin="round"
-      />
-      <path 
-        d="M9 22V12H15V22" 
-        stroke={color} 
-        strokeWidth="2" 
-        strokeLinecap="round" 
-        strokeLinejoin="round"
-      />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      <polyline points="9 22 9 12 15 12 15 22" />
     </svg>
   );
 }
 
-function SearchIcon({ color }: { color: string }) {
+function SearchIcon({ active }: { active: boolean }) {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle 
-        cx="11" 
-        cy="11" 
-        r="7" 
-        stroke={color} 
-        strokeWidth="2"
-      />
-      <path 
-        d="M21 21L16.5 16.5" 
-        stroke={color} 
-        strokeWidth="2" 
-        strokeLinecap="round"
-      />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
     </svg>
   );
 }
 
-function CalendarIcon({ color }: { color: string }) {
+function CalendarIcon({ active }: { active: boolean }) {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect 
-        x="3" 
-        y="4" 
-        width="18" 
-        height="18" 
-        rx="2" 
-        stroke={color} 
-        strokeWidth="2"
-      />
-      <path 
-        d="M16 2V6" 
-        stroke={color} 
-        strokeWidth="2" 
-        strokeLinecap="round"
-      />
-      <path 
-        d="M8 2V6" 
-        stroke={color} 
-        strokeWidth="2" 
-        strokeLinecap="round"
-      />
-      <path 
-        d="M3 10H21" 
-        stroke={color} 
-        strokeWidth="2"
-      />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
     </svg>
   );
 }
 
-function PersonIcon({ color }: { color: string }) {
+function UserIcon({ active }: { active: boolean }) {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle 
-        cx="12" 
-        cy="7" 
-        r="4" 
-        stroke={color} 
-        strokeWidth="2"
-      />
-      <path 
-        d="M4 21V19C4 16.7909 5.79086 15 8 15H16C18.2091 15 20 16.7909 20 19V21" 
-        stroke={color} 
-        strokeWidth="2" 
-        strokeLinecap="round"
-      />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
     </svg>
   );
 }
 
-function LoginIcon({ color }: { color: string }) {
+function LogInIcon({ active }: { active: boolean }) {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path 
-        d="M15 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H15" 
-        stroke={color} 
-        strokeWidth="2" 
-        strokeLinecap="round" 
-        strokeLinejoin="round"
-      />
-      <path 
-        d="M10 17L15 12L10 7" 
-        stroke={color} 
-        strokeWidth="2" 
-        strokeLinecap="round" 
-        strokeLinejoin="round"
-      />
-      <path 
-        d="M15 12H3" 
-        stroke={color} 
-        strokeWidth="2" 
-        strokeLinecap="round" 
-        strokeLinejoin="round"
-      />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+      <polyline points="10 17 15 12 10 7" />
+      <line x1="15" y1="12" x2="3" y2="12" />
     </svg>
   );
 }
 
-function getIcon(tabId: string, color: string) {
+function getIcon(tabId: string, active: boolean) {
   switch (tabId) {
     case "home":
-      return <HomeIcon color={color} />;
+      return <HomeIcon active={active} />;
     case "search":
-      return <SearchIcon color={color} />;
+      return <SearchIcon active={active} />;
     case "events":
-      return <CalendarIcon color={color} />;
+      return <CalendarIcon active={active} />;
     case "profile":
-      return <PersonIcon color={color} />;
+      return <UserIcon active={active} />;
     case "login":
-      return <LoginIcon color={color} />;
+      return <LogInIcon active={active} />;
     default:
-      return <HomeIcon color={color} />;
+      return <HomeIcon active={active} />;
   }
 }
 
-// Curved notch SVG component
-function CurvedNotch() {
-  return (
-    <svg 
-      className="sf-notch-svg"
-      width="90" 
-      height="25" 
-      viewBox="0 0 90 25" 
-      fill="none" 
-      xmlns="http://www.w3.org/2000/svg"
-      preserveAspectRatio="none"
-    >
-      {/* Curved notch path - smooth upward curve */}
-      <path 
-        d="M0 25 L0 20 Q0 0 20 0 L70 0 Q90 0 90 20 L90 25 Z" 
-        fill="#F5A623"
-      />
-    </svg>
-  );
-}
-
 export function BottomNavigation() {
-  const [mounted, setMounted] = useState(false);
   const router = useRouter();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const getActiveTab = (): string => {
     const path = router.pathname;
@@ -217,62 +111,24 @@ export function BottomNavigation() {
   };
 
   const activeTab = getActiveTab();
-  const activeIndex = tabs.findIndex(tab => tab.id === activeTab);
-
-  if (!mounted) {
-    return null;
-  }
-
-  // Calculate the center position for each tab (each tab is 20% width)
-  // Tab center = (index * 20%) + 10% = percentage from left edge to tab center
-  // We need to position the bubble and notch centered on each tab
 
   return (
-    <nav
-      className="sf-bottom-nav"
-      role="navigation"
-      aria-label="Main navigation"
-    >
-      {/* Curved notch background that slides with the bubble */}
-      <div 
-        className="sf-notch-container"
-        style={{
-          transform: `translateX(calc(${activeIndex} * 20vw + 10vw - 45px))`,
-        }}
-      >
-        <CurvedNotch />
-      </div>
-
-      {/* Floating bubble indicator */}
-      <div 
-        className="sf-bubble"
-        style={{
-          transform: `translateX(calc(${activeIndex} * 20vw + 10vw - 35px))`,
-        }}
-      >
-        <div className="sf-bubble-circle">
-          {getIcon(activeTab, "#FFFFFF")}
-        </div>
-      </div>
-
-      {/* Navigation tabs */}
-      <ul className="sf-nav-list">
+    <nav className="bottom-nav" role="navigation" aria-label="Main navigation">
+      <ul className="bottom-nav-list">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           
           return (
-            <li key={tab.id} className="sf-nav-item">
+            <li key={tab.id} className="bottom-nav-item">
               <Link
                 href={tab.href}
-                className="sf-nav-link"
+                className={`bottom-nav-link ${isActive ? "bottom-nav-link-active" : ""}`}
                 aria-current={isActive ? "page" : undefined}
               >
-                <span 
-                  className={`sf-nav-icon ${isActive ? "sf-nav-icon-active" : "sf-nav-icon-inactive"}`}
-                >
-                  {getIcon(tab.id, "#FFFFFF")}
+                <span className="bottom-nav-icon">
+                  {getIcon(tab.id, isActive)}
                 </span>
-                <span className="sf-nav-label">{tab.label}</span>
+                <span className="bottom-nav-label">{tab.label}</span>
               </Link>
             </li>
           );

@@ -231,234 +231,77 @@
 }
 
 /* ============================================
-   BOTTOM NAVIGATION - RESET STATE
+   BOTTOM NAVIGATION - CLEAN RESET
    ============================================
-   All previous navigation styles have been removed.
-   Ready for fresh implementation.
-   
-   Mobile requirements preserved:
-   - Fixed at bottom (to be implemented)
-   - Works on 320px–430px screens
-   - Content has padding-bottom: 70px (see body styles above)
-   - No overflow, no horizontal scroll
+   Simple, functional bottom navigation.
+   5 tabs, basic styling, no animations.
+   Ready to be restyled from scratch.
    ============================================ */
 
-.bottom-nav-reset {
+.bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   width: 100%;
-  height: 70px;
-  background: #f8fafc;
-  border-top: 1px solid #e2e8f0;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.dark .bottom-nav-reset {
-  background: #1e293b;
-  border-top-color: #334155;
-}
-
-.bottom-nav-placeholder {
-  color: #64748b;
-  font-size: 0.875rem;
-  text-align: center;
-}
-
-.dark .bottom-nav-placeholder {
-  color: #94a3b8;
-}
-
-/* ============================================
-   SMART FUNDI BOTTOM NAVIGATION
-   ============================================
-   - Orange background (#F5A623) with curved notch
-   - White icons and labels (always visible)
-   - Active tab: icon in floating deep blue bubble
-   - 5 tabs, flex: 1 each for equal width
-   - Fixed at bottom, 65px height
-   - Icons: 24px inline SVGs
-   - Labels: 12px, always visible in white
-   - Curved notch slides with bubble
-   ============================================ */
-
-.sf-bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
   height: 65px;
-  background-color: #F5A623;
+  background-color: hsl(var(--card));
+  border-top: 1px solid hsl(var(--border));
   z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: visible;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* Curved notch container - slides with bubble */
-.sf-notch-container {
-  position: absolute;
-  top: -20px;
-  left: 0;
-  width: 90px;
-  height: 25px;
-  pointer-events: none;
-  z-index: 999;
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform;
-}
-
-.sf-notch-svg {
-  width: 90px;
-  height: 25px;
-  display: block;
-}
-
-.sf-nav-list {
+.bottom-nav-list {
   display: flex;
   width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
   list-style: none;
-  position: relative;
 }
 
-.sf-nav-item {
+.bottom-nav-item {
   flex: 1;
-  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.sf-nav-link {
+.bottom-nav-link {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
   height: 100%;
-  color: #FFFFFF;
-  text-decoration: none;
-  gap: 4px;
   padding: 8px 4px;
-  position: relative;
+  text-decoration: none;
+  color: hsl(var(--muted-foreground));
+  gap: 4px;
 }
 
-.sf-nav-link.sf-nav-active .sf-nav-label {
-  color: #FFFFFF;
+.bottom-nav-link-active {
+  color: hsl(var(--primary));
 }
 
-.sf-nav-icon {
+.bottom-nav-icon {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 24px;
   height: 24px;
-  transition: transform 0.4s ease, opacity 0.3s ease;
-  will-change: transform, opacity;
 }
 
-.sf-nav-icon-active {
-  transform: translateY(-30px);
-  opacity: 0;
-}
-
-.sf-nav-icon-inactive {
-  transform: translateY(0);
-  opacity: 1;
-}
-
-.sf-nav-icon svg {
+.bottom-nav-icon svg {
   width: 24px;
   height: 24px;
 }
 
-.sf-nav-label {
-  font-size: 12px;
+.bottom-nav-label {
+  font-size: 11px;
   font-weight: 500;
   text-align: center;
-  line-height: 1.2;
-  color: #FFFFFF;
-  white-space: nowrap;
-}
-
-/* ============================================
-   FLOATING BUBBLE INDICATOR
-   ============================================ */
-
-.sf-bubble {
-  position: absolute;
-  bottom: 22px;
-  left: 0;
-  width: 70px;
-  height: 70px;
-  pointer-events: none;
-  z-index: 1001;
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform;
-}
-
-.sf-bubble-circle {
-  width: 70px;
-  height: 70px;
-  background-color: #1A3C6E;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(26, 60, 110, 0.4);
-  border: 4px solid #0d1b2e;
-}
-
-.sf-bubble-circle svg {
-  width: 28px;
-  height: 28px;
-}
-
-/* Responsive adjustments for smaller screens */
-@media (max-width: 360px) {
-  .sf-nav-icon,
-  .sf-nav-icon svg {
-    width: 22px;
-    height: 22px;
-  }
-  
-  .sf-nav-label {
-    font-size: 11px;
-  }
-  
-  .sf-bubble {
-    width: 60px;
-    height: 60px;
-    bottom: 20px;
-  }
-  
-  .sf-bubble-circle {
-    width: 60px;
-    height: 60px;
-  }
-  
-  .sf-bubble-circle svg {
-    width: 24px;
-    height: 24px;
-  }
-  
-  .sf-notch-container {
-    width: 80px;
-    top: -18px;
-  }
-  
-  .sf-notch-svg {
-    width: 80px;
-    height: 22px;
-  }
+  line-height: 1;
 }
 
 /* ============================================
@@ -468,10 +311,6 @@
 .floating-avatar,
 .floating-button {
   bottom: calc(65px + 16px + env(safe-area-inset-bottom, 0px)) !important;
-}
-
-.sf-bottom-nav {
-  bottom: 0 !important;
 }
 
 /* Hide scrollbar but keep functionality */
