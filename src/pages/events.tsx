@@ -8,7 +8,7 @@ import { Calendar, MapPin, Users, Sparkles } from "lucide-react";
 import { mockEvents } from "@/lib/mockData";
 
 export default function EventsPage() {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
 
   const upcomingEvents = mockEvents.filter(e => new Date(e.date) >= new Date());
   const totalAttendees = mockEvents.reduce((sum, e) => sum + e.expectedAttendees, 0);
@@ -178,13 +178,13 @@ export default function EventsPage() {
                     <Calendar className="h-8 w-8 text-blue-500" />
                   </div>
                   <h3 className="text-lg font-bold text-foreground mb-2">
-                    No Upcoming Events
+                    {t("empty.events.title")}
                   </h3>
                   <p className="text-muted-foreground text-sm mb-1">
-                    Hakuna matukio yajayo kwa sasa
+                    {t("empty.events.subtitle")}
                   </p>
                   <p className="text-muted-foreground text-xs">
-                    Angalia tena baadaye kwa matukio mapya
+                    {t("empty.events.hint")}
                   </p>
                 </CardContent>
               </Card>

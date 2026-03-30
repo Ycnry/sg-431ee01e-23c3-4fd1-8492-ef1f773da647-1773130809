@@ -1,7 +1,6 @@
 import { useState } from "react";
 import Head from "next/head";
 import { Header } from "@/components/Header";
-import { BottomNavigation } from "@/components/BottomNavigation";
 import { ChatInterface } from "@/components/messaging/ChatInterface";
 import { ConversationList } from "@/components/messaging/ConversationList";
 import { Card, CardContent } from "@/components/ui/card";
@@ -54,13 +53,13 @@ export default function MessagesPage() {
           <MessageSquare className="h-8 w-8 text-orange-500" />
         </div>
         <h3 className="text-lg font-bold text-foreground mb-2">
-          No Messages Yet
+          {t("empty.messages.title")}
         </h3>
         <p className="text-muted-foreground text-sm mb-1">
-          Hakuna ujumbe bado
+          {t("empty.messages.subtitle")}
         </p>
         <p className="text-muted-foreground text-xs">
-          Anza mazungumzo na fundi au duka kupata msaada
+          {t("empty.messages.hint")}
         </p>
       </CardContent>
     </Card>
@@ -73,13 +72,13 @@ export default function MessagesPage() {
         <MessageSquare className="h-8 w-8 text-blue-500" />
       </div>
       <h3 className="text-lg font-bold text-foreground mb-2">
-        Select a Conversation
+        {t("empty.messages.select.title")}
       </h3>
       <p className="text-muted-foreground text-sm mb-1">
-        Chagua mazungumzo kuanza
+        {t("empty.messages.select.subtitle")}
       </p>
       <p className="text-muted-foreground text-xs text-center px-4">
-        Bofya kwenye mazungumzo kushoto ili kutuma ujumbe
+        {t("empty.messages.select.hint")}
       </p>
     </div>
   );
@@ -109,7 +108,7 @@ export default function MessagesPage() {
             ) : (
               <div>
                 <h1 className="text-xl font-bold mb-4">
-                  {language === "en" ? "Messages" : "Ujumbe"}
+                  {t("nav.messages")}
                 </h1>
                 {mockConversations.length > 0 ? (
                   <ConversationList
@@ -128,7 +127,7 @@ export default function MessagesPage() {
           <div className="hidden lg:grid lg:grid-cols-3 gap-6">
             <div className="lg:col-span-1">
               <h1 className="text-xl font-bold mb-4">
-                {language === "en" ? "Messages" : "Ujumbe"}
+                {t("nav.messages")}
               </h1>
               {mockConversations.length > 0 ? (
                 <ConversationList
