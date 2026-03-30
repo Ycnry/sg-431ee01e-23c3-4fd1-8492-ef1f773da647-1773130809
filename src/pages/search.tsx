@@ -3,30 +3,38 @@ import Head from "next/head";
 import { Header } from "@/components/Header";
 import { FundiCard } from "@/components/FundiCard";
 import { ShopCard } from "@/components/ShopCard";
+import { SuperAgentCard } from "@/components/SuperAgentCard";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Search as SearchIcon, MapPin, Briefcase, Loader2 } from "lucide-react";
-import { mockFundis, mockShops } from "@/lib/mockData";
-import { Fundi, Shop } from "@/types";
+import { Search as SearchIcon, MapPin, Briefcase, Loader2, Shield } from "lucide-react";
+import { mockFundis, mockShops, mockSuperAgents } from "@/lib/mockData";
+import { Fundi, Shop, SuperAgent } from "@/types";
 
 export default function SearchPage() {
   const { language, t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchType, setSearchType] = useState<"fundi" | "shop">("fundi");
+  const [searchType, setSearchType] = useState<"fundi" | "shop" | "super_agent">("fundi");
   const [selectedCity, setSelectedCity] = useState("all");
   const [selectedSpecialty, setSelectedSpecialty] = useState("all");
+  const [selectedRegion, setSelectedRegion] = useState("all");
   const [providers, setProviders] = useState<(Fundi | Shop)[]>([]);
+  const [superAgents, setSuperAgents] = useState<SuperAgent[]>([]);
   const [loading, setLoading] = useState(false);
 
   const cities = [...new Set([...mockFundis.map(f => f.city), ...mockShops.map(s => s.city)])];
   const specialties = [...new Set(mockFundis.map(f => f.specialty))];
+  const regions = [...new Set(mockSuperAgents.map(sa => sa.region))];
 
   useEffect(() => {
-    fetchProviders();
-  }, [searchType, selectedCity, selectedSpecialty]);
+    if (searchType === "super_agent") {
+      fetchSuperAgents();
+    } else {
+      fetchProviders();
+    }
+  }, [searchType, selectedCity, selectedSpecialty, selectedRegion]);
 
   const fetchProviders = async () => {
     setLoading(true);
@@ -50,6 +58,25 @@ export default function SearchPage() {
     }
   };
 
+  const fetchSuperAgents = () => {
+    setLoading(true);
+    try {
+      // Filter active super agents only
+      let filtered = mockSuperAgents.filter(sa => sa.subscriptionStatus === "active");
+      
+      // Filter by region if selected
+      if (selectedRegion !== "all") {
+        filtered = filtered.filter(sa => sa.region === selectedRegion);
+      }
+      
+      setSuperAgents(filtered);
+    } catch (error) {
+      console.error("Super agent search error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const filteredProviders = providers.filter((provider) => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
@@ -67,6 +94,26 @@ export default function SearchPage() {
       );
     }
   });
+
+  const filteredSuperAgents = superAgents.filter((agent) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      agent.name.toLowerCase().includes(query) ||
+      agent.region.toLowerCase().includes(query) ||
+      (agent.district && agent.district.toLowerCase().includes(query))
+    );
+  });
+
+  const handleContactAgent = (agent: SuperAgent) => {
+    // Handle contact action - could open messaging or show contact info
+    console.log("Contact agent:", agent.name);
+  };
+
+  const handleViewProfile = (agent: SuperAgent) => {
+    // Handle view profile action
+    console.log("View profile:", agent.name);
+  };
 
   const metaTitle = language === "en" ? "Search - Smart Fundi" : "Tafuta - Smart Fundi";
 
@@ -89,8 +136,8 @@ export default function SearchPage() {
               </h1>
               <p className="text-muted-foreground">
                 {language === "en" 
-                  ? "Find skilled technicians and hardware shops near you" 
-                  : "Tafuta mafundi na maduka ya vifaa karibu nawe"}
+                  ? "Find skilled technicians, hardware shops, and super agents near you" 
+                  : "Tafuta mafundi, maduka ya vifaa, na mawakala wakuu karibu nawe"}
               </p>
             </div>
 
@@ -98,16 +145,22 @@ export default function SearchPage() {
             <Card className="mb-8">
               <CardContent className="p-6">
                 <div className="space-y-4">
-                  {/* Fundi/Shop Toggle */}
-                  <Tabs value={searchType} onValueChange={(value) => setSearchType(value as "fundi" | "shop")}>
-                    <TabsList className="grid w-full grid-cols-2">
+                  {/* Fundi/Shop/Super Agent Toggle */}
+                  <Tabs value={searchType} onValueChange={(value) => setSearchType(value as "fundi" | "shop" | "super_agent")}>
+                    <TabsList className="grid w-full grid-cols-3">
                       <TabsTrigger value="fundi" className="flex items-center gap-2">
                         <Briefcase className="h-4 w-4" />
-                        {language === "en" ? "Technicians" : "Mafundi"}
+                        <span className="hidden sm:inline">{language === "en" ? "Technicians" : "Mafundi"}</span>
+                        <span className="sm:hidden">{language === "en" ? "Fundis" : "Mafundi"}</span>
                       </TabsTrigger>
                       <TabsTrigger value="shop" className="flex items-center gap-2">
                         <MapPin className="h-4 w-4" />
-                        {language === "en" ? "Shops" : "Maduka"}
+                        <span>{language === "en" ? "Shops" : "Maduka"}</span>
+                      </TabsTrigger>
+                      <TabsTrigger value="super_agent" className="flex items-center gap-2">
+                        <Shield className="h-4 w-4" />
+                        <span className="hidden sm:inline">{language === "en" ? "Super Agents" : "Mawakala"}</span>
+                        <span className="sm:hidden">{language === "en" ? "Agents" : "Mawakala"}</span>
                       </TabsTrigger>
                     </TabsList>
                   </Tabs>
@@ -116,7 +169,11 @@ export default function SearchPage() {
                   <div className="relative">
                     <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                     <Input
-                      placeholder={language === "en" ? "Search by name or specialty..." : "Tafuta kwa jina au ujuzi..."}
+                      placeholder={
+                        searchType === "super_agent"
+                          ? (language === "en" ? "Search by name or region..." : "Tafuta kwa jina au mkoa...")
+                          : (language === "en" ? "Search by name or specialty..." : "Tafuta kwa jina au ujuzi...")
+                      }
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pl-10"
@@ -125,27 +182,31 @@ export default function SearchPage() {
 
                   {/* Filter Dropdowns */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">
-                        {language === "en" ? "City" : "Jiji"}
-                      </label>
-                      <Select value={selectedCity} onValueChange={setSelectedCity}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">
-                            {language === "en" ? "All Cities" : "Miji Yote"}
-                          </SelectItem>
-                          {cities.map((city) => (
-                            <SelectItem key={city} value={city}>
-                              {city}
+                    {/* City filter for Fundis and Shops */}
+                    {(searchType === "fundi" || searchType === "shop") && (
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">
+                          {language === "en" ? "City" : "Jiji"}
+                        </label>
+                        <Select value={selectedCity} onValueChange={setSelectedCity}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">
+                              {language === "en" ? "All Cities" : "Miji Yote"}
                             </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                            {cities.map((city) => (
+                              <SelectItem key={city} value={city}>
+                                {city}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
 
+                    {/* Specialty filter for Fundis only */}
                     {searchType === "fundi" && (
                       <div>
                         <label className="text-sm font-medium mb-2 block">
@@ -168,6 +229,30 @@ export default function SearchPage() {
                         </Select>
                       </div>
                     )}
+
+                    {/* Region filter for Super Agents */}
+                    {searchType === "super_agent" && (
+                      <div className="md:col-span-2">
+                        <label className="text-sm font-medium mb-2 block">
+                          {language === "en" ? "Region" : "Mkoa"}
+                        </label>
+                        <Select value={selectedRegion} onValueChange={setSelectedRegion}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">
+                              {language === "en" ? "All Regions" : "Mikoa Yote"}
+                            </SelectItem>
+                            {regions.map((region) => (
+                              <SelectItem key={region} value={region}>
+                                {region}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -184,8 +269,49 @@ export default function SearchPage() {
                   {t("loading.search.subtitle")}
                 </p>
               </div>
+            ) : searchType === "super_agent" ? (
+              /* Super Agents Results */
+              filteredSuperAgents.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 text-center">
+                  <div className="w-20 h-20 rounded-full bg-yellow-100 dark:bg-yellow-900/20 flex items-center justify-center mb-6">
+                    <Shield className="h-10 w-10 text-yellow-500" />
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground mb-2">
+                    {t("empty.superAgents.title")}
+                  </h3>
+                  <p className="text-muted-foreground mb-1">
+                    {t("empty.superAgents.subtitle")}
+                  </p>
+                  <p className="text-sm text-muted-foreground max-w-md">
+                    {t("empty.superAgents.hint")}
+                  </p>
+                </div>
+              ) : (
+                <>
+                  {/* Results Count */}
+                  <div className="mb-4">
+                    <p className="text-sm text-muted-foreground">
+                      {language === "en" 
+                        ? `Found ${filteredSuperAgents.length} super agent${filteredSuperAgents.length !== 1 ? "s" : ""}`
+                        : `Mawakala wakuu ${filteredSuperAgents.length} wamepatikana`}
+                    </p>
+                  </div>
+
+                  {/* Super Agents Grid */}
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {filteredSuperAgents.map((agent) => (
+                      <SuperAgentCard 
+                        key={agent.id} 
+                        agent={agent}
+                        onContact={handleContactAgent}
+                        onViewProfile={handleViewProfile}
+                      />
+                    ))}
+                  </div>
+                </>
+              )
             ) : filteredProviders.length === 0 ? (
-              /* Empty State - Friendly User Message */
+              /* Empty State for Fundis/Shops */
               <div className="flex flex-col items-center justify-center py-16 text-center">
                 <div className="w-20 h-20 rounded-full bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center mb-6">
                   <SearchIcon className="h-10 w-10 text-orange-500" />
