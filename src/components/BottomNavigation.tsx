@@ -87,7 +87,10 @@ export function BottomNavigation() {
                             stiffness: 200,
                             damping: 20,
                           }}
-                          className="absolute inset-0 rounded-full -z-10 backdrop-blur-2xl shadow-md"
+                          className={cn(
+                            "absolute inset-0 rounded-full -z-10 backdrop-blur-2xl shadow-md",
+                            isActive && "nav-bubble-glow"
+                          )}
                           style={{
                             background: isActive 
                               ? "linear-gradient(to top right, #1A3C6E, #1A3C6ECC, #1A3C6E99)"
@@ -103,7 +106,7 @@ export function BottomNavigation() {
                         variant="ghost"
                         size="icon"
                         className={cn(
-                          "relative z-10 rounded-full transition-transform text-white hover:text-white hover:bg-transparent",
+                          "relative z-10 rounded-full transition-transform text-white hover:text-white hover:bg-transparent nav-icon-glow",
                           isActive && "scale-110",
                           !isActive && "hover:scale-110"
                         )}

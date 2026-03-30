@@ -313,6 +313,35 @@
   bottom: calc(65px + 16px + env(safe-area-inset-bottom, 0px)) !important;
 }
 
+/* ============================================
+   BOTTOM NAVIGATION GLOW EFFECTS
+   ============================================ */
+
+/* Pulse glow animation for hover */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 16px 6px rgba(245, 166, 35, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 20px 8px rgba(245, 166, 35, 0.8);
+  }
+}
+
+/* Icon button hover glow */
+.nav-icon-glow {
+  transition: box-shadow 0.3s ease;
+  box-shadow: 0 0 0 0 transparent;
+}
+
+.nav-icon-glow:hover {
+  animation: pulse-glow 1.5s ease-in-out infinite;
+}
+
+/* Active bubble permanent glow */
+.nav-bubble-glow {
+  box-shadow: 0 0 14px 4px rgba(26, 60, 110, 0.5);
+}
+
 /* Hide scrollbar but keep functionality */
 .scrollbar-hide {
   -ms-overflow-style: none;
