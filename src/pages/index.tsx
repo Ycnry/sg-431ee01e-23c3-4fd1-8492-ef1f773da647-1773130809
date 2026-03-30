@@ -8,7 +8,6 @@ import { ShopCard } from "@/components/ShopCard";
 import { EventCard } from "@/components/EventCard";
 import { SuperAgentCard } from "@/components/SuperAgentCard";
 import { BottomNavigation } from "@/components/BottomNavigation";
-import { LiveChatWidget } from "@/components/LiveChatWidget";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -20,13 +19,28 @@ import Link from "next/link";
 
 export default function Home() {
   const { t, language } = useLanguage();
-  const [showSplash, setShowSplash] = useState(true);
+  
+  // Check sessionStorage to determine initial state
+  const [showSplash, setShowSplash] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [showContent, setShowContent] = useState(false);
   const [selectedCity, setSelectedCity] = useState("Dar es Salaam");
 
   useEffect(() => {
-    setShowSplash(true);
+    // Check if splash has already been shown this session
+    const splashShown = sessionStorage.getItem("smartfundi_splash_shown");
+    
+    if (splashShown === "true") {
+      // Skip splash and welcome, go directly to content
+      setShowSplash(false);
+      setShowWelcome(false);
+      setShowContent(true);
+    } else {
+      // First visit this session - show splash screen
+      setShowSplash(true);
+      setShowWelcome(false);
+      setShowContent(false);
+    }
   }, []);
 
   const handleSplashComplete = () => {
@@ -37,6 +51,8 @@ export default function Home() {
   const handleWelcomeComplete = () => {
     setShowWelcome(false);
     setShowContent(true);
+    // Mark splash as shown for this session
+    sessionStorage.setItem("smartfundi_splash_shown", "true");
   };
 
   const cities = ["Dar es Salaam", "Arusha", "Mwanza"];
