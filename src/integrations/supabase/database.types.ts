@@ -1,4 +1,4 @@
- 
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 export type Json =
   | string
   | number
@@ -445,7 +445,7 @@ export type Database = {
     }
     Enums: {
       subscription_status: "trial" | "active" | "expired" | "cancelled"
-      user_role: "customer" | "fundi" | "shop" | "admin"
+      user_role: "customer" | "fundi" | "shop" | "admin" | "super_agent"
       verification_status: "pending" | "verified" | "rejected"
     }
     CompositeTypes: {
@@ -575,7 +575,7 @@ export const Constants = {
   public: {
     Enums: {
       subscription_status: ["trial", "active", "expired", "cancelled"],
-      user_role: ["customer", "fundi", "shop", "admin"],
+      user_role: ["customer", "fundi", "shop", "admin", "super_agent"],
       verification_status: ["pending", "verified", "rejected"],
     },
   },
