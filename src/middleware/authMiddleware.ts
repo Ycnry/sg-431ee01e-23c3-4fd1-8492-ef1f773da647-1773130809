@@ -2,7 +2,9 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { verifyAccessToken, type AuthUser } from "@/lib/auth";
 import { createRateLimiter, getClientIp, createIdentifier } from "@/lib/rateLimit";
 import { supabase } from "@/integrations/supabase/client";
-import type { Json } from "@/integrations/supabase/types";
+
+// JSON type for Supabase RPC calls
+type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 // =====================================================
 // EXTENDED REQUEST TYPE
