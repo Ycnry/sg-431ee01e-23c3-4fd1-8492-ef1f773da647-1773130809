@@ -5,13 +5,22 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "@/components/ui/toaster";
 import { initializeMockSubscriptions, initializeSampleMediaMessages } from "@/lib/mockData";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { BottomNavigation } from "@/components/BottomNavigation";
 
 export default function App({ Component, pageProps }: AppProps) {
+  const [splashComplete, setSplashComplete] = useState(false);
+
   useEffect(() => {
     initializeMockSubscriptions();
     initializeSampleMediaMessages();
+
+    // Wait for splash screen (3s) + welcome animation (2s) to complete
+    const timer = setTimeout(() => {
+      setSplashComplete(true);
+    }, 5000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -19,7 +28,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <LanguageProvider>
         <AuthProvider>
           <Component {...pageProps} />
-          <BottomNavigation />
+          <BottomNavigation visible={splashComplete} />
           <Toaster />
         </AuthProvider>
       </LanguageProvider>
