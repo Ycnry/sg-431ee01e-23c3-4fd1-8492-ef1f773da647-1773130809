@@ -470,9 +470,6 @@ export default function Home() {
 
         {/* Bottom Navigation for Mobile */}
         <BottomNavigation />
-        
-        {/* Live Chat Widget */}
-        <LiveChatWidget position="bottom-right" />
       </div>
     </>
   );
