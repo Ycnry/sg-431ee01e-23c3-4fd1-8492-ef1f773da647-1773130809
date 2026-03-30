@@ -324,6 +324,58 @@ const translations: Record<string, Record<Language, string>> = {
   "error.network.title": { en: "Connection Error", sw: "Tatizo la Mtandao" },
   "error.network.subtitle": { en: "Unable to connect to the server", sw: "Imeshindwa kuunganisha na seva" },
   "error.network.hint": { en: "Check your internet connection and try again", sw: "Angalia muunganisho wako wa mtandao na ujaribu tena" },
+
+  // Super Agent Section
+  "superAgent.title": { en: "Super Agents", sw: "Mawakala Wakuu" },
+  "superAgent.subtitle": { en: "Verified representatives in your area", sw: "Wawakilishi wastahilifu katika eneo lako" },
+  "superAgent.badge": { en: "Super Agent", sw: "Wakala Mkuu" },
+  "superAgent.verified": { en: "Verified Representative", sw: "Mwakilishi Aliyethibitishwa" },
+  "superAgent.region": { en: "Region", sw: "Mkoa" },
+  "superAgent.district": { en: "District", sw: "Wilaya" },
+  "superAgent.fundisOnboarded": { en: "Fundis Onboarded", sw: "Mafundi Waliosajiliwa" },
+  "superAgent.shopsOnboarded": { en: "Shops Onboarded", sw: "Maduka Yaliyosajiliwa" },
+  "superAgent.totalOnboarded": { en: "Total Onboarded", sw: "Jumla Waliosajiliwa" },
+  "superAgent.contact": { en: "Contact Agent", sw: "Wasiliana na Wakala" },
+  "superAgent.viewProfile": { en: "View Profile", sw: "Angalia Wasifu" },
+  
+  // Super Agent Registration
+  "superAgent.register.title": { en: "Become a Super Agent", sw: "Kuwa Wakala Mkuu" },
+  "superAgent.register.subtitle": { en: "Join our network of verified representatives", sw: "Jiunge na mtandao wetu wa wawakilishi wastahilifu" },
+  "superAgent.register.fee": { en: "Monthly subscription: TZS 40,000", sw: "Ada ya kila mwezi: TZS 40,000" },
+  "superAgent.register.benefits": { en: "Benefits", sw: "Faida" },
+  "superAgent.register.benefit1": { en: "Earn commission for every Fundi and Shop you onboard", sw: "Pata kamisheni kwa kila Fundi na Duka unayosajili" },
+  "superAgent.register.benefit2": { en: "Get a verified gold badge on your profile", sw: "Pata beji ya dhahabu iliyothibitishwa kwenye wasifu wako" },
+  "superAgent.register.benefit3": { en: "Access exclusive training and support", sw: "Pata mafunzo na msaada wa kipekee" },
+  "superAgent.register.benefit4": { en: "Priority listing in your region", sw: "Orodha ya kipaumbele katika mkoa wako" },
+  
+  // Super Agent Subscription
+  "superAgent.subscription.active": { en: "Active", sw: "Hai" },
+  "superAgent.subscription.expired": { en: "Expired", sw: "Imekwisha" },
+  "superAgent.subscription.pending": { en: "Pending Payment", sw: "Inasubiri Malipo" },
+  "superAgent.subscription.suspended": { en: "Suspended", sw: "Imesimamishwa" },
+  "superAgent.subscription.renew": { en: "Renew Subscription", sw: "Fanya Upya Usajili" },
+  "superAgent.subscription.expiresIn": { en: "Expires in", sw: "Inaisha baada ya" },
+  "superAgent.subscription.days": { en: "days", sw: "siku" },
+  "superAgent.subscription.renewReminder": { en: "Your subscription expires in 5 days. Renew now to continue.", sw: "Usajili wako unaisha baada ya siku 5. Fanya upya sasa kuendelea." },
+  
+  // Super Agent Payment
+  "superAgent.payment.title": { en: "Complete Payment", sw: "Kamilisha Malipo" },
+  "superAgent.payment.amount": { en: "Amount: TZS 40,000", sw: "Kiasi: TZS 40,000" },
+  "superAgent.payment.selectMethod": { en: "Select Payment Method", sw: "Chagua Njia ya Malipo" },
+  "superAgent.payment.mpesa": { en: "M-Pesa", sw: "M-Pesa" },
+  "superAgent.payment.tigopesa": { en: "Tigo Pesa", sw: "Tigo Pesa" },
+  "superAgent.payment.airtel": { en: "Airtel Money", sw: "Airtel Money" },
+  "superAgent.payment.processing": { en: "Processing payment...", sw: "Inashughulikia malipo..." },
+  "superAgent.payment.success": { en: "Payment successful! Your account is now active.", sw: "Malipo yamefanikiwa! Akaunti yako sasa iko hai." },
+  "superAgent.payment.failed": { en: "Payment failed. Please try again.", sw: "Malipo yameshindwa. Tafadhali jaribu tena." },
+  
+  // Super Agent Empty State
+  "empty.superAgents.title": { en: "No Super Agents Yet", sw: "Hakuna Mawakala Wakuu Bado" },
+  "empty.superAgents.subtitle": { en: "No super agents available in your area", sw: "Hakuna mawakala wakuu katika eneo lako" },
+  "empty.superAgents.hint": { en: "Check back later or become a Super Agent yourself", sw: "Angalia tena baadaye au jiwe Wakala Mkuu mwenyewe" },
+
+  // Auth - Super Agent Option
+  "auth.superAgent": { en: "Super Agent (regional representative)", sw: "Wakala Mkuu (mwakilishi wa mkoa)" },
 };
 
 export function LanguageProvider({ children }: { children: ReactNode }) {

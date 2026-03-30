@@ -321,6 +321,87 @@ export type Database = {
         }
         Relationships: []
       }
+      super_agents: {
+        Row: {
+          bio: string | null
+          city: string
+          created_at: string | null
+          email: string | null
+          full_name: string
+          fundis_onboarded: number | null
+          id: string
+          id_document_url: string | null
+          is_verified: boolean | null
+          last_payment_amount: number | null
+          last_payment_date: string | null
+          national_id_number: string | null
+          payment_method: string | null
+          phone: string
+          photo_url: string | null
+          region: string
+          shops_onboarded: number | null
+          subscription_end_date: string | null
+          subscription_start_date: string | null
+          subscription_status: string
+          total_commission: number | null
+          updated_at: string | null
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          bio?: string | null
+          city: string
+          created_at?: string | null
+          email?: string | null
+          full_name: string
+          fundis_onboarded?: number | null
+          id?: string
+          id_document_url?: string | null
+          is_verified?: boolean | null
+          last_payment_amount?: number | null
+          last_payment_date?: string | null
+          national_id_number?: string | null
+          payment_method?: string | null
+          phone: string
+          photo_url?: string | null
+          region: string
+          shops_onboarded?: number | null
+          subscription_end_date?: string | null
+          subscription_start_date?: string | null
+          subscription_status?: string
+          total_commission?: number | null
+          updated_at?: string | null
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          bio?: string | null
+          city?: string
+          created_at?: string | null
+          email?: string | null
+          full_name?: string
+          fundis_onboarded?: number | null
+          id?: string
+          id_document_url?: string | null
+          is_verified?: boolean | null
+          last_payment_amount?: number | null
+          last_payment_date?: string | null
+          national_id_number?: string | null
+          payment_method?: string | null
+          phone?: string
+          photo_url?: string | null
+          region?: string
+          shops_onboarded?: number | null
+          subscription_end_date?: string | null
+          subscription_start_date?: string | null
+          subscription_status?: string
+          total_commission?: number | null
+          updated_at?: string | null
+          user_id?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       validation_logs: {
         Row: {
           created_at: string | null

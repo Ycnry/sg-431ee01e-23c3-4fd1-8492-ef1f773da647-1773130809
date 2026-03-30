@@ -120,3 +120,30 @@ export interface Event {
   isSponsored: boolean;
   expectedAttendees: number;
 }
+
+export interface SuperAgent {
+  id: string;
+  userId: string;
+  name: string;
+  email: string;
+  phone: string;
+  photo?: string;
+  region: string;
+  district?: string;
+  ward?: string;
+  bio?: string;
+  fundisOnboarded: number;
+  shopsOnboarded: number;
+  totalCommissionEarned: number;
+  subscriptionStatus: "active" | "expired" | "pending" | "suspended";
+  subscriptionStartDate?: string;
+  subscriptionEndDate?: string;
+  paymentMethod?: "mpesa" | "tigopesa" | "airtel";
+  lastPaymentDate?: string;
+  lastPaymentAmount?: number;
+  verified: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type UserType = "customer" | "fundi" | "shop" | "admin" | "super_agent";
