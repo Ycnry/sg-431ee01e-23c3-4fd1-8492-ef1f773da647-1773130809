@@ -13,7 +13,7 @@ import { mockFundis, mockShops } from "@/lib/mockData";
 import { Fundi, Shop } from "@/types";
 
 export default function SearchPage() {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState<"fundi" | "shop">("fundi");
   const [selectedCity, setSelectedCity] = useState("all");
@@ -178,10 +178,10 @@ export default function SearchPage() {
               <div className="flex flex-col items-center justify-center py-16">
                 <Loader2 className="h-12 w-12 text-orange-500 animate-spin mb-4" />
                 <p className="text-lg font-medium text-foreground">
-                  {language === "en" ? "Searching..." : "Inatafuta..."}
+                  {t("loading.search.title")}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {language === "en" ? "Finding the best matches for you" : "Tunapata matokeo bora kwako"}
+                  {t("loading.search.subtitle")}
                 </p>
               </div>
             ) : filteredProviders.length === 0 ? (
@@ -191,17 +191,15 @@ export default function SearchPage() {
                   <SearchIcon className="h-10 w-10 text-orange-500" />
                 </div>
                 <h3 className="text-xl font-bold text-foreground mb-2">
-                  No Results Found
+                  {t("empty.search.title")}
                 </h3>
                 <p className="text-muted-foreground mb-1">
                   {searchType === "fundi" 
-                    ? "Hakuna mafundi waliopatikana"
-                    : "Hakuna maduka yaliyopatikana"}
+                    ? t("empty.search.fundis")
+                    : t("empty.search.shops")}
                 </p>
                 <p className="text-sm text-muted-foreground max-w-md">
-                  {language === "en"
-                    ? "Try changing the city or specialty you're searching for"
-                    : "Jaribu kubadilisha mji au ujuzi unaotafuta"}
+                  {t("empty.search.hint")}
                 </p>
               </div>
             ) : (

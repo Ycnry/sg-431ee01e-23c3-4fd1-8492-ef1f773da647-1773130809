@@ -292,6 +292,38 @@ const translations: Record<string, Record<Language, string>> = {
   "howToPayBank.alternatives.title": { en: "Other Payment Methods", sw: "Njia Nyingine za Malipo" },
   "howToPayBank.alternatives.description": { en: "Prefer mobile money? View M-Pesa, Airtel Money, and Mixx payment guides", sw: "Unapendelea pesa ya simu? Angalia miongozo ya M-Pesa, Airtel Money, na Mixx" },
   "howToPayBank.alternatives.link": { en: "Mobile Money Payment Guide", sw: "Mwongozo wa Malipo ya Pesa ya Simu" },
+
+  // Empty States - Search
+  "empty.search.title": { en: "No Results Found", sw: "Hakuna Matokeo" },
+  "empty.search.fundis": { en: "No fundis found", sw: "Hakuna mafundi waliopatikana" },
+  "empty.search.shops": { en: "No shops found", sw: "Hakuna maduka yaliyopatikana" },
+  "empty.search.hint": { en: "Try changing the city or specialty you're searching for", sw: "Jaribu kubadilisha mji au ujuzi unaotafuta" },
+  
+  // Empty States - Events
+  "empty.events.title": { en: "No Upcoming Events", sw: "Hakuna Matukio Yajayo" },
+  "empty.events.subtitle": { en: "No events scheduled at this time", sw: "Hakuna matukio yajayo kwa sasa" },
+  "empty.events.hint": { en: "Check back later for new events", sw: "Angalia tena baadaye kwa matukio mapya" },
+  
+  // Empty States - Messages
+  "empty.messages.title": { en: "No Messages Yet", sw: "Hakuna Ujumbe Bado" },
+  "empty.messages.subtitle": { en: "You don't have any messages yet", sw: "Huna ujumbe wowote bado" },
+  "empty.messages.hint": { en: "Start a conversation with a fundi or shop to get help", sw: "Anza mazungumzo na fundi au duka kupata msaada" },
+  "empty.messages.select.title": { en: "Select a Conversation", sw: "Chagua Mazungumzo" },
+  "empty.messages.select.subtitle": { en: "Choose a conversation to start", sw: "Chagua mazungumzo kuanza" },
+  "empty.messages.select.hint": { en: "Click on a conversation on the left to send a message", sw: "Bofya kwenye mazungumzo kushoto ili kutuma ujumbe" },
+  
+  // Loading States
+  "loading.search.title": { en: "Searching...", sw: "Inatafuta..." },
+  "loading.search.subtitle": { en: "Finding the best matches for you", sw: "Tunapata matokeo bora kwako" },
+  "loading.general": { en: "Loading...", sw: "Inapakia..." },
+  
+  // Error States
+  "error.general.title": { en: "Something Went Wrong", sw: "Kuna Tatizo" },
+  "error.general.subtitle": { en: "An error occurred", sw: "Kuna hitilafu imetokea" },
+  "error.general.hint": { en: "Please try again later", sw: "Tafadhali jaribu tena baadaye" },
+  "error.network.title": { en: "Connection Error", sw: "Tatizo la Mtandao" },
+  "error.network.subtitle": { en: "Unable to connect to the server", sw: "Imeshindwa kuunganisha na seva" },
+  "error.network.hint": { en: "Check your internet connection and try again", sw: "Angalia muunganisho wako wa mtandao na ujaribu tena" },
 };
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
