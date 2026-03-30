@@ -6,6 +6,7 @@ import { Header } from "@/components/Header";
 import { FundiCard } from "@/components/FundiCard";
 import { ShopCard } from "@/components/ShopCard";
 import { EventCard } from "@/components/EventCard";
+import { SuperAgentCard } from "@/components/SuperAgentCard";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { LiveChatWidget } from "@/components/LiveChatWidget";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Search, Shield, MessageSquare, TrendingUp, Users, MapPin, Wrench, Store } from "lucide-react";
-import { mockFundis, mockShops, mockEvents } from "@/lib/mockData";
+import { mockFundis, mockShops, mockEvents, mockSuperAgents } from "@/lib/mockData";
 import Link from "next/link";
 
 export default function Home() {
@@ -52,6 +53,9 @@ export default function Home() {
 
   const sponsoredEvents = mockEvents.filter(e => e.isSponsored);
   const upcomingEvents = mockEvents.slice(0, 3);
+  
+  // Filter active super agents only
+  const activeSuperAgents = mockSuperAgents.filter(sa => sa.subscriptionStatus === "active");
 
   const metaTitle = language === "en" 
     ? "Smart Fundi - Find Skilled Technicians in Tanzania" 
@@ -164,16 +168,84 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Fundis Section - Mobile Optimized Tabs */}
-        <section id="fundis" className="py-10 sm:py-12 md:py-16">
+        {/* Super Agents Section - Mawakala Wakuu */}
+        <section id="super-agents" className="py-10 sm:py-12 md:py-16">
           <div className="container">
             <div className="mb-6 sm:mb-8">
               <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                <div className="bg-blue-600 p-1.5 sm:p-2 rounded-lg shrink-0">
-                  <Wrench className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                <div className="bg-gradient-to-r from-yellow-400 to-orange-500 p-1.5 sm:p-2 rounded-lg shrink-0">
+                  <Shield className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
                 <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">
-                  {language === "en" ? "Best Fundis" : "Mafundi Bora"}
+                  {t("superAgent.title")}
+                </h2>
+                <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs ml-2">
+                  {language === "en" ? "Premium" : "Bora"}
+                </Badge>
+              </div>
+              <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">
+                {t("superAgent.subtitle")}
+              </p>
+              
+              {activeSuperAgents.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {activeSuperAgents.slice(0, 3).map((agent) => (
+                    <SuperAgentCard 
+                      key={agent.id} 
+                      agent={agent}
+                      onContact={(agent) => {
+                        // Handle contact action
+                        console.log("Contact agent:", agent.name);
+                      }}
+                      onViewProfile={(agent) => {
+                        // Handle view profile action
+                        console.log("View profile:", agent.name);
+                      }}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <Card className="bg-card border border-border">
+                  <CardContent className="p-8 text-center">
+                    <div className="w-16 h-16 rounded-full bg-yellow-100 dark:bg-yellow-900/20 flex items-center justify-center mx-auto mb-4">
+                      <Shield className="h-8 w-8 text-yellow-500" />
+                    </div>
+                    <h3 className="text-lg font-bold text-foreground mb-2">
+                      {t("empty.superAgents.title")}
+                    </h3>
+                    <p className="text-muted-foreground text-sm mb-1">
+                      {t("empty.superAgents.subtitle")}
+                    </p>
+                    <p className="text-muted-foreground text-xs">
+                      {t("empty.superAgents.hint")}
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {activeSuperAgents.length > 3 && (
+                <div className="mt-4 sm:mt-6 text-center">
+                  <Link href="/super-agents">
+                    <Button variant="outline" size="default" className="w-full sm:w-auto h-11 border-yellow-400 text-yellow-700 hover:bg-yellow-50 dark:text-yellow-400 dark:hover:bg-yellow-900/20">
+                      {language === "en" ? "View All Super Agents" : "Ona Mawakala Wakuu Wote"}
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* Mawakala Wakuu Section - Mobile Optimized */}
+        <section id="mawakala-wakuu" className="py-10 sm:py-12 md:py-16 bg-muted/50">
+          <div className="container">
+            <div className="mb-6 sm:mb-8">
+              <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                <div className="bg-purple-600 p-1.5 sm:p-2 rounded-lg shrink-0">
+                  <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                </div>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">
+                  {language === "en" ? "Mawakala Wakuu" : "Mawakala Wakuu"}
                 </h2>
               </div>
               <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">
