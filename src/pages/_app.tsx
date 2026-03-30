@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { initializeMockSubscriptions, initializeSampleMediaMessages } from "@/lib/mockData";
 import { useEffect, useState } from "react";
 import { BottomNavigation } from "@/components/BottomNavigation";
+import { LiveChatWidget } from "@/components/LiveChatWidget";
 
 export default function App({ Component, pageProps }: AppProps) {
   const [splashComplete, setSplashComplete] = useState(false);
@@ -29,6 +30,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <AuthProvider>
           <Component {...pageProps} />
           <BottomNavigation visible={splashComplete} />
+          <LiveChatWidget />
           <Toaster />
         </AuthProvider>
       </LanguageProvider>

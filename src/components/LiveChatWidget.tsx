@@ -182,21 +182,14 @@ export function LiveChatWidget({ position = "bottom-right" }: LiveChatWidgetProp
     setTimeout(() => handleSendMessage(), 100);
   };
 
-  // FIXED: Position classes - always on the RIGHT side, never left
-  // This prevents overlap with the Nyumbani tab on the left
-  const positionClasses = "right-4";
-
-  // FIXED: Bottom positioning - always 96px (24 * 4) above viewport bottom
-  // This ensures it's always above the 65px navigation bar with safe spacing
-  const bottomPosition = "bottom-24"; // 96px - well above the 65px nav bar
-
   // Floating button when chat is closed
   if (!isOpen) {
     return (
       <div 
-        className="fixed right-4 z-40"
+        className="fixed z-50"
         style={{ 
-          bottom: "80px"
+          bottom: "80px",
+          right: "16px"
         }}
       >
         <Button
@@ -219,9 +212,10 @@ export function LiveChatWidget({ position = "bottom-right" }: LiveChatWidgetProp
   // Chat window when open
   return (
     <div 
-      className="fixed right-4 z-40"
+      className="fixed z-50"
       style={{ 
-        bottom: "80px"
+        bottom: "80px",
+        right: "16px"
       }}
     >
       <Card
