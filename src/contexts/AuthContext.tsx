@@ -6,7 +6,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (name: string, email: string, password: string, userType: "customer" | "fundi" | "shop") => Promise<void>;
+  signUp: (name: string, email: string, password: string, userType: "customer" | "fundi" | "shop" | "super_agent") => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   sendMagicLink: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -59,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const signUp = async (name: string, email: string, password: string, userType: "customer" | "fundi" | "shop") => {
+  const signUp = async (name: string, email: string, password: string, userType: "customer" | "fundi" | "shop" | "super_agent") => {
     try {
       const response = await fetch("/api/auth/signup", {
         method: "POST",
