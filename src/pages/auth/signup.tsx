@@ -11,11 +11,11 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Mail, Lock, User, Loader2, AlertCircle, CheckCircle2, Wrench, UserCircle, Store, Upload, FileText } from "lucide-react";
+import { Mail, Lock, User, Loader2, AlertCircle, CheckCircle2, Wrench, UserCircle, Store, Upload, FileText, Shield } from "lucide-react";
 
 export default function SignUpPage() {
   const router = useRouter();
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const { signUp, signInWithGoogle, sendMagicLink } = useAuth();
 
   const [formData, setFormData] = useState({
@@ -23,16 +23,20 @@ export default function SignUpPage() {
     email: "",
     password: "",
     confirmPassword: "",
-    userType: "customer" as "customer" | "fundi" | "shop",
+    userType: "customer" as "customer" | "fundi" | "shop" | "super_agent",
     nationalIdNumber: "",
     idDocument: null as File | null,
     businessRegistrationNumber: "",
     physicalAddress: "",
     storefrontPhoto: null as File | null,
     businessLicense: null as File | null,
+    // Super Agent specific fields
+    region: "",
+    district: "",
+    phone: "",
   });
   const [magicEmail, setMagicEmail] = useState("");
-  const [magicUserType, setMagicUserType] = useState<"customer" | "fundi" | "shop">("customer");
+  const [magicUserType, setMagicUserType] = useState<"customer" | "fundi" | "shop" | "super_agent">("customer");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [magicLinkSent, setMagicLinkSent] = useState(false);
@@ -209,6 +213,12 @@ export default function SignUpPage() {
       description: language === "en" ? "Sell tools & supplies" : "Uza zana na vifaa",
       icon: Store,
     },
+    {
+      value: "super_agent",
+      label: language === "en" ? "Super Agent" : "Wakala Mkuu",
+      description: language === "en" ? "Regional rep" : "Mwakilishi wa mkoa",
+      icon: Shield,
+    },
   ];
 
   const metaTitle = language === "en" ? "Sign Up - Smart Fundi" : "Jisajili - Smart Fundi";
@@ -279,7 +289,7 @@ export default function SignUpPage() {
                       </Label>
                       <RadioGroup
                         value={formData.userType}
-                        onValueChange={(value: "customer" | "fundi" | "shop") =>
+                        onValueChange={(value: "customer" | "fundi" | "shop" | "super_agent") =>
                           setFormData({ ...formData, userType: value })
                         }
                         className="grid grid-cols-3 gap-2"
@@ -592,7 +602,7 @@ export default function SignUpPage() {
                         </Label>
                         <RadioGroup
                           value={magicUserType}
-                          onValueChange={(value: "customer" | "fundi" | "shop") => setMagicUserType(value)}
+                          onValueChange={(value: "customer" | "fundi" | "shop" | "super_agent") => setMagicUserType(value)}
                           className="grid grid-cols-3 gap-2"
                         >
                           {userTypes.map((type) => {
