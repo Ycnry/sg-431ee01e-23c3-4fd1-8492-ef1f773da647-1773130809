@@ -549,6 +549,86 @@ export default function SignUpPage() {
                       </div>
                     )}
 
+                    {/* Super Agent Registration Section - Mobile Optimized */}
+                    {formData.userType === "super_agent" && (
+                      <div className="space-y-3 p-3 border-2 border-yellow-400 dark:border-yellow-600 rounded-lg bg-yellow-50 dark:bg-yellow-950">
+                        <div className="flex items-center gap-2">
+                          <Shield className="h-4 w-4 text-yellow-600 flex-shrink-0" />
+                          <h3 className="text-xs sm:text-sm font-semibold text-yellow-900 dark:text-yellow-100">
+                            {language === "en" ? "Super Agent Registration" : "Usajili wa Wakala Mkuu"}
+                          </h3>
+                        </div>
+                        
+                        {/* Payment Notice */}
+                        <Alert className="border-yellow-300 bg-yellow-100 dark:bg-yellow-900/30">
+                          <AlertCircle className="h-4 w-4 text-yellow-700 dark:text-yellow-400" />
+                          <AlertDescription className="text-xs text-yellow-800 dark:text-yellow-200 ml-2">
+                            {language === "en" 
+                              ? "Super Agent registration requires a monthly fee of TZS 40,000. Payment is required after signup to activate your account."
+                              : "Usajili wa Wakala Mkuu unahitaji ada ya kila mwezi ya TZS 40,000. Malipo yanahitajika baada ya kujisajili kuamsha akaunti yako."}
+                          </AlertDescription>
+                        </Alert>
+                        
+                        <div className="space-y-1.5">
+                          <Label htmlFor="phone" className="text-xs sm:text-sm">
+                            {language === "en" ? "Phone Number" : "Nambari ya Simu"} *
+                          </Label>
+                          <Input
+                            id="phone"
+                            type="tel"
+                            placeholder="+255 7XX XXX XXX"
+                            value={formData.phone}
+                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                            className="h-9 sm:h-10 text-sm"
+                            required={formData.userType === "super_agent"}
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="space-y-1.5">
+                            <Label htmlFor="region" className="text-xs sm:text-sm">
+                              {language === "en" ? "Region" : "Mkoa"} *
+                            </Label>
+                            <Input
+                              id="region"
+                              type="text"
+                              placeholder={language === "en" ? "e.g. Dar es Salaam" : "mfano Dar es Salaam"}
+                              value={formData.region}
+                              onChange={(e) => setFormData({ ...formData, region: e.target.value })}
+                              className="h-9 sm:h-10 text-sm"
+                              required={formData.userType === "super_agent"}
+                            />
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <Label htmlFor="district" className="text-xs sm:text-sm">
+                              {language === "en" ? "District" : "Wilaya"}
+                            </Label>
+                            <Input
+                              id="district"
+                              type="text"
+                              placeholder={language === "en" ? "e.g. Kinondoni" : "mfano Kinondoni"}
+                              value={formData.district}
+                              onChange={(e) => setFormData({ ...formData, district: e.target.value })}
+                              className="h-9 sm:h-10 text-sm"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Benefits List */}
+                        <div className="mt-2 p-2 bg-white dark:bg-gray-900 rounded border border-yellow-200 dark:border-yellow-800">
+                          <p className="text-xs font-semibold text-yellow-800 dark:text-yellow-200 mb-1">
+                            {language === "en" ? "Benefits:" : "Faida:"}
+                          </p>
+                          <ul className="text-xs text-yellow-700 dark:text-yellow-300 space-y-0.5">
+                            <li>✓ {language === "en" ? "Earn commission per onboarding" : "Pata kamisheni kwa kila usajili"}</li>
+                            <li>✓ {language === "en" ? "Gold verified badge" : "Beji ya dhahabu iliyothibitishwa"}</li>
+                            <li>✓ {language === "en" ? "Priority regional listing" : "Orodha ya kipaumbele ya mkoa"}</li>
+                          </ul>
+                        </div>
+                      </div>
+                    )}
+
                     <Button type="submit" className="w-full h-10 sm:h-11 text-sm sm:text-base" disabled={loading}>
                       {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                       {language === "en" ? "Create Account" : "Fungua Akaunti"}
