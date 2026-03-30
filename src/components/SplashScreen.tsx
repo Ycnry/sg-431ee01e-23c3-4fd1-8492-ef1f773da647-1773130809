@@ -37,16 +37,22 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-[9999] flex items-center justify-center bg-gradient-to-br from-blue-900 via-blue-800 to-blue-950 overflow-hidden"
+        className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden"
+        style={{ backgroundColor: "#0d1b2e" }}
         initial={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.5 }}
       >
+        {/* Subtle radial glow effect centered */}
+        <div 
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: "radial-gradient(circle at center, rgba(26, 60, 110, 0.4) 0%, rgba(26, 60, 110, 0.1) 40%, transparent 70%)"
+          }}
+        />
+
         {/* Animated background grid */}
         <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:50px_50px]" />
-        
-        {/* Radial gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-radial from-blue-600/20 via-transparent to-transparent" />
 
         {/* Floating particles - render only on client */}
         {isClient && [...Array(20)].map((_, i) => (
@@ -54,12 +60,12 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
             key={i}
             className="absolute w-1 h-1 bg-orange-400 rounded-full"
             initial={{
-              x: Math.random() * window.innerWidth,
-              y: Math.random() * window.innerHeight,
+              x: Math.random() * (typeof window !== "undefined" ? window.innerWidth : 400),
+              y: Math.random() * (typeof window !== "undefined" ? window.innerHeight : 800),
               opacity: 0,
             }}
             animate={{
-              y: [null, Math.random() * window.innerHeight],
+              y: [null, Math.random() * (typeof window !== "undefined" ? window.innerHeight : 800)],
               opacity: [0, 1, 0],
             }}
             transition={{
@@ -89,7 +95,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
               className="absolute inset-0 blur-3xl"
               animate={{
                 scale: [1, 1.2, 1],
-                opacity: [0.5, 0.8, 0.5],
+                opacity: [0.3, 0.5, 0.3],
               }}
               transition={{
                 duration: 2,
@@ -97,7 +103,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
                 ease: "easeInOut",
               }}
             >
-              <div className="w-full h-full bg-gradient-to-br from-blue-500 to-orange-500 rounded-full" />
+              <div className="w-full h-full rounded-full" style={{ backgroundColor: "#1A3C6E" }} />
             </motion.div>
 
             {/* Main logo */}
@@ -106,9 +112,9 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
               animate={{
                 y: [0, -10, 0],
                 boxShadow: [
-                  "0 20px 60px rgba(59, 130, 246, 0.3)",
-                  "0 30px 80px rgba(249, 115, 22, 0.4)",
-                  "0 20px 60px rgba(59, 130, 246, 0.3)",
+                  "0 20px 60px rgba(26, 60, 110, 0.4)",
+                  "0 30px 80px rgba(26, 60, 110, 0.5)",
+                  "0 20px 60px rgba(26, 60, 110, 0.4)",
                 ],
               }}
               transition={{
@@ -165,9 +171,9 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
               className="text-4xl font-bold text-white"
               animate={{
                 textShadow: [
-                  "0 0 20px rgba(59, 130, 246, 0.5)",
+                  "0 0 20px rgba(26, 60, 110, 0.5)",
                   "0 0 30px rgba(249, 115, 22, 0.5)",
-                  "0 0 20px rgba(59, 130, 246, 0.5)",
+                  "0 0 20px rgba(26, 60, 110, 0.5)",
                 ],
               }}
               transition={{
@@ -183,7 +189,8 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
 
           {/* Tagline */}
           <motion.p
-            className="mt-2 text-blue-200 text-sm tracking-wider"
+            className="mt-2 text-sm tracking-wider"
+            style={{ color: "#A0AEC0" }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 0.8 }}
@@ -193,7 +200,8 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
 
           {/* Loading progress bar */}
           <motion.div
-            className="mt-8 w-64 h-1 bg-blue-950/50 rounded-full overflow-hidden"
+            className="mt-8 w-64 h-1 rounded-full overflow-hidden"
+            style={{ backgroundColor: "rgba(26, 60, 110, 0.3)" }}
             initial={{ opacity: 0, width: 0 }}
             animate={{ opacity: 1, width: 256 }}
             transition={{ delay: 1, duration: 0.5 }}
@@ -208,7 +216,8 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
 
           {/* Loading text */}
           <motion.p
-            className="mt-4 text-blue-300 text-xs"
+            className="mt-4 text-xs"
+            style={{ color: "#A0AEC0" }}
             initial={{ opacity: 0 }}
             animate={{ opacity: [0, 1, 0] }}
             transition={{
