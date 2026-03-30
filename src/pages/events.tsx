@@ -171,13 +171,20 @@ export default function EventsPage() {
                 ))}
               </div>
             ) : (
+              /* Empty State - Friendly User Message */
               <Card className="bg-card border border-border">
                 <CardContent className="p-8 text-center">
-                  <Calendar className="h-12 w-12 mx-auto mb-3 text-muted-foreground" />
-                  <p className="text-muted-foreground">
-                    {language === "en"
-                      ? "No upcoming events at the moment"
-                      : "Hakuna matukio yajayo kwa sasa"}
+                  <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center mx-auto mb-4">
+                    <Calendar className="h-8 w-8 text-blue-500" />
+                  </div>
+                  <h3 className="text-lg font-bold text-foreground mb-2">
+                    No Upcoming Events
+                  </h3>
+                  <p className="text-muted-foreground text-sm mb-1">
+                    Hakuna matukio yajayo kwa sasa
+                  </p>
+                  <p className="text-muted-foreground text-xs">
+                    Angalia tena baadaye kwa matukio mapya
                   </p>
                 </CardContent>
               </Card>

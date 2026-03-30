@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { ChatInterface } from "@/components/messaging/ChatInterface";
 import { ConversationList } from "@/components/messaging/ConversationList";
+import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Conversation } from "@/types";
 import { MessageSquare } from "lucide-react";
@@ -45,6 +46,44 @@ export default function MessagesPage() {
 
   const metaTitle = language === "en" ? "Messages - Smart Fundi" : "Ujumbe - Smart Fundi";
 
+  /* Empty State Component */
+  const EmptyMessagesState = () => (
+    <Card className="bg-card border border-border">
+      <CardContent className="p-8 text-center">
+        <div className="w-16 h-16 rounded-full bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center mx-auto mb-4">
+          <MessageSquare className="h-8 w-8 text-orange-500" />
+        </div>
+        <h3 className="text-lg font-bold text-foreground mb-2">
+          No Messages Yet
+        </h3>
+        <p className="text-muted-foreground text-sm mb-1">
+          Hakuna ujumbe bado
+        </p>
+        <p className="text-muted-foreground text-xs">
+          Anza mazungumzo na fundi au duka kupata msaada
+        </p>
+      </CardContent>
+    </Card>
+  );
+
+  /* Select Conversation Empty State */
+  const SelectConversationState = () => (
+    <div className="h-[600px] flex flex-col items-center justify-center border-2 border-dashed rounded-lg bg-card">
+      <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center mb-4">
+        <MessageSquare className="h-8 w-8 text-blue-500" />
+      </div>
+      <h3 className="text-lg font-bold text-foreground mb-2">
+        Select a Conversation
+      </h3>
+      <p className="text-muted-foreground text-sm mb-1">
+        Chagua mazungumzo kuanza
+      </p>
+      <p className="text-muted-foreground text-xs text-center px-4">
+        Bofya kwenye mazungumzo kushoto ili kutuma ujumbe
+      </p>
+    </div>
+  );
+
   return (
     <>
       <Head>
@@ -72,20 +111,14 @@ export default function MessagesPage() {
                 <h1 className="text-xl font-bold mb-4">
                   {language === "en" ? "Messages" : "Ujumbe"}
                 </h1>
-                <ConversationList
-                  conversations={mockConversations}
-                  onSelectConversation={setSelectedConversation}
-                  selectedId={selectedConversation}
-                />
-                {mockConversations.length === 0 && (
-                  <div className="text-center py-12">
-                    <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground">
-                      {language === "en" 
-                        ? "No messages yet. Start a conversation with a fundi or shop!" 
-                        : "Hakuna ujumbe bado. Anza mazungumzo na fundi au duka!"}
-                    </p>
-                  </div>
+                {mockConversations.length > 0 ? (
+                  <ConversationList
+                    conversations={mockConversations}
+                    onSelectConversation={setSelectedConversation}
+                    selectedId={selectedConversation}
+                  />
+                ) : (
+                  <EmptyMessagesState />
                 )}
               </div>
             )}
@@ -97,11 +130,15 @@ export default function MessagesPage() {
               <h1 className="text-xl font-bold mb-4">
                 {language === "en" ? "Messages" : "Ujumbe"}
               </h1>
-              <ConversationList
-                conversations={mockConversations}
-                onSelectConversation={setSelectedConversation}
-                selectedId={selectedConversation}
-              />
+              {mockConversations.length > 0 ? (
+                <ConversationList
+                  conversations={mockConversations}
+                  onSelectConversation={setSelectedConversation}
+                  selectedId={selectedConversation}
+                />
+              ) : (
+                <EmptyMessagesState />
+              )}
             </div>
             
             <div className="lg:col-span-2">
@@ -113,20 +150,11 @@ export default function MessagesPage() {
                   onBack={() => setSelectedConversation(undefined)}
                 />
               ) : (
-                <div className="h-[600px] flex flex-col items-center justify-center border-2 border-dashed rounded-lg">
-                  <MessageSquare className="h-12 w-12 text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground text-center px-4">
-                    {t("messaging.selectChat") || (language === "en" 
-                      ? "Select a conversation to start messaging" 
-                      : "Chagua mazungumzo kuanza kutuma ujumbe")}
-                  </p>
-                </div>
+                <SelectConversationState />
               )}
             </div>
           </div>
         </main>
-        
-        <BottomNavigation />
       </div>
     </>
   );
