@@ -13,24 +13,26 @@ import {
 } from "@/components/ui/tooltip";
 import { motion, AnimatePresence } from "framer-motion";
 import { Home, Search, Calendar, User, LogIn } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface NavItem {
   id: string;
   icon: React.ComponentType<{ className?: string }>;
-  label: string;
+  labelKey: string;
   href: string;
 }
 
 const navItems: NavItem[] = [
-  { id: "home", icon: Home, label: "Nyumbani", href: "/" },
-  { id: "search", icon: Search, label: "Tafuta", href: "/search" },
-  { id: "events", icon: Calendar, label: "Matukio", href: "/events" },
-  { id: "profile", icon: User, label: "Wasifu", href: "/profile" },
-  { id: "login", icon: LogIn, label: "Ingia", href: "/auth/signin" },
+  { id: "home", icon: Home, labelKey: "nav.tab.home", href: "/" },
+  { id: "search", icon: Search, labelKey: "nav.tab.search", href: "/search" },
+  { id: "events", icon: Calendar, labelKey: "nav.tab.events", href: "/events" },
+  { id: "profile", icon: User, labelKey: "nav.tab.profile", href: "/profile" },
+  { id: "login", icon: LogIn, labelKey: "nav.tab.login", href: "/auth/signin" },
 ];
 
 export function BottomNavigation() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [hovered, setHovered] = React.useState<number | null>(null);
 
   const getActiveIndex = (): number => {
@@ -60,6 +62,7 @@ export function BottomNavigation() {
             const isActive = activeIndex === i;
             const isHovered = hovered === i;
             const showBubble = isActive || isHovered;
+            const label = t(item.labelKey);
 
             return (
               <Tooltip key={item.id}>
@@ -109,7 +112,7 @@ export function BottomNavigation() {
                       >
                         <a>
                           <item.icon className="h-6 w-6 text-white" />
-                          <span className="sr-only">{item.label}</span>
+                          <span className="sr-only">{label}</span>
                         </a>
                       </Button>
                     </Link>
@@ -119,7 +122,7 @@ export function BottomNavigation() {
                   side="top"
                   className="text-xs bg-[#1A3C6E] text-white border-[#1A3C6E]"
                 >
-                  {item.label}
+                  {label}
                 </TooltipContent>
               </Tooltip>
             );
