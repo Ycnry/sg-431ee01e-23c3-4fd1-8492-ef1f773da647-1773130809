@@ -38,23 +38,68 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
+      console.log("[Auth] Attempting sign in for:", email);
+      
       const response = await fetch("/api/auth/signin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Sign in failed");
+      console.log("[Auth] Sign in response status:", response.status, response.statusText);
+
+      // Parse response body (try JSON first, fall back to text)
+      let responseData;
+      const contentType = response.headers.get("content-type");
+      
+      try {
+        if (contentType && contentType.includes("application/json")) {
+          responseData = await response.json();
+        } else {
+          responseData = { message: await response.text() };
+        }
+      } catch (parseError) {
+        console.error("[Auth] Failed to parse response:", parseError);
+        responseData = { message: "Invalid server response" };
       }
 
-      const data = await response.json();
-      setUser(data.user);
-      localStorage.setItem("smartfundi_user", JSON.stringify(data.user));
-      localStorage.setItem("smartfundi_token", data.token);
+      console.log("[Auth] Sign in response body:", responseData);
+
+      if (!response.ok) {
+        // Detailed error logging
+        console.error("[Auth] Sign in failed with details:", {
+          status: response.status,
+          statusText: response.statusText,
+          url: response.url,
+          headers: Object.fromEntries(response.headers.entries()),
+          body: responseData,
+          errorCode: responseData.code || "UNKNOWN",
+          errorMessage: responseData.error || responseData.message || "Unknown error",
+          validationDetails: responseData.details || null,
+          timestamp: new Date().toISOString(),
+        });
+
+        // Throw error with the most informative message available
+        const errorMessage = 
+          responseData.error || 
+          responseData.message || 
+          `Sign in failed (HTTP ${response.status}: ${response.statusText})`;
+        
+        throw new Error(errorMessage);
+      }
+
+      console.log("[Auth] Sign in successful for:", email);
+      setUser(responseData.user);
+      localStorage.setItem("smartfundi_user", JSON.stringify(responseData.user));
+      localStorage.setItem("smartfundi_token", responseData.token);
     } catch (error) {
-      console.error("Sign in error:", error);
+      console.error("[Auth] Sign in error caught:", {
+        error,
+        errorType: error instanceof Error ? error.constructor.name : typeof error,
+        errorMessage: error instanceof Error ? error.message : String(error),
+        errorStack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+      });
       throw error;
     }
   };
