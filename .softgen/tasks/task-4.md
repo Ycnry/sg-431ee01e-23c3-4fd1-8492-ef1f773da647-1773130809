@@ -1,6 +1,6 @@
 ---
 title: Shop Profile Redesign
-status: todo
+status: done
 priority: high
 type: feature
 tags: [profile, ui, shop]
@@ -13,12 +13,12 @@ position: 3
 Shop profile with cover image, overlapping logo, stats row, and 3-tab system. Sticky WhatsApp + Call buttons.
 
 ## Checklist
-- [ ] Full-width cover image with overlapping shop logo (green border)
-- [ ] Shop name, category badge, rating, location, operating hours
-- [ ] Stats row: Products Listed | Reviews | Cities Served
-- [ ] Tab system: Products (2-col grid with prices), Reviews (list), About
-- [ ] Sticky WhatsApp + Call buttons pinned at bottom
-- [ ] Empty states for products/reviews
+- [x] Full-width cover image with overlapping shop logo (green border)
+- [x] Shop name, category badge, rating, location, operating hours
+- [x] Stats row: Products Listed | Reviews | Cities Served
+- [x] Tab system: Products (2-col grid with prices), Reviews (list), About
+- [x] Sticky WhatsApp + Call buttons pinned at bottom
+- [x] Empty states for products/reviews
 
 ## Acceptance
 - Shop profile shows cover image with overlapping logo
