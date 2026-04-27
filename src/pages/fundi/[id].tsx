@@ -1,28 +1,73 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
+import Link from "next/link";
 import { Header } from "@/components/Header";
-import { BottomNavigation } from "@/components/BottomNavigation";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Star, MessageSquare, Phone, MapPin, CheckCircle2, ShieldCheck, ShieldX } from "lucide-react";
 import { mockFundis } from "@/lib/mockData";
 import { subscriptionDb } from "@/lib/subscriptionDb";
 import { Fundi } from "@/types";
+import { 
+  Star, MapPin, CheckCircle2, Briefcase, Clock, Camera, 
+  MessageSquare, Image, Phone, Calendar, Award, Wrench,
+  ChevronLeft, Heart
+} from "lucide-react";
+
+// Mock portfolio images
+const mockPortfolio = [
+  "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1581141849291-1125c7b692b5?w=400&h=400&fit=crop",
+];
+
+// Mock reviews
+const mockReviews = [
+  {
+    id: "1",
+    customerName: "Maria Joseph",
+    customerPhoto: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop",
+    rating: 5,
+    comment: "Excellent work! Very professional and completed the job on time. Highly recommended!",
+    date: "2026-04-15",
+  },
+  {
+    id: "2",
+    customerName: "John Mwamba",
+    customerPhoto: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop",
+    rating: 4,
+    comment: "Good quality work. Arrived on time and was very respectful. Will hire again.",
+    date: "2026-04-10",
+  },
+  {
+    id: "3",
+    customerName: "Grace Kimaro",
+    customerPhoto: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop",
+    rating: 5,
+    comment: "Amazing fundi! Fixed everything perfectly. Fair price too.",
+    date: "2026-04-05",
+  },
+];
+
+// Mock skills
+const mockSkills = ["Plumbing", "Pipe Fitting", "Water Heater Installation", "Drain Cleaning", "Leak Repair", "Bathroom Renovation"];
 
 export default function FundiProfile() {
   const router = useRouter();
   const { id } = router.query;
   const { t, language } = useLanguage();
-  const [rating, setRating] = useState(0);
-  const [review, setReview] = useState("");
   const [fundi, setFundi] = useState<Fundi | null>(null);
   const [isPromoted, setIsPromoted] = useState(false);
   const [subscriptionActive, setSubscriptionActive] = useState(false);
+  const [activeTab, setActiveTab] = useState("portfolio");
+  const [isHeaderSticky, setIsHeaderSticky] = useState(false);
+  const tabsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (id) {
@@ -35,17 +80,17 @@ export default function FundiProfile() {
     }
   }, [id]);
 
-  const handleSubmitReview = () => {
-    if (rating > 0 && review.trim()) {
-      console.log("Review submitted:", { rating, review, language });
-      setRating(0);
-      setReview("");
-    }
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      if (tabsRef.current) {
+        const tabsTop = tabsRef.current.getBoundingClientRect().top;
+        setIsHeaderSticky(tabsTop <= 60);
+      }
+    };
 
-  const metaTitle = language === "en" 
-    ? `${fundi?.name} - ${fundi?.specialty} in ${fundi?.city} | Smart Fundi`
-    : `${fundi?.name} - ${fundi?.specialty} ${fundi?.city} | Smart Fundi`;
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   if (!fundi) {
     return (
@@ -57,227 +102,293 @@ export default function FundiProfile() {
     );
   }
 
+  const initials = fundi.name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
+  const jobsCompleted = Math.floor(Math.random() * 200) + 50;
+  const yearsExperience = Math.floor(Math.random() * 10) + 2;
+  const hourlyRate = Math.floor(Math.random() * 30000) + 15000;
+
   return (
     <>
       <Head>
-        <title>{metaTitle}</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+        <title>{fundi.name} - {fundi.specialty} | Smart Fundi</title>
+        <meta name="description" content={`Hire ${fundi.name}, a verified ${fundi.specialty} in ${fundi.city}`} />
       </Head>
 
-      <div className="min-h-screen bg-background pb-20 md:pb-8">
-        <Header />
-        
-        <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 pt-20 sm:pt-24">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-            {/* Main Content */}
-            <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-              {/* Profile Card */}
-              <Card className="overflow-hidden">
-                <CardContent className="p-4 sm:p-6">
-                  <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
-                    <Avatar className="h-24 w-24 sm:h-32 sm:w-32 border-4 border-white shadow-lg flex-shrink-0">
-                      <AvatarImage src={fundi.image || fundi.photo} alt={fundi.name} />
-                      <AvatarFallback className="text-3xl sm:text-4xl">{fundi.name?.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 text-center sm:text-left min-w-0">
-                      <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-2">
-                        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold break-words">{fundi.name}</h1>
-                        {fundi.verified && (
-                          <Badge variant="default" className="bg-blue-600 hover:bg-blue-700 gap-1 text-xs">
-                            <CheckCircle2 className="h-3 w-3" />
-                            <span className="hidden xs:inline">{t("common.verified")}</span>
-                          </Badge>
-                        )}
-                      </div>
-                      
-                      {isPromoted && (
-                        <Badge variant="secondary" className="bg-orange-100 text-orange-700 mb-2 text-xs">
-                          {t("common.featured")}
-                        </Badge>
-                      )}
-                      
-                      <p className="text-base sm:text-lg text-muted-foreground">{fundi.specialty}</p>
-                      
-                      <div className="flex items-center justify-center sm:justify-start gap-1 text-sm text-muted-foreground mt-2">
-                        <MapPin className="h-4 w-4 flex-shrink-0" />
-                        <span className="truncate">{fundi.city}</span>
-                      </div>
-                      
-                      <div className="flex items-center justify-center sm:justify-start gap-2 mt-3">
-                        <div className="flex items-center gap-1">
-                          <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                          <span className="font-bold text-lg">{fundi.rating?.toFixed(1)}</span>
-                        </div>
-                        <span className="text-sm text-muted-foreground">
-                          ({fundi.reviewCount} {t("common.reviews")})
-                        </span>
-                      </div>
-                      
-                      <div className="mt-2 text-sm">
-                        {subscriptionActive ? (
-                          <span className="flex items-center justify-center sm:justify-start gap-2 text-green-600">
-                            <ShieldCheck className="h-4 w-4" />
-                            <span className="text-xs sm:text-sm">
-                              {language === "en" ? "Active Subscription" : "Usajili Hai"}
-                            </span>
-                          </span>
-                        ) : (
-                          <span className="flex items-center justify-center sm:justify-start gap-2 text-red-600">
-                            <ShieldX className="h-4 w-4" />
-                            <span className="text-xs sm:text-sm">
-                              {language === "en" ? "Inactive Subscription" : "Usajili Umekwisha"}
-                            </span>
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+      <div className="min-h-screen bg-background pb-24">
+        {/* Fixed Back Button */}
+        <button
+          onClick={() => router.back()}
+          className="fixed top-4 left-4 z-50 bg-black/50 backdrop-blur-sm text-white rounded-full p-2 hover:bg-black/70 transition-colors"
+        >
+          <ChevronLeft className="h-6 w-6" />
+        </button>
 
-              {/* Contact Actions - Mobile Prominent */}
-              <Card className="lg:hidden">
-                <CardContent className="p-4">
-                  <h2 className="text-lg font-semibold mb-3">
-                    {language === "en" ? "Contact" : "Wasiliana"}
-                  </h2>
-                  <div className="grid grid-cols-2 gap-3">
-                    <Button className="gap-2 h-12" variant="default">
-                      <MessageSquare className="h-5 w-5" />
-                      <span className="text-sm">{t("action.message")}</span>
-                    </Button>
-                    {fundi.whatsapp && (
-                      <Button className="gap-2 h-12" variant="outline">
-                        <Phone className="h-5 w-5" />
-                        <span className="text-sm">{t("action.call")}</span>
-                      </Button>
-                    )}
-                  </div>
-                  {fundi.whatsapp && (
-                    <Button variant="outline" className="w-full gap-2 mt-3 h-12 border-green-600 text-green-600 hover:bg-green-50">
-                      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                      </svg>
-                      <span className="text-sm">{t("action.whatsapp")}</span>
-                    </Button>
-                  )}
-                  {isPromoted && (
-                    <p className="text-center text-xs text-orange-600 mt-3">
-                      {language === "en" 
-                        ? "Featured provider - Priority service!" 
-                        : "Mtoa huduma maarufu - Huduma ya kipaumbele!"}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
+        {/* Cover Banner */}
+        <div className="relative h-48 sm:h-56 md:h-64 bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600">
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1504148455328-c376907d081c?w=1200&h=400&fit=crop')] bg-cover bg-center opacity-30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          
+          {isPromoted && (
+            <Badge className="absolute top-4 right-4 bg-yellow-500 text-white">
+              <Star className="h-3 w-3 mr-1 fill-white" />
+              {language === "en" ? "Featured" : "Maarufu"}
+            </Badge>
+          )}
+        </div>
 
-              {/* Leave a Review */}
-              <Card>
-                <CardContent className="p-4 sm:p-6">
-                  <h2 className="text-lg sm:text-xl font-semibold mb-4">
-                    {language === "en" ? "Leave a Review" : "Toa Maoni"}
-                  </h2>
-                  
-                  <div className="space-y-4">
-                    {/* Star Rating */}
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">
-                        {language === "en" ? "Your Rating" : "Ukadiriaji Wako"}
-                      </label>
-                      <div className="flex gap-1">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <button
-                            key={star}
-                            onClick={() => setRating(star)}
-                            className="p-1 hover:scale-110 transition-transform"
-                          >
-                            <Star 
-                              className={`h-8 w-8 ${rating >= star ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`} 
-                            />
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    {/* Review Text */}
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">
-                        {language === "en" ? "Your Review" : "Maoni Yako"}
-                      </label>
-                      <Textarea
-                        value={review}
-                        onChange={(e) => setReview(e.target.value)}
-                        placeholder={language === "en" 
-                          ? "Share your experience with this fundi..." 
-                          : "Shiriki uzoefu wako na fundi huyu..."}
-                        className="min-h-[100px] text-base"
-                      />
-                    </div>
-                    
-                    <Button 
-                      onClick={handleSubmitReview}
-                      disabled={rating === 0 || !review.trim()}
-                      className="w-full h-12"
-                    >
-                      {language === "en" ? "Submit Review" : "Tuma Maoni"}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Sidebar - Desktop Only */}
-            <div className="hidden lg:block space-y-6">
-              <Card>
-                <CardContent className="p-6">
-                  <h2 className="text-xl font-semibold mb-4">
-                    {language === "en" ? "Contact" : "Wasiliana"}
-                  </h2>
-                  
-                  <div className="space-y-3">
-                    <Button className="w-full gap-2" size="lg">
-                      <MessageSquare className="h-5 w-5" />
-                      {t("action.message")}
-                    </Button>
-                    
-                    {fundi.whatsapp && (
-                      <>
-                        <Button variant="outline" className="w-full gap-2" size="lg">
-                          <Phone className="h-5 w-5" />
-                          {t("action.call")}
-                        </Button>
-                        
-                        <Button variant="outline" className="w-full gap-2 border-green-600 text-green-600 hover:bg-green-50" size="lg">
-                          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                          </svg>
-                          {t("action.whatsapp")}
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {isPromoted && (
-                <Card className="border-orange-500 border-2">
-                  <CardContent className="p-6">
-                    <Badge className="mb-3 bg-orange-500">
-                      {language === "en" ? "Featured Listing" : "Orodha Maarufu"}
-                    </Badge>
-                    <p className="text-sm text-muted-foreground">
-                      {language === "en" 
-                        ? "This is a premium verified professional with an active promoted listing."
-                        : "Huyu ni mtaalamu aliyethibitishwa na orodha iliyotangazwa."}
-                    </p>
-                  </CardContent>
-                </Card>
+        {/* Profile Photo - Overlapping */}
+        <div className="relative px-4 sm:px-6 -mt-16 sm:-mt-20">
+          <div className="flex flex-col items-center sm:items-start sm:flex-row sm:gap-6">
+            <div className="relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full blur-sm" />
+              <Avatar className="relative h-32 w-32 sm:h-36 sm:w-36 border-4 border-orange-500 shadow-xl">
+                <AvatarImage src={fundi.image || fundi.photo} alt={fundi.name} />
+                <AvatarFallback className="bg-orange-100 text-orange-700 text-3xl font-bold">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              {fundi.verified && (
+                <div className="absolute -bottom-1 -right-1 bg-blue-500 rounded-full p-1.5 border-2 border-white">
+                  <CheckCircle2 className="h-4 w-4 text-white" />
+                </div>
               )}
             </div>
+
+            <div className="mt-4 sm:mt-8 text-center sm:text-left flex-1">
+              <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+                <h1 className="text-2xl sm:text-3xl font-bold">{fundi.name}</h1>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50">
+                  <Heart className="h-5 w-5" />
+                </Button>
+              </div>
+              
+              <Badge className="mt-2 bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300">
+                <Wrench className="h-3 w-3 mr-1" />
+                {fundi.specialty}
+              </Badge>
+
+              <div className="flex items-center justify-center sm:justify-start gap-4 mt-3 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  <span className="font-semibold text-foreground">{fundi.rating.toFixed(1)}</span>
+                  <span>({fundi.reviewCount})</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <MapPin className="h-4 w-4" />
+                  <span>{fundi.city}</span>
+                </div>
+              </div>
+            </div>
           </div>
-        </main>
-        
-        <BottomNavigation />
+        </div>
+
+        {/* Stats Row */}
+        <div className="grid grid-cols-3 gap-1 mt-6 mx-4 sm:mx-6 bg-muted/50 rounded-xl p-1">
+          <div className="text-center py-4 bg-background rounded-lg">
+            <div className="text-2xl sm:text-3xl font-bold text-foreground">{jobsCompleted}</div>
+            <div className="text-xs sm:text-sm text-muted-foreground">
+              {language === "en" ? "Jobs Done" : "Kazi Zilizofanywa"}
+            </div>
+          </div>
+          <div className="text-center py-4 bg-background rounded-lg">
+            <div className="text-2xl sm:text-3xl font-bold text-foreground flex items-center justify-center gap-1">
+              {fundi.rating.toFixed(1)}
+              <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+            </div>
+            <div className="text-xs sm:text-sm text-muted-foreground">
+              {language === "en" ? "Rating" : "Ukadiriaji"}
+            </div>
+          </div>
+          <div className="text-center py-4 bg-background rounded-lg">
+            <div className="text-2xl sm:text-3xl font-bold text-foreground">{yearsExperience}</div>
+            <div className="text-xs sm:text-sm text-muted-foreground">
+              {language === "en" ? "Years Exp." : "Miaka Uzoefu"}
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs Section */}
+        <div ref={tabsRef} className={`mt-6 ${isHeaderSticky ? "sticky top-0 z-40 bg-background shadow-md" : ""}`}>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="w-full grid grid-cols-3 h-12 bg-muted/50 mx-0 rounded-none border-b">
+              <TabsTrigger 
+                value="portfolio" 
+                className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-orange-500 data-[state=active]:text-orange-600 rounded-none"
+              >
+                <Image className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">{language === "en" ? "Portfolio" : "Kazi"}</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="reviews"
+                className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-orange-500 data-[state=active]:text-orange-600 rounded-none"
+              >
+                <MessageSquare className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">{language === "en" ? "Reviews" : "Maoni"}</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="about"
+                className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-orange-500 data-[state=active]:text-orange-600 rounded-none"
+              >
+                <Award className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">{language === "en" ? "About" : "Kuhusu"}</span>
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Portfolio Tab */}
+            <TabsContent value="portfolio" className="mt-0 p-0">
+              {mockPortfolio.length > 0 ? (
+                <div className="grid grid-cols-3 gap-0.5">
+                  {mockPortfolio.map((img, index) => (
+                    <div key={index} className="aspect-square relative group cursor-pointer overflow-hidden">
+                      <img 
+                        src={img} 
+                        alt={`Work ${index + 1}`}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                  <div className="w-24 h-24 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center mb-4">
+                    <Camera className="h-12 w-12 text-orange-400" />
+                  </div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    {language === "en" ? "No Portfolio Yet" : "Hakuna Kazi Bado"}
+                  </h3>
+                  <p className="text-muted-foreground text-sm max-w-xs">
+                    {language === "en" 
+                      ? "This fundi hasn't uploaded any work samples yet. Check back soon!"
+                      : "Fundi huyu hajaongeza sampuli za kazi bado. Rudi tena baadaye!"}
+                  </p>
+                </div>
+              )}
+            </TabsContent>
+
+            {/* Reviews Tab */}
+            <TabsContent value="reviews" className="mt-0">
+              {mockReviews.length > 0 ? (
+                <div className="divide-y">
+                  {mockReviews.map((review) => (
+                    <div key={review.id} className="p-4 sm:p-6">
+                      <div className="flex items-start gap-3">
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage src={review.customerPhoto} alt={review.customerName} />
+                          <AvatarFallback>{review.customerName[0]}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-semibold">{review.customerName}</h4>
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(review.date).toLocaleDateString(language === "sw" ? "sw-TZ" : "en-US")}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-0.5 mt-1">
+                            {[...Array(5)].map((_, i) => (
+                              <Star 
+                                key={i} 
+                                className={`h-4 w-4 ${i < review.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`} 
+                              />
+                            ))}
+                          </div>
+                          <p className="mt-2 text-sm text-muted-foreground">{review.comment}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                  <div className="w-24 h-24 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center mb-4">
+                    <MessageSquare className="h-12 w-12 text-orange-400" />
+                  </div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    {language === "en" ? "No Reviews Yet" : "Hakuna Maoni Bado"}
+                  </h3>
+                  <p className="text-muted-foreground text-sm max-w-xs">
+                    {language === "en" 
+                      ? "Be the first to review this fundi after hiring them!"
+                      : "Kuwa wa kwanza kutoa maoni baada ya kumwajiri!"}
+                  </p>
+                </div>
+              )}
+            </TabsContent>
+
+            {/* About Tab */}
+            <TabsContent value="about" className="mt-0 p-4 sm:p-6 space-y-6">
+              {/* Bio */}
+              <div>
+                <h3 className="font-semibold text-lg mb-2">
+                  {language === "en" ? "About Me" : "Kunihusu"}
+                </h3>
+                <p className="text-muted-foreground">
+                  {fundi.bio || (language === "en" 
+                    ? `Experienced ${fundi.specialty} based in ${fundi.city}. Committed to delivering quality work and excellent customer service.`
+                    : `${fundi.specialty} mwenye uzoefu anayeishi ${fundi.city}. Nimejitolea kutoa kazi bora na huduma nzuri kwa wateja.`)}
+                </p>
+              </div>
+
+              {/* Skills */}
+              <div>
+                <h3 className="font-semibold text-lg mb-3">
+                  {language === "en" ? "Skills" : "Ujuzi"}
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {mockSkills.map((skill) => (
+                    <Badge key={skill} variant="secondary" className="rounded-full">
+                      {skill}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              {/* Rate & Availability */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-muted/50 rounded-xl p-4">
+                  <div className="text-sm text-muted-foreground mb-1">
+                    {language === "en" ? "Hourly Rate" : "Kiwango kwa Saa"}
+                  </div>
+                  <div className="text-xl font-bold text-orange-600">
+                    TZS {hourlyRate.toLocaleString()}
+                  </div>
+                </div>
+                <div className="bg-muted/50 rounded-xl p-4">
+                  <div className="text-sm text-muted-foreground mb-1">
+                    {language === "en" ? "Availability" : "Upatikanaji"}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="h-3 w-3 bg-green-500 rounded-full animate-pulse" />
+                    <span className="font-semibold text-green-600">
+                      {language === "en" ? "Available" : "Anapatikana"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact Buttons */}
+              <div className="space-y-3">
+                {fundi.whatsapp && (
+                  <Button 
+                    className="w-full h-12 rounded-full bg-green-600 hover:bg-green-700 text-white"
+                    onClick={() => window.open(`https://wa.me/${fundi.whatsapp}`, "_blank")}
+                  >
+                    <Phone className="h-5 w-5 mr-2" />
+                    {language === "en" ? "WhatsApp" : "WhatsApp"}
+                  </Button>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        {/* Sticky Book Now Button */}
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t z-50">
+          <Button className="w-full h-14 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white text-lg font-semibold shadow-lg">
+            <Calendar className="h-5 w-5 mr-2" />
+            {language === "en" ? "Book Now" : "Weka Booking Sasa"}
+          </Button>
+        </div>
       </div>
     </>
   );

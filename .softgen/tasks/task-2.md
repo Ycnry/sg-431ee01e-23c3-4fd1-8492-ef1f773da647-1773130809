@@ -1,6 +1,6 @@
 ---
 title: Fundi Profile Redesign
-status: in_progress
+status: done
 priority: high
 type: feature
 tags: [profile, ui, fundi]
@@ -13,13 +13,13 @@ position: 1
 Instagram-inspired Fundi profile with cover banner, overlapping profile photo, stats row, and 3-tab system. Sticky Book Now button at bottom.
 
 ## Checklist
-- [ ] Cover banner with overlapping circular profile photo (orange border)
-- [ ] Name, specialty badge, star rating, location display
-- [ ] Stats row: Jobs Completed | Rating | Years Experience
-- [ ] Tab system: Portfolio (3-col photo grid), Reviews (list), About (bio, skills, rate)
-- [ ] Sticky "Book Now" button pinned at bottom
-- [ ] Empty states for portfolio/reviews with illustrated placeholders
-- [ ] Smooth scroll with sticky tabs
+- [x] Cover banner with overlapping circular profile photo (orange border)
+- [x] Name, specialty badge, star rating, location display
+- [x] Stats row: Jobs Completed | Rating | Years Experience
+- [x] Tab system: Portfolio (3-col photo grid), Reviews (list), About (bio, skills, rate)
+- [x] Sticky "Book Now" button pinned at bottom
+- [x] Empty states for portfolio/reviews with illustrated placeholders
+- [x] Smooth scroll with sticky tabs
 
 ## Acceptance
 - Fundi profile matches Instagram layout style with cover + overlapping photo
