@@ -1,6 +1,6 @@
-
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { User } from "@/types";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AuthContextType {
   user: User | null;
@@ -15,169 +15,202 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+async function buildUserFromSupabase(authUserId: string, fallbackEmail: string): Promise<User> {
+  const { data: profile, error } = await supabase
+    .from("smart_fundi_users")
+    .select("*")
+    .eq("id", authUserId)
+    .maybeSingle();
+
+  if (error) {
+    console.warn("[Auth] Profile fetch warning:", error.message);
+  }
+
+  return {
+    id: authUserId,
+    email: profile?.email || fallbackEmail,
+    name: profile?.full_name || fallbackEmail.split("@")[0],
+    userType: (profile?.role as User["userType"]) || "customer",
+    verified: profile?.is_verified ?? false,
+    createdAt: profile?.created_at || new Date().toISOString(),
+  } as User;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     checkAuthStatus();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("[Auth] State change:", event);
+      if (event === "SIGNED_OUT") {
+        setUser(null);
+        localStorage.removeItem("smartfundi_user");
+        localStorage.removeItem("smartfundi_token");
+      } else if (session?.user && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED")) {
+        const userData = await buildUserFromSupabase(session.user.id, session.user.email || "");
+        setUser(userData);
+        localStorage.setItem("smartfundi_user", JSON.stringify(userData));
+        localStorage.setItem("smartfundi_token", session.access_token);
+      }
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
   }, []);
 
   const checkAuthStatus = async () => {
     try {
-      const storedUser = localStorage.getItem("smartfundi_user");
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.user) {
+        const userData = await buildUserFromSupabase(session.user.id, session.user.email || "");
+        setUser(userData);
+        localStorage.setItem("smartfundi_user", JSON.stringify(userData));
+        localStorage.setItem("smartfundi_token", session.access_token);
+      } else {
+        const storedUser = localStorage.getItem("smartfundi_user");
+        if (storedUser) {
+          setUser(JSON.parse(storedUser));
+        }
       }
     } catch (error) {
-      console.error("Auth status check failed:", error);
+      console.error("[Auth] Status check failed:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const signIn = async (email: string, password: string) => {
-    try {
-      console.log("[Auth] Attempting sign in for:", email);
-      
-      const response = await fetch("/api/auth/signin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+    console.log("[Auth] Sign in attempt for:", email);
 
-      console.log("[Auth] Sign in response status:", response.status, response.statusText);
+    const cleanEmail = email.trim().toLowerCase();
 
-      // Parse response body (try JSON first, fall back to text)
-      let responseData;
-      const contentType = response.headers.get("content-type");
-      
-      try {
-        if (contentType && contentType.includes("application/json")) {
-          responseData = await response.json();
-        } else {
-          responseData = { message: await response.text() };
-        }
-      } catch (parseError) {
-        console.error("[Auth] Failed to parse response:", parseError);
-        responseData = { message: "Invalid server response" };
-      }
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: cleanEmail,
+      password,
+    });
 
-      console.log("[Auth] Sign in response body:", responseData);
-
-      if (!response.ok) {
-        // Detailed error logging
-        console.error("[Auth] Sign in failed with details:", {
-          status: response.status,
-          statusText: response.statusText,
-          url: response.url,
-          headers: Object.fromEntries(response.headers.entries()),
-          body: responseData,
-          errorCode: responseData.code || "UNKNOWN",
-          errorMessage: responseData.error || responseData.message || "Unknown error",
-          validationDetails: responseData.details || null,
-          timestamp: new Date().toISOString(),
-        });
-
-        // Throw error with the most informative message available
-        const errorMessage = 
-          responseData.error || 
-          responseData.message || 
-          `Sign in failed (HTTP ${response.status}: ${response.statusText})`;
-        
-        throw new Error(errorMessage);
-      }
-
-      console.log("[Auth] Sign in successful for:", email);
-      setUser(responseData.user);
-      localStorage.setItem("smartfundi_user", JSON.stringify(responseData.user));
-      localStorage.setItem("smartfundi_token", responseData.token);
-    } catch (error) {
-      console.error("[Auth] Sign in error caught:", {
-        error,
-        errorType: error instanceof Error ? error.constructor.name : typeof error,
-        errorMessage: error instanceof Error ? error.message : String(error),
-        errorStack: error instanceof Error ? error.stack : undefined,
+    if (error) {
+      console.error("[Auth] Supabase sign in failed:", {
+        message: error.message,
+        status: error.status,
+        code: error.code,
         timestamp: new Date().toISOString(),
       });
-      throw error;
+      throw new Error(error.message || "Invalid credentials");
     }
+
+    if (!data.user || !data.session) {
+      throw new Error("Sign in failed - no user data returned");
+    }
+
+    console.log("[Auth] Supabase auth successful for user:", data.user.id);
+
+    const userData = await buildUserFromSupabase(data.user.id, data.user.email || cleanEmail);
+    setUser(userData);
+    localStorage.setItem("smartfundi_user", JSON.stringify(userData));
+    localStorage.setItem("smartfundi_token", data.session.access_token);
+
+    console.log("[Auth] Sign in complete:", userData.email);
   };
 
   const signUp = async (name: string, email: string, password: string, userType: "customer" | "fundi" | "shop" | "super_agent") => {
-    try {
-      const response = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, userType }),
+    console.log("[Auth] Sign up attempt for:", email);
+
+    const cleanEmail = email.trim().toLowerCase();
+
+    const { data, error } = await supabase.auth.signUp({
+      email: cleanEmail,
+      password,
+      options: {
+        data: {
+          full_name: name,
+          role: userType,
+        },
+      },
+    });
+
+    if (error) {
+      console.error("[Auth] Supabase sign up failed:", error);
+      throw new Error(error.message || "Sign up failed");
+    }
+
+    if (!data.user) {
+      throw new Error("Sign up failed - no user data");
+    }
+
+    // Create profile record
+    const { error: profileError } = await supabase
+      .from("smart_fundi_users")
+      .insert({
+        id: data.user.id,
+        email: cleanEmail,
+        full_name: name,
+        role: userType,
+        is_active: true,
+        is_verified: false,
+        verification_status: "pending",
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Sign up failed");
-      }
+    if (profileError) {
+      console.warn("[Auth] Profile creation warning:", profileError.message);
+    }
 
-      const data = await response.json();
-      setUser(data.user);
-      localStorage.setItem("smartfundi_user", JSON.stringify(data.user));
-      localStorage.setItem("smartfundi_token", data.token);
-    } catch (error) {
-      console.error("Sign up error:", error);
-      throw error;
+    if (data.session) {
+      const userData = await buildUserFromSupabase(data.user.id, cleanEmail);
+      setUser(userData);
+      localStorage.setItem("smartfundi_user", JSON.stringify(userData));
+      localStorage.setItem("smartfundi_token", data.session.access_token);
     }
   };
 
   const signInWithGoogle = async () => {
-    try {
-      const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-      if (!clientId) {
-        throw new Error("Google OAuth not configured");
-      }
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/`,
+      },
+    });
 
-      const redirectUri = `${window.location.origin}/api/auth/google/callback`;
-      const scope = "openid profile email";
-      const responseType = "code";
-      const state = Math.random().toString(36).substring(7);
+    if (error) {
+      console.error("[Auth] Google sign in error:", error);
+      throw new Error(error.message);
+    }
 
-      localStorage.setItem("oauth_state", state);
-
-      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=${responseType}&scope=${encodeURIComponent(scope)}&state=${state}`;
-
-      window.location.href = authUrl;
-    } catch (error) {
-      console.error("Google sign in error:", error);
-      throw error;
+    if (data?.url) {
+      window.location.href = data.url;
     }
   };
 
   const sendMagicLink = async (email: string) => {
-    try {
-      const response = await fetch("/api/auth/magic-link", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email.trim().toLowerCase(),
+      options: {
+        emailRedirectTo: `${window.location.origin}/`,
+      },
+    });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to send magic link");
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error("Magic link error:", error);
-      throw error;
+    if (error) {
+      console.error("[Auth] Magic link error:", error);
+      throw new Error(error.message);
     }
+
+    return { message: "Magic link sent" };
   };
 
   const signOut = async () => {
     try {
+      await supabase.auth.signOut();
       setUser(null);
       localStorage.removeItem("smartfundi_user");
       localStorage.removeItem("smartfundi_token");
       window.location.href = "/";
     } catch (error) {
-      console.error("Sign out error:", error);
+      console.error("[Auth] Sign out error:", error);
       throw error;
     }
   };
