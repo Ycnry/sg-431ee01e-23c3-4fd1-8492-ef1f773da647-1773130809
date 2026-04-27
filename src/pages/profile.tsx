@@ -1,301 +1,434 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Head from "next/head";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { Header } from "@/components/Header";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { User, Settings, Star, MessageSquare, Calendar, CreditCard } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { mockFundis, mockShops } from "@/lib/mockData";
+import { 
+  Star, MapPin, Calendar, Heart, Settings, 
+  User, LogOut, Bell, Globe, Lock, ChevronRight,
+  Bookmark, ClipboardList, CheckCircle2, Clock, XCircle
+} from "lucide-react";
 
-export default function ProfilePage() {
-  const { t, language } = useLanguage();
-  const [activeTab, setActiveTab] = useState("profile");
+// Mock bookings data
+const mockBookings = [
+  {
+    id: "1",
+    fundiName: "John Mwangi",
+    fundiPhoto: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop",
+    service: "Electrical Repair",
+    date: "2026-04-25",
+    status: "completed",
+    price: 45000,
+  },
+  {
+    id: "2",
+    fundiName: "Peter Omondi",
+    fundiPhoto: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop",
+    service: "Plumbing",
+    date: "2026-04-28",
+    status: "pending",
+    price: 35000,
+  },
+  {
+    id: "3",
+    fundiName: "James Kileo",
+    fundiPhoto: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop",
+    service: "Carpentry",
+    date: "2026-04-10",
+    status: "cancelled",
+    price: 60000,
+  },
+];
 
-  const [profileData, setProfileData] = useState({
-    name: "John Doe",
-    email: "john@example.com",
-    phone: "+255 712 345 678",
-    city: "Dar es Salaam",
-    specialty: "Electrician",
-    bio: "Experienced electrician with 10+ years in residential and commercial electrical work.",
-    whatsapp: "+255 712 345 678",
-  });
+export default function CustomerProfile() {
+  const router = useRouter();
+  const { t, language, setLanguage } = useLanguage();
+  const { user, signOut } = useAuth();
+  const [activeTab, setActiveTab] = useState("bookings");
+  const [isHeaderSticky, setIsHeaderSticky] = useState(false);
+  const [notifications, setNotifications] = useState(true);
+  const [smsNotifications, setSmsNotifications] = useState(true);
+  const tabsRef = useRef<HTMLDivElement>(null);
 
-  const metaTitle = language === "en" ? "My Profile - Smart Fundi" : "Wasifu Wangu - Smart Fundi";
+  // Mock saved items
+  const savedFundis = mockFundis.slice(0, 3);
+  const savedShops = mockShops.slice(0, 2);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (tabsRef.current) {
+        const tabsTop = tabsRef.current.getBoundingClientRect().top;
+        setIsHeaderSticky(tabsTop <= 60);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push("/");
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "completed":
+        return (
+          <Badge className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
+            <CheckCircle2 className="h-3 w-3 mr-1" />
+            {language === "en" ? "Completed" : "Imekamilika"}
+          </Badge>
+        );
+      case "pending":
+        return (
+          <Badge className="bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300">
+            <Clock className="h-3 w-3 mr-1" />
+            {language === "en" ? "Pending" : "Inasubiri"}
+          </Badge>
+        );
+      case "cancelled":
+        return (
+          <Badge className="bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300">
+            <XCircle className="h-3 w-3 mr-1" />
+            {language === "en" ? "Cancelled" : "Imefutwa"}
+          </Badge>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const userName = user?.name || "Guest User";
+  const userEmail = user?.email || "guest@example.com";
+  const memberSince = user?.createdAt ? new Date(user.createdAt).getFullYear() : 2026;
+  const initials = userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
 
   return (
     <>
       <Head>
-        <title>{metaTitle}</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>{language === "en" ? "My Profile" : "Wasifu Wangu"} - Smart Fundi</title>
       </Head>
 
-      <div className="min-h-screen bg-background">
-        <Header />
-        
-        <main className="container mx-auto px-4 py-8">
-          <div className="max-w-4xl mx-auto">
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold mb-2">
-                {language === "en" ? "My Profile" : "Wasifu Wangu"}
-              </h1>
-              <p className="text-muted-foreground">
-                {language === "en" ? "Manage your account and preferences" : "Simamia akaunti na mapendeleo yako"}
-              </p>
+      <Header />
+
+      <div className="min-h-screen bg-background pb-24">
+        {/* Profile Header */}
+        <div className="bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700 pt-8 pb-20 px-4">
+          <div className="max-w-lg mx-auto text-center">
+            <div className="relative inline-block">
+              <div className="absolute -inset-1 bg-white/30 rounded-full blur-sm" />
+              <Avatar className="relative h-28 w-28 border-4 border-blue-400 shadow-xl">
+                <AvatarImage src={user?.photo} alt={userName} />
+                <AvatarFallback className="bg-blue-100 text-blue-700 text-3xl font-bold">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
             </div>
-
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-4 mb-6">
-                <TabsTrigger value="profile">
-                  <User className="h-4 w-4 mr-2" />
-                  {language === "en" ? "Profile" : "Wasifu"}
-                </TabsTrigger>
-                <TabsTrigger value="reviews">
-                  <Star className="h-4 w-4 mr-2" />
-                  {language === "en" ? "Reviews" : "Maoni"}
-                </TabsTrigger>
-                <TabsTrigger value="subscription">
-                  <CreditCard className="h-4 w-4 mr-2" />
-                  {language === "en" ? "Subscription" : "Usajili"}
-                </TabsTrigger>
-                <TabsTrigger value="settings">
-                  <Settings className="h-4 w-4 mr-2" />
-                  {language === "en" ? "Settings" : "Mipangilio"}
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="profile">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{language === "en" ? "Profile Information" : "Taarifa za Wasifu"}</CardTitle>
-                    <CardDescription>
-                      {language === "en" ? "Update your profile details" : "Sasisha maelezo yako ya wasifu"}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="flex items-center gap-6">
-                      <Avatar className="h-24 w-24">
-                        <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=John" alt="Profile" />
-                        <AvatarFallback>JD</AvatarFallback>
-                      </Avatar>
-                      <Button variant="outline">
-                        {language === "en" ? "Change Photo" : "Badilisha Picha"}
-                      </Button>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="name">{language === "en" ? "Full Name" : "Jina Kamili"}</Label>
-                        <Input
-                          id="name"
-                          value={profileData.name}
-                          onChange={(e) => setProfileData({...profileData, name: e.target.value})}
-                        />
-                      </div>
-
-                      <div>
-                        <Label htmlFor="email">{language === "en" ? "Email" : "Barua pepe"}</Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          value={profileData.email}
-                          onChange={(e) => setProfileData({...profileData, email: e.target.value})}
-                        />
-                      </div>
-
-                      <div>
-                        <Label htmlFor="phone">{language === "en" ? "Phone Number" : "Nambari ya Simu"}</Label>
-                        <Input
-                          id="phone"
-                          value={profileData.phone}
-                          onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
-                        />
-                      </div>
-
-                      <div>
-                        <Label htmlFor="city">{language === "en" ? "City" : "Jiji"}</Label>
-                        <Select value={profileData.city} onValueChange={(value) => setProfileData({...profileData, city: value})}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Dar es Salaam">Dar es Salaam</SelectItem>
-                            <SelectItem value="Arusha">Arusha</SelectItem>
-                            <SelectItem value="Mwanza">Mwanza</SelectItem>
-                            <SelectItem value="Dodoma">Dodoma</SelectItem>
-                            <SelectItem value="Mbeya">Mbeya</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div>
-                        <Label htmlFor="specialty">{language === "en" ? "Specialty" : "Ujuzi"}</Label>
-                        <Select value={profileData.specialty} onValueChange={(value) => setProfileData({...profileData, specialty: value})}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Electrician">Electrician</SelectItem>
-                            <SelectItem value="Plumber">Plumber</SelectItem>
-                            <SelectItem value="Carpenter">Carpenter</SelectItem>
-                            <SelectItem value="Mechanic">Mechanic</SelectItem>
-                            <SelectItem value="Mason">Mason</SelectItem>
-                            <SelectItem value="Painter">Painter</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div>
-                        <Label htmlFor="whatsapp">{language === "en" ? "WhatsApp (Optional)" : "WhatsApp (Hiari)"}</Label>
-                        <Input
-                          id="whatsapp"
-                          value={profileData.whatsapp}
-                          onChange={(e) => setProfileData({...profileData, whatsapp: e.target.value})}
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="bio">{language === "en" ? "Bio" : "Maelezo"}</Label>
-                      <Textarea
-                        id="bio"
-                        rows={4}
-                        value={profileData.bio}
-                        onChange={(e) => setProfileData({...profileData, bio: e.target.value})}
-                      />
-                    </div>
-
-                    <Button className="bg-blue-600 hover:bg-blue-700">
-                      {language === "en" ? "Save Changes" : "Hifadhi Mabadiliko"}
-                    </Button>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="reviews">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{language === "en" ? "My Reviews" : "Maoni Yangu"}</CardTitle>
-                    <CardDescription>
-                      {language === "en" ? "Reviews from your customers" : "Maoni kutoka kwa wateja wako"}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-2 p-4 border rounded-lg">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="flex">
-                              {[1,2,3,4,5].map((star) => (
-                                <Star key={star} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                              ))}
-                            </div>
-                            <span className="text-sm font-medium">Excellent work!</span>
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            Professional and efficient. Fixed my electrical issue quickly.
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-2">- Sarah M. • 2 days ago</p>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="subscription">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{language === "en" ? "Subscription Status" : "Hali ya Usajili"}</CardTitle>
-                    <CardDescription>
-                      {language === "en" ? "Manage your subscription plan" : "Simamia mpango wako wa usajili"}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between p-4 bg-green-50 dark:bg-green-950 rounded-lg">
-                        <div>
-                          <p className="font-semibold text-green-700 dark:text-green-400">
-                            {language === "en" ? "Active Subscription" : "Usajili Unaofanya Kazi"}
-                          </p>
-                          <p className="text-sm text-green-600 dark:text-green-500">
-                            {language === "en" ? "Monthly Plan - 5,000 TZS" : "Mpango wa Mwezi - 5,000 TZS"}
-                          </p>
-                        </div>
-                        <Badge className="bg-green-600">Active</Badge>
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">{language === "en" ? "Next billing date" : "Tarehe ya malipo ijayo"}</span>
-                          <span className="font-medium">Dec 7, 2025</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">{language === "en" ? "Payment method" : "Njia ya malipo"}</span>
-                          <span className="font-medium">M-Pesa</span>
-                        </div>
-                      </div>
-
-                      <Button variant="outline" className="w-full">
-                        {language === "en" ? "Cancel Subscription" : "Futa Usajili"}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="settings">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{language === "en" ? "Account Settings" : "Mipangilio ya Akaunti"}</CardTitle>
-                    <CardDescription>
-                      {language === "en" ? "Manage your account preferences" : "Simamia mapendeleo yako ya akaunti"}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <h3 className="font-medium mb-2">{language === "en" ? "Notifications" : "Arifa"}</h3>
-                      <div className="space-y-2">
-                        <label className="flex items-center gap-2">
-                          <input type="checkbox" defaultChecked className="rounded" />
-                          <span className="text-sm">{language === "en" ? "Email notifications" : "Arifa za barua pepe"}</span>
-                        </label>
-                        <label className="flex items-center gap-2">
-                          <input type="checkbox" defaultChecked className="rounded" />
-                          <span className="text-sm">{language === "en" ? "SMS notifications" : "Arifa za SMS"}</span>
-                        </label>
-                      </div>
-                    </div>
-
-                    <div>
-                      <h3 className="font-medium mb-2">{language === "en" ? "Privacy" : "Faragha"}</h3>
-                      <div className="space-y-2">
-                        <label className="flex items-center gap-2">
-                          <input type="checkbox" defaultChecked className="rounded" />
-                          <span className="text-sm">{language === "en" ? "Show phone number on profile" : "Onyesha nambari ya simu kwenye wasifu"}</span>
-                        </label>
-                        <label className="flex items-center gap-2">
-                          <input type="checkbox" defaultChecked className="rounded" />
-                          <span className="text-sm">{language === "en" ? "Allow messages from customers" : "Ruhusu ujumbe kutoka kwa wateja"}</span>
-                        </label>
-                      </div>
-                    </div>
-
-                    <Button className="bg-blue-600 hover:bg-blue-700">
-                      {language === "en" ? "Save Settings" : "Hifadhi Mipangilio"}
-                    </Button>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
+            
+            <h1 className="text-2xl font-bold text-white mt-4">{userName}</h1>
+            
+            <div className="flex items-center justify-center gap-4 mt-2 text-blue-100 text-sm">
+              <div className="flex items-center gap-1">
+                <Calendar className="h-4 w-4" />
+                <span>{language === "en" ? `Member since ${memberSince}` : `Mwanachama tangu ${memberSince}`}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <MapPin className="h-4 w-4" />
+                <span>Dar es Salaam</span>
+              </div>
+            </div>
           </div>
-        </main>
+        </div>
+
+        {/* Stats Row - Overlapping */}
+        <div className="px-4 -mt-12">
+          <div className="max-w-lg mx-auto grid grid-cols-3 gap-1 bg-card rounded-xl shadow-lg p-1 border">
+            <div className="text-center py-4 bg-background rounded-lg">
+              <div className="text-2xl font-bold text-foreground">{mockBookings.length}</div>
+              <div className="text-xs text-muted-foreground">
+                {language === "en" ? "Bookings" : "Booking"}
+              </div>
+            </div>
+            <div className="text-center py-4 bg-background rounded-lg">
+              <div className="text-2xl font-bold text-foreground flex items-center justify-center gap-1">
+                5
+                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {language === "en" ? "Reviews" : "Maoni"}
+              </div>
+            </div>
+            <div className="text-center py-4 bg-background rounded-lg">
+              <div className="text-2xl font-bold text-foreground flex items-center justify-center gap-1">
+                {savedFundis.length}
+                <Heart className="h-4 w-4 fill-red-400 text-red-400" />
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {language === "en" ? "Favourites" : "Vipendwa"}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs Section */}
+        <div ref={tabsRef} className={`mt-6 ${isHeaderSticky ? "sticky top-[60px] z-40 bg-background shadow-md" : ""}`}>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="w-full grid grid-cols-3 h-12 bg-muted/50 mx-0 rounded-none border-b">
+              <TabsTrigger 
+                value="bookings" 
+                className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:text-blue-600 rounded-none"
+              >
+                <ClipboardList className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">{language === "en" ? "Bookings" : "Booking"}</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="saved"
+                className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:text-blue-600 rounded-none"
+              >
+                <Bookmark className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">{language === "en" ? "Saved" : "Zilizohifadhiwa"}</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="settings"
+                className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:text-blue-600 rounded-none"
+              >
+                <Settings className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">{language === "en" ? "Settings" : "Mipangilio"}</span>
+              </TabsTrigger>
+            </TabsList>
+
+            {/* My Bookings Tab */}
+            <TabsContent value="bookings" className="mt-0">
+              {mockBookings.length > 0 ? (
+                <div className="divide-y">
+                  {mockBookings.map((booking) => (
+                    <div key={booking.id} className="p-4 hover:bg-muted/50 transition-colors">
+                      <div className="flex items-start gap-3">
+                        <Avatar className="h-12 w-12">
+                          <AvatarImage src={booking.fundiPhoto} alt={booking.fundiName} />
+                          <AvatarFallback>{booking.fundiName[0]}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <h4 className="font-semibold">{booking.fundiName}</h4>
+                              <p className="text-sm text-muted-foreground">{booking.service}</p>
+                            </div>
+                            {getStatusBadge(booking.status)}
+                          </div>
+                          <div className="flex items-center justify-between mt-2">
+                            <span className="text-sm text-muted-foreground">
+                              {new Date(booking.date).toLocaleDateString(language === "sw" ? "sw-TZ" : "en-US")}
+                            </span>
+                            <span className="font-semibold text-blue-600">
+                              TZS {booking.price.toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                  <div className="w-24 h-24 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-4">
+                    <ClipboardList className="h-12 w-12 text-blue-400" />
+                  </div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    {language === "en" ? "No Bookings Yet" : "Hakuna Booking Bado"}
+                  </h3>
+                  <p className="text-muted-foreground text-sm max-w-xs mb-4">
+                    {language === "en" 
+                      ? "Find and book your first fundi today!"
+                      : "Tafuta na weka booking ya fundi wako wa kwanza leo!"}
+                  </p>
+                  <Link href="/search">
+                    <Button className="rounded-full">
+                      {language === "en" ? "Find Fundi" : "Tafuta Fundi"}
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </TabsContent>
+
+            {/* Saved Tab */}
+            <TabsContent value="saved" className="mt-0 p-4">
+              {(savedFundis.length > 0 || savedShops.length > 0) ? (
+                <div className="space-y-6">
+                  {/* Saved Fundis */}
+                  {savedFundis.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold mb-3 flex items-center gap-2">
+                        <User className="h-4 w-4" />
+                        {language === "en" ? "Saved Fundis" : "Mafundi Waliohifadhiwa"}
+                      </h3>
+                      <div className="grid grid-cols-3 gap-2">
+                        {savedFundis.map((fundi) => (
+                          <Link key={fundi.id} href={`/fundi/${fundi.id}`}>
+                            <div className="aspect-square relative rounded-xl overflow-hidden group cursor-pointer">
+                              <img 
+                                src={fundi.image || fundi.photo} 
+                                alt={fundi.name}
+                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                              <div className="absolute bottom-2 left-2 right-2">
+                                <p className="text-white text-xs font-medium truncate">{fundi.name}</p>
+                                <p className="text-white/70 text-[10px] truncate">{fundi.specialty}</p>
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Saved Shops */}
+                  {savedShops.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold mb-3 flex items-center gap-2">
+                        <Bookmark className="h-4 w-4" />
+                        {language === "en" ? "Saved Shops" : "Maduka Yaliyohifadhiwa"}
+                      </h3>
+                      <div className="grid grid-cols-3 gap-2">
+                        {savedShops.map((shop) => (
+                          <Link key={shop.id} href={`/shop/${shop.id}`}>
+                            <div className="aspect-square relative rounded-xl overflow-hidden group cursor-pointer">
+                              <img 
+                                src={shop.image || shop.logo} 
+                                alt={shop.shopName || shop.name}
+                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                              <div className="absolute bottom-2 left-2 right-2">
+                                <p className="text-white text-xs font-medium truncate">{shop.shopName || shop.name}</p>
+                                <p className="text-white/70 text-[10px] truncate">{shop.category}</p>
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                  <div className="w-24 h-24 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-4">
+                    <Heart className="h-12 w-12 text-blue-400" />
+                  </div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    {language === "en" ? "No Saved Items" : "Hakuna Vilivyohifadhiwa"}
+                  </h3>
+                  <p className="text-muted-foreground text-sm max-w-xs">
+                    {language === "en" 
+                      ? "Save your favourite fundis and shops for quick access!"
+                      : "Hifadhi mafundi na maduka unayoyapenda kwa upatikanaji wa haraka!"}
+                  </p>
+                </div>
+              )}
+            </TabsContent>
+
+            {/* Settings Tab */}
+            <TabsContent value="settings" className="mt-0">
+              <div className="divide-y">
+                {/* Edit Profile */}
+                <button className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                      <User className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <span className="font-medium">{language === "en" ? "Edit Profile" : "Hariri Wasifu"}</span>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                </button>
+
+                {/* Change Password */}
+                <button className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                      <Lock className="h-5 w-5 text-purple-600" />
+                    </div>
+                    <span className="font-medium">{language === "en" ? "Change Password" : "Badilisha Nywila"}</span>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                </button>
+
+                {/* Language */}
+                <div className="p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                      <Globe className="h-5 w-5 text-green-600" />
+                    </div>
+                    <span className="font-medium">{language === "en" ? "Language" : "Lugha"}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">EN</span>
+                    <Switch 
+                      checked={language === "sw"} 
+                      onCheckedChange={(checked) => setLanguage(checked ? "sw" : "en")}
+                    />
+                    <span className="text-sm text-muted-foreground">SW</span>
+                  </div>
+                </div>
+
+                {/* Push Notifications */}
+                <div className="p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                      <Bell className="h-5 w-5 text-orange-600" />
+                    </div>
+                    <div>
+                      <span className="font-medium">{language === "en" ? "Push Notifications" : "Arifa za Push"}</span>
+                      <p className="text-xs text-muted-foreground">
+                        {language === "en" ? "Get notified about bookings" : "Pata arifa kuhusu booking"}
+                      </p>
+                    </div>
+                  </div>
+                  <Switch checked={notifications} onCheckedChange={setNotifications} />
+                </div>
+
+                {/* SMS Notifications */}
+                <div className="p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center">
+                      <Bell className="h-5 w-5 text-teal-600" />
+                    </div>
+                    <div>
+                      <span className="font-medium">{language === "en" ? "SMS Notifications" : "Arifa za SMS"}</span>
+                      <p className="text-xs text-muted-foreground">
+                        {language === "en" ? "Receive SMS updates" : "Pata arifa za SMS"}
+                      </p>
+                    </div>
+                  </div>
+                  <Switch checked={smsNotifications} onCheckedChange={setSmsNotifications} />
+                </div>
+
+                {/* Logout */}
+                <button 
+                  onClick={handleSignOut}
+                  className="w-full p-4 flex items-center justify-between hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                      <LogOut className="h-5 w-5 text-red-600" />
+                    </div>
+                    <span className="font-medium text-red-600">{language === "en" ? "Logout" : "Ondoka"}</span>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-red-400" />
+                </button>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </>
   );
