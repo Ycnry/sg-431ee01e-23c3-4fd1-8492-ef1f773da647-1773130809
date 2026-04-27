@@ -32,8 +32,11 @@ export default function SignInPage() {
       await signIn(emailPassword.email, emailPassword.password);
       router.push("/");
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "Sign in failed. Please try again.";
-      setError(errorMessage);
+      console.error("[SignIn] Authentication failed:", err);
+      const friendlyMessage = language === "en"
+        ? "Invalid email or password. Please try again."
+        : "Barua pepe au nywila si sahihi. Jaribu tena.";
+      setError(friendlyMessage);
     } finally {
       setLoading(false);
     }
