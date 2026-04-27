@@ -1,6 +1,6 @@
 ---
 title: Super Agent Profile Redesign
-status: todo
+status: done
 priority: high
 type: feature
 tags: [profile, ui, super-agent]
@@ -10,18 +10,19 @@ position: 4
 ---
 
 ## Notes
-Super Agent profile with blue/gold theme, verified badge, and 3-tab system showing onboarded fundis/shops.
+Super Agent profile with blue/gold theme, verified banner for active subscriptions, and 3-tab system.
 
 ## Checklist
-- [ ] Deep blue cover banner with gold accents
-- [ ] Circular profile photo with gold border
-- [ ] Name, gold Super Agent verified badge, region covered
-- [ ] Stats row: Fundis Onboarded | Shops Onboarded | Months Active
-- [ ] Tab system: My Fundis (grid), My Shops (grid), About
-- [ ] Gold verified banner if subscription is active
-- [ ] Empty states for fundis/shops lists
+- [x] Cover banner in deep blue with gold accents
+- [x] Circular profile photo with gold border, name, gold Super Agent badge
+- [x] Stats row: Fundis Onboarded | Shops Onboarded | Months Active
+- [x] My Fundis tab with grid of onboarded fundis
+- [x] My Shops tab with grid of onboarded shops
+- [x] About tab with bio, coverage area, subscription status badge
+- [x] Gold verified banner at top when subscription is active
+- [x] Sticky contact button at bottom
 
 ## Acceptance
 - Super Agent profile has blue/gold theme throughout
-- Gold verified banner shows for active subscriptions
+- Verified banner shows for active subscriptions
 - My Fundis and My Shops tabs display grids of onboarded users

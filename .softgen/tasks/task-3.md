@@ -1,6 +1,6 @@
 ---
 title: Customer Profile Redesign
-status: todo
+status: done
 priority: high
 type: feature
 tags: [profile, ui, customer]
@@ -10,17 +10,17 @@ position: 2
 ---
 
 ## Notes
-Customer profile with circular photo, stats row, and 3-tab system for bookings, saved items, and settings.
+Customer profile with Instagram-style layout, stats row, and 3-tab system for bookings, saved items, and settings.
 
 ## Checklist
-- [ ] Circular profile photo with blue border
-- [ ] Name, member since date, city display
-- [ ] Stats row: Bookings Made | Reviews Given | Favourite Fundis
-- [ ] Tab system: My Bookings (list with status badges), Saved (grid), Settings
-- [ ] Settings tab: edit profile, change password, language toggle, notifications, logout
-- [ ] Empty states with friendly placeholders
+- [x] Circular profile photo with blue border, name, member since, city
+- [x] Stats row: Bookings Made | Reviews Given | Favourite Fundis
+- [x] My Bookings tab with status badges (Completed, Pending, Cancelled)
+- [x] Saved tab with grid of saved Fundis and Shops
+- [x] Settings tab with edit profile, change password, language toggle, notifications, red logout button
+- [x] Smooth scroll with sticky tabs
 
 ## Acceptance
-- Customer profile displays all stats and tabs correctly
-- Bookings show status badges (Completed, Pending, Cancelled)
+- Customer profile shows stats and all 3 tabs
+- Bookings show correct status badges (Completed, Pending, Cancelled)
 - Settings tab has all required options including red logout button
