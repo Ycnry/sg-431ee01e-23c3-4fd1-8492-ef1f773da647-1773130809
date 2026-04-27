@@ -12,9 +12,9 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { mockFundis, mockShops } from "@/lib/mockData";
 import { 
-  Star, MapPin, Calendar, Heart, Settings, 
+  Star, MapPin, Calendar, Settings, 
   User, LogOut, Bell, Globe, Lock, ChevronRight,
-  Bookmark, ClipboardList, CheckCircle2, Clock, XCircle
+  ClipboardList, CheckCircle2, Clock, XCircle
 } from "lucide-react";
 
 // Mock bookings data
@@ -53,20 +53,16 @@ export default function CustomerProfile() {
   const { t, language, setLanguage } = useLanguage();
   const { user, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState("bookings");
-  const [isHeaderSticky, setIsHeaderSticky] = useState(false);
+  const [isTabsSticky, setIsTabsSticky] = useState(false);
   const [notifications, setNotifications] = useState(true);
   const [smsNotifications, setSmsNotifications] = useState(true);
   const tabsRef = useRef<HTMLDivElement>(null);
-
-  // Mock saved items
-  const savedFundis = mockFundis.slice(0, 3);
-  const savedShops = mockShops.slice(0, 2);
 
   useEffect(() => {
     const handleScroll = () => {
       if (tabsRef.current) {
         const tabsTop = tabsRef.current.getBoundingClientRect().top;
-        setIsHeaderSticky(tabsTop <= 60);
+        setIsTabsSticky(tabsTop <= 60);
       }
     };
 
@@ -151,7 +147,7 @@ export default function CustomerProfile() {
 
         {/* Stats Row - Overlapping */}
         <div className="px-4 -mt-12">
-          <div className="max-w-lg mx-auto grid grid-cols-3 gap-1 bg-card rounded-xl shadow-lg p-1 border">
+          <div className="max-w-lg mx-auto grid grid-cols-2 gap-1 bg-card rounded-xl shadow-lg p-1 border">
             <div className="text-center py-4 bg-background rounded-lg">
               <div className="text-2xl font-bold text-foreground">{mockBookings.length}</div>
               <div className="text-xs text-muted-foreground">
@@ -167,35 +163,19 @@ export default function CustomerProfile() {
                 {language === "en" ? "Reviews" : "Maoni"}
               </div>
             </div>
-            <div className="text-center py-4 bg-background rounded-lg">
-              <div className="text-2xl font-bold text-foreground flex items-center justify-center gap-1">
-                {savedFundis.length}
-                <Heart className="h-4 w-4 fill-red-400 text-red-400" />
-              </div>
-              <div className="text-xs text-muted-foreground">
-                {language === "en" ? "Favourites" : "Vipendwa"}
-              </div>
-            </div>
           </div>
         </div>
 
         {/* Tabs Section */}
-        <div ref={tabsRef} className={`mt-6 ${isHeaderSticky ? "sticky top-[60px] z-40 bg-background shadow-md" : ""}`}>
+        <div ref={tabsRef} className={`mt-6 ${isTabsSticky ? "sticky top-[60px] z-40 bg-background shadow-md" : ""}`}>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="w-full grid grid-cols-3 h-12 bg-muted/50 mx-0 rounded-none border-b">
+            <TabsList className="w-full grid grid-cols-2 h-12 bg-muted/50 mx-0 rounded-none border-b">
               <TabsTrigger 
                 value="bookings" 
                 className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:text-blue-600 rounded-none"
               >
                 <ClipboardList className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">{language === "en" ? "Bookings" : "Booking"}</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="saved"
-                className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:text-blue-600 rounded-none"
-              >
-                <Bookmark className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">{language === "en" ? "Saved" : "Zilizohifadhiwa"}</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="settings"
@@ -256,83 +236,6 @@ export default function CustomerProfile() {
                       {language === "en" ? "Find Fundi" : "Tafuta Fundi"}
                     </Button>
                   </Link>
-                </div>
-              )}
-            </TabsContent>
-
-            {/* Saved Tab */}
-            <TabsContent value="saved" className="mt-0 p-4">
-              {(savedFundis.length > 0 || savedShops.length > 0) ? (
-                <div className="space-y-6">
-                  {/* Saved Fundis */}
-                  {savedFundis.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold mb-3 flex items-center gap-2">
-                        <User className="h-4 w-4" />
-                        {language === "en" ? "Saved Fundis" : "Mafundi Waliohifadhiwa"}
-                      </h3>
-                      <div className="grid grid-cols-3 gap-2">
-                        {savedFundis.map((fundi) => (
-                          <Link key={fundi.id} href={`/fundi/${fundi.id}`}>
-                            <div className="aspect-square relative rounded-xl overflow-hidden group cursor-pointer">
-                              <img 
-                                src={fundi.image || fundi.photo} 
-                                alt={fundi.name}
-                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                              />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                              <div className="absolute bottom-2 left-2 right-2">
-                                <p className="text-white text-xs font-medium truncate">{fundi.name}</p>
-                                <p className="text-white/70 text-[10px] truncate">{fundi.specialty}</p>
-                              </div>
-                            </div>
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Saved Shops */}
-                  {savedShops.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold mb-3 flex items-center gap-2">
-                        <Bookmark className="h-4 w-4" />
-                        {language === "en" ? "Saved Shops" : "Maduka Yaliyohifadhiwa"}
-                      </h3>
-                      <div className="grid grid-cols-3 gap-2">
-                        {savedShops.map((shop) => (
-                          <Link key={shop.id} href={`/shop/${shop.id}`}>
-                            <div className="aspect-square relative rounded-xl overflow-hidden group cursor-pointer">
-                              <img 
-                                src={shop.image || shop.logo} 
-                                alt={shop.shopName || shop.name}
-                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                              />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                              <div className="absolute bottom-2 left-2 right-2">
-                                <p className="text-white text-xs font-medium truncate">{shop.shopName || shop.name}</p>
-                                <p className="text-white/70 text-[10px] truncate">{shop.category}</p>
-                              </div>
-                            </div>
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-                  <div className="w-24 h-24 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-4">
-                    <Heart className="h-12 w-12 text-blue-400" />
-                  </div>
-                  <h3 className="font-semibold text-lg mb-2">
-                    {language === "en" ? "No Saved Items" : "Hakuna Vilivyohifadhiwa"}
-                  </h3>
-                  <p className="text-muted-foreground text-sm max-w-xs">
-                    {language === "en" 
-                      ? "Save your favourite fundis and shops for quick access!"
-                      : "Hifadhi mafundi na maduka unayoyapenda kwa upatikanaji wa haraka!"}
-                  </p>
                 </div>
               )}
             </TabsContent>
