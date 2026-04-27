@@ -26,14 +26,15 @@ async function buildUserFromSupabase(authUserId: string, fallbackEmail: string):
     console.warn("[Auth] Profile fetch warning:", error.message);
   }
 
+  const role = (profile?.role as User["user_type"]) || "customer";
+
   return {
     id: authUserId,
     email: profile?.email || fallbackEmail,
     name: profile?.full_name || fallbackEmail.split("@")[0],
-    userType: (profile?.role as User["userType"]) || "customer",
-    verified: profile?.is_verified ?? false,
+    user_type: role,
     createdAt: profile?.created_at || new Date().toISOString(),
-  } as User;
+  };
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -199,7 +200,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error(error.message);
     }
 
-    return { message: "Magic link sent" };
+    console.log("[Auth] Magic link sent to:", email);
   };
 
   const signOut = async () => {
